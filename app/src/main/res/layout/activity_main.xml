@@ -12,61 +12,37 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/local"
+            android:id="@+id/main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_x="70dp"
+            android:layout_x="85dp"
             android:layout_y="20dp"
-            android:text="지역을 선택해주세요"
-            android:textSize="12pt"/>
+            android:text="메뉴를 선택해주세요"
+            android:textSize="12pt" />
 
         <Button
-            android:id="@+id/seoul_button"
-            android:layout_width="wrap_content"
+            android:id="@+id/localselectbutton"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:layout_x="30dp"
-            android:layout_y="70dp"
-            android:text="서울" />
+            android:layout_x="20dp"
+            android:layout_y="80dp"
+            android:text="여행지역 선택" />
 
         <Button
-            android:id="@+id/sokcho_button"
-            android:layout_width="wrap_content"
+            android:id="@+id/transformInfo_button"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:layout_x="153dp"
-            android:layout_y="70dp"
-            android:text="속초" />
+            android:layout_x= "276dp"
+            android:layout_y="80dp"
+            android:text="교통편 확인" />
 
         <Button
-            android:id="@+id/incheon_button"
-            android:layout_width="wrap_content"
+            android:id="@+id/budgetsetting_button"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:layout_x="280dp"
-            android:layout_y="70dp"
-            android:text="인천" />
-
-        <Button
-            android:id="@+id/jeonju_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_x="30dp"
-            android:layout_y="140dp"
-            android:text="전주" />
-
-        <Button
-            android:id="@+id/daegu_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_x="153dp"
-            android:layout_y="140dp"
-            android:text="대구" />
-
-        <Button
-            android:id="@+id/busan_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_x="280dp"
-            android:layout_y="140dp"
-            android:text="부산" />
+            android:layout_x="148dp"
+            android:layout_y="80dp"
+            android:text="지출 점검" />
 
     </AbsoluteLayout>
 
