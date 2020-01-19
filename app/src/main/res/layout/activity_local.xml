@@ -9,7 +9,7 @@
             android:id="@+id/local"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_x="70dp"
+            android:layout_x="20dp"
             android:layout_y="20dp"
             android:text="지역을 선택해주세요"
             android:textSize="12pt"/>
@@ -18,16 +18,15 @@
             android:id="@+id/seoul_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_x="30dp"
+            android:layout_x="20dp"
             android:layout_y="70dp"
-            android:onClick="onSeoulClick"
             android:text="서울" />
 
         <Button
             android:id="@+id/sokcho_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_x="153dp"
+            android:layout_x="140dp"
             android:layout_y="70dp"
             android:text="속초" />
 
@@ -35,7 +34,7 @@
             android:id="@+id/incheon_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_x="280dp"
+            android:layout_x="260dp"
             android:layout_y="70dp"
             android:text="인천" />
 
@@ -43,7 +42,7 @@
             android:id="@+id/jeonju_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_x="30dp"
+            android:layout_x="20dp"
             android:layout_y="140dp"
             android:text="전주" />
 
@@ -51,7 +50,7 @@
             android:id="@+id/daegu_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_x="153dp"
+            android:layout_x="140dp"
             android:layout_y="140dp"
             android:text="대구" />
 
@@ -59,7 +58,7 @@
             android:id="@+id/busan_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_x="280dp"
+            android:layout_x="260dp"
             android:layout_y="140dp"
             android:onClick="onBusanClick"
             android:text="부산" />

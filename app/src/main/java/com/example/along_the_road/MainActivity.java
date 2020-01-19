@@ -9,20 +9,31 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button intent_btn;
-    public static final int sub = 1001; // 다른 activity를 띄우기 위한 요청코드
+    Button local_btn;
+    Button budget_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        intent_btn = (Button) findViewById(R.id.localselectbutton); // 페이지 전환 버튼
+        local_btn = (Button) findViewById(R.id.localselect_button); // 페이지 전환 버튼
 
-        intent_btn.setOnClickListener(new View.OnClickListener() {
+        local_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), localselectActivity.class);
+
+                startActivity(intent);
+            }
+        });
+
+        budget_btn = (Button) findViewById(R.id.budgetsetting_button); // 페이지 전환 버튼
+
+        budget_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), managebudgetActivity.class);
 
                 startActivity(intent);
             }

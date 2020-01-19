@@ -38,7 +38,7 @@ public class dayselectActivity extends AppCompatActivity {
        callbackMethod = new DatePickerDialog.OnDateSetListener() {
            @Override
            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-               textView_Date.setText(year + "년" + month + "월" + dayOfMonth + "일");
+               textView_Date.setText(year + "년" + month + "월" + dayOfMonth + "일을 선택하셨습니다.");
            }
        };
     }
