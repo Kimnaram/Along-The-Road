@@ -7,29 +7,39 @@
     tools:context=".dayselectActivity">
 
     <TextView
-        android:id="@+id/city"
+        android:id="@+id/startdate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_x="20dp"
-        android:layout_y="10dp"
-        android:textSize="8pt" />
-
-    <TextView
-        android:id="@+id/dayselect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_x="20dp"
+        android:layout_x="10dp"
         android:layout_y="50dp"
-        android:text="여행 기간을 설정하세요"
+        android:text="출발 날짜를 설정하세요"
         android:textSize="10pt" />
 
     <Button
-        android:id="@+id/daybutton"
+        android:id="@+id/startdate_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_x="0dp"
-        android:layout_y="90dp"
-        android:onClick="OnclickHandler"
-        android:text="DatePickerDialog" />
+        android:layout_y="80dp"
+        android:onClick="OnsclickHandler"
+        android:text="날짜 선택하기" />
+
+    <TextView
+        android:id="@+id/arrivedate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_x="10dp"
+        android:layout_y="140dp"
+        android:textSize="10pt"
+        android:text="도착 날짜를 설정하세요" />
+
+    <Button
+        android:id="@+id/arrivedate_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_x="0dp"
+        android:layout_y="168dp"
+        android:onClick="OnaclickHandler"
+        android:text="날짜 선택하기" />
 
 </AbsoluteLayout>
