@@ -9,15 +9,12 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button local_btn;
-    Button budget_btn;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        local_btn = (Button) findViewById(R.id.localselect_button); // 페이지 전환 버튼
+        Button local_btn = (Button) findViewById(R.id.local_select); // 페이지 전환 버튼
 
         local_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -28,14 +25,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        budget_btn = (Button) findViewById(R.id.budgetsetting_button); // 페이지 전환 버튼
+        Button budget_btn = (Button) findViewById(R.id.budget_setting); // 페이지 전환 버튼
 
         budget_btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), managebudgetActivity.class);
+            public void onClick(View v) {
+                Intent bntent = new Intent(getApplicationContext(), managebudgetActivity.class);
 
-                startActivity(intent);
+                startActivity(bntent);
             }
         });
     }

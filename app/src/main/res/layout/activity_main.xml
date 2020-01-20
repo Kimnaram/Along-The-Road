@@ -18,7 +18,7 @@
             android:textSize="12pt" />
 
         <Button
-            android:id="@+id/localselect_button"
+            android:id="@+id/local_select"
             android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:layout_x="10dp"
@@ -34,7 +34,7 @@
             android:text="교통편 확인" />
 
         <Button
-            android:id="@+id/budgetsetting_button"
+            android:id="@+id/budget_setting"
             android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:layout_x="125dp"

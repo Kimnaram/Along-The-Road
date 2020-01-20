@@ -4,21 +4,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="지출한 비용을 쓰세요"
-        android:textSize="11pt"/>
-
     <EditText
+        android:id="@+id/input"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_y="20dp" />
+        android:layout_y="20dp"
+        android:hint="지출한 비용을 쓰세요" />
 
     <Button
         android:id="@+id/budget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="등록"/>
+
+    <TextView
+        android:id="@+id/output"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="8pt" />
 
 </LinearLayout>
