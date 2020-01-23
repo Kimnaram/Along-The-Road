@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".dayselectActivity">
 
     <TextView
         android:id="@+id/startdate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_x="10dp"
-        android:layout_y="50dp"
         android:text="출발 날짜를 설정하세요"
         android:textSize="10pt" />
 
@@ -19,8 +18,6 @@
         android:id="@+id/startdate_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_x="0dp"
-        android:layout_y="80dp"
         android:onClick="OnsclickHandler"
         android:text="날짜 선택하기" />
 
@@ -28,8 +25,6 @@
         android:id="@+id/arrivedate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_x="10dp"
-        android:layout_y="140dp"
         android:textSize="10pt"
         android:text="도착 날짜를 설정하세요" />
 
@@ -37,9 +32,33 @@
         android:id="@+id/arrivedate_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_x="0dp"
-        android:layout_y="168dp"
         android:onClick="OnaclickHandler"
         android:text="날짜 선택하기" />
 
-</AbsoluteLayout>
+    <CalendarView
+        android:id="@+id/calendar"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:minDate="01/20/2020"
+        android:maxDate="05/31/2020"
+        android:layout_weight="1" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*">
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="4"
+                android:text="다음"/>
+
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>
