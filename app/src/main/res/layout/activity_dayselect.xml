@@ -8,38 +8,17 @@
     tools:context=".dayselectActivity">
 
     <TextView
-        android:id="@+id/startdate"
-        android:layout_width="wrap_content"
+        android:id="@+id/trip"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="출발 날짜를 설정하세요"
+        android:gravity="center"
+        android:text="여행 기간을 설정하세요"
         android:textSize="10pt" />
-
-    <Button
-        android:id="@+id/startdate_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="OnsclickHandler"
-        android:text="날짜 선택하기" />
-
-    <TextView
-        android:id="@+id/arrivedate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="10pt"
-        android:text="도착 날짜를 설정하세요" />
-
-    <Button
-        android:id="@+id/arrivedate_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="OnaclickHandler"
-        android:text="날짜 선택하기" />
 
     <CalendarView
         android:id="@+id/calendar"
         android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:minDate="01/20/2020"
+        android:layout_height="100dp"
         android:maxDate="05/31/2020"
         android:layout_weight="1" />
 
