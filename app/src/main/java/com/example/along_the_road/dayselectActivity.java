@@ -23,11 +23,12 @@ public class dayselectActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final String city = intent.getExtras().getString("city");
         final Button next_btn = (Button)findViewById(R.id.next);
-        final String min_date = intent.getExtras().getString("min_date");
-        final long min_date_l = Long.parseLong(min_date);
+        //final String min_date = intent.getExtras().getString("min_date");
+        //final long min_date_l = Long.parseLong(min_date);
+        /****************************** max_date를 어떻게 설정할 것인지 ******************************/
 
         CalendarView calendar = (CalendarView)findViewById(R.id.calendar);
-        calendar.setMinDate(min_date_l);
+        //calendar.setMinDate(min_date_l);
 
         //리스너 등록
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {

@@ -60,7 +60,6 @@
             android:layout_height="wrap_content"
             android:layout_x="260dp"
             android:layout_y="140dp"
-            android:onClick="onBusanClick"
             android:text="부산" />
 
     </AbsoluteLayout>
