@@ -9,6 +9,9 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class dayselectActivity extends AppCompatActivity {
 
     private int count = 0;
@@ -23,14 +26,23 @@ public class dayselectActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final String city = intent.getExtras().getString("city");
         final Button next_btn = (Button)findViewById(R.id.next);
-        //final String min_date = intent.getExtras().getString("min_date");
-        //final long min_date_l = Long.parseLong(min_date);
-        /****************************** max_date를 어떻게 설정할 것인지 ******************************/
 
         CalendarView calendar = (CalendarView)findViewById(R.id.calendar);
-        //calendar.setMinDate(min_date_l);
+        final SimpleDateFormat format1 = new SimpleDateFormat ( "MMddyyyy");
+        Date date = new Date();
 
-        //리스너 등록
+        final String min_date = format1.format(date);
+        int temp_md = Integer.parseInt(min_date);
+        temp_md = temp_md + 50000000;
+        final String max_date = Integer.toString(temp_md);
+        final long max_d = Long.parseLong(max_date);
+        final long min_d = Long.parseLong(min_date);
+        calendar.setMinDate(min_d);
+        calendar.setMaxDate(max_d);
+       /****************************** min_date, max_date를 어떻게 설정할 것인지 ******************************/
+
+
+       //리스너 등록
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 
            @Override

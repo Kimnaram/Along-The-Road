@@ -19,7 +19,6 @@
         android:id="@+id/calendar"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:maxDate="05/31/2020"
         android:layout_weight="1" />
 
     <TableLayout

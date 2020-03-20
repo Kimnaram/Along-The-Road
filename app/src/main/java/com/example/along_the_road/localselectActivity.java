@@ -7,9 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import java.util.Date;
-import java.text.SimpleDateFormat;
-
 public class localselectActivity extends AppCompatActivity {
 
     @Override
@@ -24,21 +21,12 @@ public class localselectActivity extends AppCompatActivity {
         final Button daegu_btn = (Button)findViewById(R.id.daegu_button);
         final Button busan_btn = (Button)findViewById(R.id.busan_button);
 
-        final SimpleDateFormat format1 = new SimpleDateFormat ( "MMddyyyy");
-
-        Date date = new Date();
-
-        final String min_date = format1.format(date);
-
-        System.out.println(min_date);
-
         seoul_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
 
-                intent.putExtra("city", "seoul");
-                intent.putExtra("min_date", min_date);
+                intent.putExtra("city", seoul_btn.getText());
 
                 startActivity(intent);
             }
@@ -49,8 +37,7 @@ public class localselectActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
 
-                intent.putExtra("city", "sokcho");
-                intent.putExtra("min_date", min_date);
+                intent.putExtra("city", sokcho_btn.getText());
 
                 startActivity(intent);
             }
@@ -61,8 +48,7 @@ public class localselectActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
 
-                intent.putExtra("city", "incheon");
-                intent.putExtra("min_date", min_date);
+                intent.putExtra("city", incheon_btn.getText());
 
                 startActivity(intent);
             }
@@ -73,8 +59,7 @@ public class localselectActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
 
-                intent.putExtra("city", "jeonju");
-                intent.putExtra("min_date", min_date);
+                intent.putExtra("city", jeonju_btn.getText());
 
                 startActivity(intent);
             }
@@ -85,8 +70,7 @@ public class localselectActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
 
-                intent.putExtra("city", "daegu");
-                intent.putExtra("min_date", min_date);
+                intent.putExtra("city", daegu_btn.getText());
 
                 startActivity(intent);
             }
@@ -97,8 +81,7 @@ public class localselectActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
 
-                intent.putExtra("city", "busan");
-                intent.putExtra("min_date", min_date);
+                intent.putExtra("city", busan_btn.getText());
 
                 startActivity(intent);
             }
