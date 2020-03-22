@@ -1,44 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-    <AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".MainActivity">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/main"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_x="70dp"
-            android:layout_y="20dp"
             android:text="메뉴를 선택해주세요"
-            android:textSize="12pt" />
+            android:gravity="center_horizontal">
 
-        <Button
-            android:id="@+id/local_select"
-            android:layout_width="110dp"
+        </TextView>
+
+        <TableLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_x="10dp"
-            android:layout_y="80dp"
-            android:text="여행지역 선택" />
+            android:stretchColumns="*">
 
-        <Button
-            android:id="@+id/transformInfo_button"
-            android:layout_width="110dp"
-            android:layout_height="wrap_content"
-            android:layout_x= "240dp"
-            android:layout_y="80dp"
-            android:text="교통편 확인" />
+            <TableRow>
 
-        <Button
-            android:id="@+id/budget_setting"
-            android:layout_width="110dp"
-            android:layout_height="wrap_content"
-            android:layout_x="125dp"
-            android:layout_y="80dp"
-            android:text="지출 점검" />
+                <Button
+                    android:id="@+id/local_select"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:layout_x="10dp"
+                    android:layout_y="80dp"
+                    android:text="여행지역 선택" />
 
-    </AbsoluteLayout>
+                <Button
+                    android:id="@+id/transformInfo_button"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:layout_x= "240dp"
+                    android:layout_y="80dp"
+                    android:text="교통편 확인" />
+
+                <Button
+                    android:id="@+id/budget_setting"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:layout_x="125dp"
+                    android:layout_y="80dp"
+                    android:text="지출 점검" />
+
+            </TableRow>
+
+        </TableLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
