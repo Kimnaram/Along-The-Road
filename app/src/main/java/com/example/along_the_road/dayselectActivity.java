@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -27,19 +28,35 @@ public class dayselectActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final String city = intent.getExtras().getString("city");
         final Button next_btn = (Button)findViewById(R.id.next);
+        final TextView depart_date = (TextView)findViewById(R.id.depart_date);
+        final TextView arrive_date = (TextView)findViewById(R.id.arrive_date);
 
         CalendarView calendar = (CalendarView)findViewById(R.id.calendar);
-        long today = calendar.getDate();
-        calendar.setDate(today);
-        calendar.setMinDate(today);
+        /****************
+         long today = calendar.getDate();
+         calendar.setDate(today);
+         calendar.setMinDate(today);
+         ***************/
         Date date = new Date();
         SimpleDateFormat format1 = new SimpleDateFormat ("MM/dd/yyyy");
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.add(Calendar.MONTH, 5);
+        cal.add(Calendar.HOUR, 9);
+        String today_ = format1.format(cal.getTime());
+        long today = Long.parseLong(today_);
+        calendar.setMinDate(today);
+        //depart_date.setText(today_string);
+        //cal.add(Calendar.DATE, 2);
+        //String arrive = format1.format(cal.getTime());
+        //arrive_date.setText(arrive);
+        cal.add(Calendar.MONTH, 2);
         String after = format1.format(cal.getTime());
         long max_date = Long.parseLong(after);
         calendar.setMaxDate(max_date);
+
+        //SimpleDateFormat format2 = new SimpleDateFormat ("MM.dd");
+        //cal.setTime(date);
+        //String depart_date = format2.format(cal.getTime());
 
         //리스너 등록
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -53,6 +70,7 @@ public class dayselectActivity extends AppCompatActivity {
                 if(count == 1) {
                     start_date = "" +year + (month + 1) + dayOfMonth;
                     end_date = null;
+                    //depart_date.setText(start_date);
                     Toast.makeText(dayselectActivity.this, "출발 날짜 : "+year + "-" + (month + 1) + "-" + dayOfMonth, Toast.LENGTH_SHORT).show();
                     System.out.println(end_date);
                 }
@@ -63,9 +81,11 @@ public class dayselectActivity extends AppCompatActivity {
                     int e_d = Integer.parseInt(temp);
                     if(s_d > e_d) {
                         Toast.makeText(getApplicationContext(), "도착 날짜가 출발 날짜보다 먼저일 수 없습니다.", Toast.LENGTH_SHORT).show();
+                        // 캘린더로 지정날짜 색칠하기?
                     }
                     else if(s_d <= e_d) {
                         end_date = ""+year + (month + 1) + dayOfMonth;
+                        //arrive_date.setText(end_date);
                         Toast.makeText(dayselectActivity.this, "도착 날짜 : "+year + "-" + (month + 1) + "-" + dayOfMonth, Toast.LENGTH_SHORT).show();
                     }
                     if(start_date != null && end_date != null) {
