@@ -50,8 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="left"
-                android:textSize="15px"
-                android:text="월 일" >
+                android:textSize="15px" >
 
             </Textview>
 
@@ -60,8 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:textSize="15px"
-                android:text="월 일" >
+                android:textSize="15px" >
 
             </Textview>
 

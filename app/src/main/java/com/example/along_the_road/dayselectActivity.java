@@ -39,24 +39,29 @@ public class dayselectActivity extends AppCompatActivity {
          ***************/
         Date date = new Date();
         SimpleDateFormat format1 = new SimpleDateFormat ("MM/dd/yyyy");
+
         Calendar cal = Calendar.getInstance();
+
         cal.setTime(date);
         cal.add(Calendar.HOUR, 9);
         String today_ = format1.format(cal.getTime());
         long today = Long.parseLong(today_);
         calendar.setMinDate(today);
         //depart_date.setText(today_string);
-        //cal.add(Calendar.DATE, 2);
-        //String arrive = format1.format(cal.getTime());
-        //arrive_date.setText(arrive);
+
         cal.add(Calendar.MONTH, 2);
         String after = format1.format(cal.getTime());
         long max_date = Long.parseLong(after);
         calendar.setMaxDate(max_date);
 
-        //SimpleDateFormat format2 = new SimpleDateFormat ("MM.dd");
-        //cal.setTime(date);
-        //String depart_date = format2.format(cal.getTime());
+        SimpleDateFormat format2 = new SimpleDateFormat ("MM.dd");
+        cal.setTime(date);
+        String depart = format2.format(cal.getTime());
+        depart_date.setText(depart);
+
+        cal.add(Calendar.DATE, 2);
+        String arrive = format1.format(cal.getTime());
+        arrive_date.setText(arrive);
 
         //리스너 등록
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
