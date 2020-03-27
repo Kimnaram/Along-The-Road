@@ -1,10 +1,10 @@
 package com.example.along_the_road;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 
-public class hotelselectActivity extends AppCompatActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class HotelSelectActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

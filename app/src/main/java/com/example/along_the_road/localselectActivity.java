@@ -1,11 +1,11 @@
 package com.example.along_the_road;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class localselectActivity extends AppCompatActivity {
 
@@ -24,7 +24,7 @@ public class localselectActivity extends AppCompatActivity {
         seoul_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
+                Intent intent = new Intent(getApplicationContext(), DaySelectActivity.class);
 
                 intent.putExtra("city", seoul_btn.getText());
 
@@ -35,7 +35,7 @@ public class localselectActivity extends AppCompatActivity {
         sokcho_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
+                Intent intent = new Intent(getApplicationContext(), DaySelectActivity.class);
 
                 intent.putExtra("city", sokcho_btn.getText());
 
@@ -46,7 +46,7 @@ public class localselectActivity extends AppCompatActivity {
         incheon_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
+                Intent intent = new Intent(getApplicationContext(), DaySelectActivity.class);
 
                 intent.putExtra("city", incheon_btn.getText());
 
@@ -57,7 +57,7 @@ public class localselectActivity extends AppCompatActivity {
         jeonju_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
+                Intent intent = new Intent(getApplicationContext(), DaySelectActivity.class);
 
                 intent.putExtra("city", jeonju_btn.getText());
 
@@ -68,7 +68,7 @@ public class localselectActivity extends AppCompatActivity {
         daegu_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
+                Intent intent = new Intent(getApplicationContext(), DaySelectActivity.class);
 
                 intent.putExtra("city", daegu_btn.getText());
 
@@ -79,7 +79,7 @@ public class localselectActivity extends AppCompatActivity {
         busan_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), dayselectActivity.class);
+                Intent intent = new Intent(getApplicationContext(), DaySelectActivity.class);
 
                 intent.putExtra("city", busan_btn.getText());
 
