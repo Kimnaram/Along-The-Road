@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".HotelSelectActivity"></activity>
+        <activity android:name=".TrafficSearchActivity"></activity>
+        <activity android:name=".HotelSelectActivity" />
         <activity android:name=".localselectActivity" />
         <activity android:name=".DaySelectActivity" />
         <activity android:name=".managebudgetActivity" />
@@ -20,6 +21,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="ujnor2ft1p" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCClHCv72sCj8-8jyzmVimeRiaBfwsOi4E" />
+
     </application>
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>

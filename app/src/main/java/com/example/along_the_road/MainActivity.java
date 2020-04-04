@@ -35,6 +35,17 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(bntent);
             }
         });
+
+        Button traffic_btn = findViewById(R.id.traffic_button);
+
+        traffic_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent tntent = new Intent(getApplicationContext(), TrafficSearchActivity.class);
+
+                startActivity(tntent);
+            }
+        });
     }
 }
 
