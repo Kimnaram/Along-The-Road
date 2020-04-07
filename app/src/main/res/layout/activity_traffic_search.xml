@@ -6,12 +6,59 @@
     android:layout_height="match_parent"
     tools:context=".TrafficSearchActivity">
 
-    <fragment android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/map"
-        android:name="com.naver.maps.map.MapFragment"
-        app:navermap_latitude="36.763695"
-        app:navermap_longitude="127.281796"
-        app:navermap_zoom="14" />
+    <TableLayout
+        android:background="#00ff0000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TableRow
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp">
+
+            <EditText
+                android:id="@+id/depart_loc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:hint="출발지"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:text="↔"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/arrive_loc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:hint="도착지"
+                android:layout_weight="1.5"
+                android:textSize="15sp"/>
+
+        </TableRow>
+        <!--
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10sp"
+                android:paddingRight="10sp">
+        -->
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map"
+            tools:context=".MapsActivity"
+            android:name="com.google.android.gms.maps.SupportMapFragment" />
+        <!--
+            </TableRow>
+
+        -->
+    </TableLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
