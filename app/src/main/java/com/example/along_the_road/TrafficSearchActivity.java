@@ -43,4 +43,3 @@ public class TrafficSearchActivity extends AppCompatActivity implements OnMapRea
     }
 
 }
-// https://maps.googleapis.com/maps/api/directions/xml?origin=37.5728359,126.9746922&destination=37.579617,126.9748523&mode=transit&departure_time=now&key=AIzaSyCRnuC-pjxhgUdIDriVhNM-zIz9iy8sTKY
