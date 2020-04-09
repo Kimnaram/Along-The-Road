@@ -26,13 +26,11 @@
         </activity>
 
         <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="ujnor2ft1p" />
+        <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDOKn6s7rULeFy1IteNOCcYwxwl5un_4zA" />
-
-        <!-- <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@interger/google_play_services_version" /> -->
-
     </application>
 
 </manifest>
