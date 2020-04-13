@@ -2,6 +2,8 @@ package com.example.along_the_road;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,6 +30,8 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -41,14 +45,22 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.jsoup.helper.HttpConnection;
+import org.w3c.dom.Text;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 
 public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
-
 
     private GoogleMap mMap;
     private Marker currentMarker = null;
@@ -57,7 +69,6 @@ public class TrafficSearchActivity extends AppCompatActivity
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int UPDATE_INTERVAL_MS = 1000;  // 1초
     private static final int FASTEST_UPDATE_INTERVAL_MS = 500; // 0.5초
-
 
     // onRequestPermissionsResult에서 수신된 결과에서 ActivityCompat.requestPermissions를 사용한 퍼미션 요청을 구별하기 위해 사용됩니다.
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -75,7 +86,6 @@ public class TrafficSearchActivity extends AppCompatActivity
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest locationRequest;
     private Location location;
-
 
     private View mLayout;  // Snackbar 사용하기 위해서는 View가 필요합니다.
     // (참고로 Toast에서는 Context가 필요했습니다.)
@@ -109,6 +119,72 @@ public class TrafficSearchActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+    }
+
+    public void sendClick(View view) {
+
+        EditText dep_loc = findViewById(R.id.depart_loc);
+        EditText arr_loc = findViewById(R.id.arrive_loc);
+        EditText method = findViewById(R.id.method);
+
+        String depart = dep_loc.getText().toString();
+        String arrival = arr_loc.getText().toString();
+
+        String str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                "origin=" + depart + "&destination=" + arrival + "&mode=transit&departure_time=now" +
+                "&key=KEY";
+
+        // url로 접근해서 json 파일을 파싱
+        URL json_url = null;
+        HttpURLConnection conn = null;
+        BufferedReader buf = null;
+
+        try {
+            json_url = new URL(str_url);
+
+            conn = (HttpURLConnection) json_url.openConnection();
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            Log.d("line : ", bufferedReader.toString());
+
+            String line = null;
+            String page = "";
+
+            while((line = bufferedReader.readLine()) != null) {
+                Log.d("line : ", line);
+                page += line;
+            }
+
+            JSONObject json = new JSONObject(page);
+
+            JSONArray jarr = json.getJSONArray("routes");
+
+            for(int i = 0; i < jarr.length(); i++) {
+                json = jarr.getJSONObject(i);
+
+                String duration = null;
+                String instructions = null;
+
+                if(json.getString("steps") == "steps") {
+
+                    if (json.getString("duration") == "duration") {
+                        duration = json.getString("text");
+                    }
+                    instructions = json.getString("html_instructions");
+                }
+
+                method.append("걸리는 시간 : " + duration+"\n");
+                Log.d("시간 : ", duration);
+                method.append("방법 : " + instructions + "\n");
+                Log.d("방법 : ", instructions);
+
+            }
+        } catch (Exception e) {
+            method.setText(e.getMessage());
+        } finally {
+            conn.disconnect();
+        }
 
     }
 
@@ -200,7 +276,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                 String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
                         + " 경도:" + String.valueOf(location.getLongitude());
 
-                Log.d(TAG, "onLocationResult : " + markerSnippet);
+                // Log.d(TAG, "onLocationResult : " + markerSnippet);
 
 
                 //현재 위치에 마커 생성하고 이동
@@ -219,7 +295,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         if (!checkLocationServicesStatus()) {
 
-            Log.d(TAG, "startLocationUpdates : call showDialogForLocationServiceSetting");
+            // Log.d(TAG, "startLocationUpdates : call showDialogForLocationServiceSetting");
             showDialogForLocationServiceSetting();
         } else {
 
@@ -232,12 +308,12 @@ public class TrafficSearchActivity extends AppCompatActivity
             if (hasFineLocationPermission != PackageManager.PERMISSION_GRANTED ||
                     hasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED) {
 
-                Log.d(TAG, "startLocationUpdates : 퍼미션 안가지고 있음");
+                // Log.d(TAG, "startLocationUpdates : 퍼미션 안가지고 있음");
                 return;
             }
 
 
-            Log.d(TAG, "startLocationUpdates : call mFusedLocationClient.requestLocationUpdates");
+            // Log.d(TAG, "startLocationUpdates : call mFusedLocationClient.requestLocationUpdates");
 
             mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 
@@ -248,16 +324,15 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
 
-        Log.d(TAG, "onStart");
+        // Log.d(TAG, "onStart");
 
         if (checkPermission()) {
 
-            Log.d(TAG, "onStart : call mFusedLocationClient.requestLocationUpdates");
+            // Log.d(TAG, "onStart : call mFusedLocationClient.requestLocationUpdates");
             mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
 
             if (mMap != null)
@@ -276,7 +351,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         if (mFusedLocationClient != null) {
 
-            Log.d(TAG, "onStop : call stopLocationUpdates");
+            // Log.d(TAG, "onStop : call stopLocationUpdates");
             mFusedLocationClient.removeLocationUpdates(locationCallback);
         }
     }
@@ -498,8 +573,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                 if (checkLocationServicesStatus()) {
                     if (checkLocationServicesStatus()) {
 
-                        Log.d(TAG, "onActivityResult : GPS 활성화 되있음");
-
+                        // Log.d(TAG, "onActivityResult : GPS 활성화 되있음");
 
                         needRequest = true;
 

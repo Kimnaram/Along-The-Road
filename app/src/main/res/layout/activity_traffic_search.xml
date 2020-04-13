@@ -14,52 +14,68 @@
 
         <TableRow
             android:paddingLeft="10sp"
-            android:paddingRight="10sp">
+            android:paddingRight="10sp" >
 
             <EditText
                 android:id="@+id/depart_loc"
-                android:layout_width="match_parent"
+                android:layout_width="220sp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
+                android:gravity="center"
                 android:hint="출발지"
                 android:textSize="15sp" />
 
+        </TableRow>
+
+        <TableRow
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp" >
+
             <TextView
                 android:id="@+id/arrow"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:text="↔"
-                android:textSize="18sp" />
+                android:textSize="23sp" />
 
             <EditText
                 android:id="@+id/arrive_loc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
+                android:gravity="center"
                 android:hint="도착지"
-                android:layout_weight="1.5"
+                android:layout_weight="2"
                 android:textSize="15sp"/>
 
+            <Button
+                android:id="@+id/send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:onClick="sendClick"
+                android:text="검색"/>
+
         </TableRow>
-        <!--
-            <TableRow
+
+        <TableRow>
+
+            <EditText
+                android:id="@+id/method"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10sp"
-                android:paddingRight="10sp">
-        -->
-        <fragment
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/map"
-            tools:context=".MapsActivity"
-            android:name="com.google.android.gms.maps.SupportMapFragment" />
-        <!--
-            </TableRow>
+                android:hint="방법" />
 
-        -->
+        </TableRow>
+
+            <fragment
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/map"
+                tools:context=".MapsActivity"
+                android:name="com.google.android.gms.maps.SupportMapFragment" />
+
     </TableLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
