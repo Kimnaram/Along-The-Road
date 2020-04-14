@@ -59,22 +59,24 @@
 
         </TableRow>
 
-        <TableRow>
-
-            <EditText
-                android:id="@+id/method"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="방법" />
-
-        </TableRow>
-
             <fragment
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="300dp"
                 android:id="@+id/map"
                 tools:context=".MapsActivity"
                 android:name="com.google.android.gms.maps.SupportMapFragment" />
+
+        <TableRow
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp" >
+
+            <TextView
+                android:id="@+id/method"
+                android:layout_width="match_parent"
+                android:layout_height="600dp"
+                android:textSize="15sp" />
+
+        </TableRow>
 
     </TableLayout>
 

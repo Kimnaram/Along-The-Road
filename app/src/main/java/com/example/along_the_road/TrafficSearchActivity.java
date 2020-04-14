@@ -2,7 +2,6 @@ package com.example.along_the_road;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -46,17 +45,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.helper.HttpConnection;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback,
@@ -74,6 +74,13 @@ public class TrafficSearchActivity extends AppCompatActivity
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     boolean needRequest = false;
 
+    private TextView method;
+    String str_url = null;
+
+    private String start_lat = null;
+    private String start_lng = null;
+    private String end_lat = null;
+    private String end_lng = null;
 
     // 앱을 실행하기 위해 필요한 퍼미션을 정의합니다.
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
@@ -126,66 +133,76 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         EditText dep_loc = findViewById(R.id.depart_loc);
         EditText arr_loc = findViewById(R.id.arrive_loc);
-        EditText method = findViewById(R.id.method);
 
         String depart = dep_loc.getText().toString();
         String arrival = arr_loc.getText().toString();
 
-        String str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
+        str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=" + depart + "&destination=" + arrival + "&mode=transit&departure_time=now" +
-                "&key=KEY";
+                "&key=AIzaSyCRnuC-pjxhgUdIDriVhNM-zIz9iy8sTKY";
 
         // url로 접근해서 json 파일을 파싱
-        URL json_url = null;
-        HttpURLConnection conn = null;
-        BufferedReader buf = null;
+        method = findViewById(R.id.method);
+        String resultText = "값이 없음";
 
         try {
-            json_url = new URL(str_url);
+            resultText = new Task().execute().get();
 
-            conn = (HttpURLConnection) json_url.openConnection();
+            JSONObject jsonObject = new JSONObject(resultText);
+            String routes = jsonObject.getString("routes");
+            JSONArray routesArray = new JSONArray(routes);
 
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-            Log.d("line : ", bufferedReader.toString());
+            for(int i = 0; i <= routesArray.length(); i++) {
+                JSONObject subJsonObject = routesArray.getJSONObject(i);
+                String legs = subJsonObject.getString("legs");
+                JSONArray LegArray = new JSONArray(legs);
 
-            String line = null;
-            String page = "";
+                for(int j = 0; j <= LegArray.length(); j++) {
+                    JSONObject legJsonObject = LegArray.getJSONObject(i);
+                    String steps = legJsonObject.getString("steps");
+                    JSONArray stepsArray = new JSONArray(steps);
 
-            while((line = bufferedReader.readLine()) != null) {
-                Log.d("line : ", line);
-                page += line;
-            }
+                    for(int k = 0; k <= stepsArray.length(); k++) {
+                        JSONObject stepsObject = stepsArray.getJSONObject(i);
+                        String html_instructions = stepsObject.getString("html_instructions");
 
-            JSONObject json = new JSONObject(page);
+                        String end_location = stepsObject.getString("end_location");
+                        JSONObject endJsonObject = new JSONObject(end_location);
+                        end_lat = endJsonObject.getString("lat");
+                        end_lng = endJsonObject.getString("lng");
 
-            JSONArray jarr = json.getJSONArray("routes");
+                        String start_location = stepsObject.getString("start_location");
+                        JSONObject startJsonObject = new JSONObject(start_location);
+                        start_lat = startJsonObject.getString("lat");
+                        start_lng = startJsonObject.getString("lng");
 
-            for(int i = 0; i < jarr.length(); i++) {
-                json = jarr.getJSONObject(i);
+                        String duration = stepsObject.getString("duration");
+                        JSONObject durJsonObject = new JSONObject(duration);
+                        String durtext = durJsonObject.getString("text");
 
-                String duration = null;
-                String instructions = null;
+                        String distance = stepsObject.getString("distance");
+                        JSONObject disJsonObject = new JSONObject(distance);
+                        String distext = disJsonObject.getString("text");
 
-                if(json.getString("steps") == "steps") {
+                        String sol1 = "거리 : " + distext +
+                                "\n걸리는 시간 : " + durtext +
+                                "\n방법 : " + html_instructions + "\n";
 
-                    if (json.getString("duration") == "duration") {
-                        duration = json.getString("text");
+                        System.out.println("시작 위치 : " + start_lat + ", " + start_lng +
+                                "\n도착 위치 : " + end_lat + ", " + end_lng);
+                        System.out.println(sol1);
+                        method.setText(sol1);
                     }
-                    instructions = json.getString("html_instructions");
                 }
-
-                method.append("걸리는 시간 : " + duration+"\n");
-                Log.d("시간 : ", duration);
-                method.append("방법 : " + instructions + "\n");
-                Log.d("방법 : ", instructions);
-
             }
-        } catch (Exception e) {
-            method.setText(e.getMessage());
-        } finally {
-            conn.disconnect();
-        }
 
+        } catch(InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -584,4 +601,40 @@ public class TrafficSearchActivity extends AppCompatActivity
                 break;
         }
     }
+
+    public class Task extends AsyncTask<String, Void, String> {
+
+        private String str, receiveMsg;
+
+        @Override
+        protected String doInBackground(String... params) {
+            URL url = null;
+            try {
+                url = new URL(str_url);
+
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                if (conn.getResponseCode() == conn.HTTP_OK) {
+                    InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                    BufferedReader reader = new BufferedReader(tmp);
+                    StringBuffer buffer = new StringBuffer();
+                    while ((str = reader.readLine()) != null) {
+                        buffer.append(str);
+                    }
+                    receiveMsg = buffer.toString();
+
+                    reader.close();
+                } else {
+                    Log.i("통신 결과", conn.getResponseCode() + "에러");
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return receiveMsg;
+        }
+    }
+
 }
