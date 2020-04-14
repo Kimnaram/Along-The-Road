@@ -139,7 +139,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=" + depart + "&destination=" + arrival + "&mode=transit&departure_time=now" +
-                "&key=AIzaSyCRnuC-pjxhgUdIDriVhNM-zIz9iy8sTKY";
+                "&key=API KEY";
 
         // url로 접근해서 json 파일을 파싱
         method = findViewById(R.id.method);
