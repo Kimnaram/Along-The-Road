@@ -2,6 +2,7 @@ package com.example.along_the_road;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -26,10 +27,14 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Looper;
+import android.service.autofill.OnClickAction;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,21 +79,19 @@ public class TrafficSearchActivity extends AppCompatActivity
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     boolean needRequest = false;
 
-    private TextView method;
-    String str_url = null;
+    private LinearLayout method_container;
+    private String str_url = null;
+    private String sol = null;
+    private String entire_sol = null;
+    private int count = 0;
 
-    private String start_lat = null;
-    private String start_lng = null;
-    private String end_lat = null;
-    private String end_lng = null;
+    private int list_len = 0;
 
     // 앱을 실행하기 위해 필요한 퍼미션을 정의합니다.
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
 
-
     Location mCurrentLocatiion;
     LatLng currentPosition;
-
 
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest locationRequest;
@@ -131,6 +134,9 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     public void sendClick(View view) {
 
+        count += 1;
+
+        method_container = findViewById(R.id.method_container);
         EditText dep_loc = findViewById(R.id.depart_loc);
         EditText arr_loc = findViewById(R.id.arrive_loc);
 
@@ -139,10 +145,8 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=" + depart + "&destination=" + arrival + "&mode=transit&departure_time=now" +
-                "&key=API KEY";
+                "APK KEY";
 
-        // url로 접근해서 json 파일을 파싱
-        method = findViewById(R.id.method);
         String resultText = "값이 없음";
 
         try {
@@ -151,48 +155,95 @@ public class TrafficSearchActivity extends AppCompatActivity
             JSONObject jsonObject = new JSONObject(resultText);
             String routes = jsonObject.getString("routes");
             JSONArray routesArray = new JSONArray(routes);
+            JSONObject subJsonObject = routesArray.getJSONObject(0);
 
-            for(int i = 0; i <= routesArray.length(); i++) {
-                JSONObject subJsonObject = routesArray.getJSONObject(i);
-                String legs = subJsonObject.getString("legs");
-                JSONArray LegArray = new JSONArray(legs);
+            String legs = subJsonObject.getString("legs");
+            JSONArray LegArray = new JSONArray(legs);
+            JSONObject legJsonObject = LegArray.getJSONObject(0);
 
-                for(int j = 0; j <= LegArray.length(); j++) {
-                    JSONObject legJsonObject = LegArray.getJSONObject(i);
-                    String steps = legJsonObject.getString("steps");
-                    JSONArray stepsArray = new JSONArray(steps);
+            String steps = legJsonObject.getString("steps");
+            JSONArray stepsArray = new JSONArray(steps);
+            list_len = stepsArray.length();
 
-                    for(int k = 0; k <= stepsArray.length(); k++) {
-                        JSONObject stepsObject = stepsArray.getJSONObject(i);
-                        String html_instructions = stepsObject.getString("html_instructions");
+            String[] getInstructions = new String[list_len];
+            String[] getDistance = new String[list_len];
+            String[] getDuration = new String[list_len];
+            String[] getEnd_lat = new String[list_len];
+            String[] getEnd_lng = new String[list_len];
+            String[] getStart_lat = new String[list_len];
+            String[] getStart_lng = new String[list_len];
+            String[] arrival_name = new String[list_len];
+            String[] depart_name = new String[list_len];
+            String[] getHeadsign = new String[list_len];
+            String[] getBusNo = new String[list_len];
 
-                        String end_location = stepsObject.getString("end_location");
-                        JSONObject endJsonObject = new JSONObject(end_location);
-                        end_lat = endJsonObject.getString("lat");
-                        end_lng = endJsonObject.getString("lng");
+            for(int i = 0; i < list_len; i++) {
 
-                        String start_location = stepsObject.getString("start_location");
-                        JSONObject startJsonObject = new JSONObject(start_location);
-                        start_lat = startJsonObject.getString("lat");
-                        start_lng = startJsonObject.getString("lng");
+                JSONObject stepsObject = stepsArray.getJSONObject(i);
+                getInstructions[i] = stepsObject.getString("html_instructions");
+                String[] Check = getInstructions[i].split(" ");
+                String BusCheck = Check[0];
 
-                        String duration = stepsObject.getString("duration");
-                        JSONObject durJsonObject = new JSONObject(duration);
-                        String durtext = durJsonObject.getString("text");
+                String end_location = stepsObject.getString("end_location");
+                JSONObject endJsonObject = new JSONObject(end_location);
+                getEnd_lat[i] = endJsonObject.getString("lat");
+                getEnd_lng[i] = endJsonObject.getString("lng");
 
-                        String distance = stepsObject.getString("distance");
-                        JSONObject disJsonObject = new JSONObject(distance);
-                        String distext = disJsonObject.getString("text");
+                String start_location = stepsObject.getString("start_location");
+                JSONObject startJsonObject = new JSONObject(start_location);
+                getStart_lat[i] = startJsonObject.getString("lat");
+                getStart_lng[i] = startJsonObject.getString("lng");
 
-                        String sol1 = "거리 : " + distext +
-                                "\n걸리는 시간 : " + durtext +
-                                "\n방법 : " + html_instructions + "\n";
+                String duration = stepsObject.getString("duration");
+                JSONObject durJsonObject = new JSONObject(duration);
+                getDuration[i] = durJsonObject.getString("text");
 
-                        System.out.println("시작 위치 : " + start_lat + ", " + start_lng +
-                                "\n도착 위치 : " + end_lat + ", " + end_lng);
-                        System.out.println(sol1);
-                        method.setText(sol1);
-                    }
+                String distance = stepsObject.getString("distance");
+                JSONObject disJsonObject = new JSONObject(distance);
+                getDistance[i] = disJsonObject.getString("text");
+
+                if(BusCheck.equals("Bus")) {
+
+                    System.out.println(BusCheck);
+
+                    String transit_details = stepsObject.getString("transit_details");
+                    JSONObject transitObject = new JSONObject(transit_details);
+
+                    String arrival_stop = transitObject.getString("arrival_stop");
+                    JSONObject arrivalObject = new JSONObject(arrival_stop);
+                    arrival_name[i] = arrivalObject.getString("name");
+
+                    String depart_stop = transitObject.getString("departure_stop");
+                    JSONObject departObject = new JSONObject(depart_stop);
+                    depart_name[i] = departObject.getString("name");
+
+                    getHeadsign[i] = transitObject.getString("headsign");
+
+                    String line = transitObject.getString("line");
+                    JSONObject lineObject = new JSONObject(line);
+                    getBusNo[i] = lineObject.getString("short_name");
+
+                }
+
+                if(!BusCheck.equals("Bus")) {
+                    sol = getInstructions[i] +
+                            "\n걸리는 시간 : " + getDuration[i] + "\n\n";
+                } else {
+                    sol = getInstructions[i] +
+                            "\n걸리는 시간 : " + getDuration[i] +
+                            "\n" + arrival_name[i] + " 승차" +
+                            "\n" + depart_name[i] + " 하차" +
+                            "\n버스 번호 : " + getBusNo[i] + "\n\n";
+                }
+
+                System.out.println("시작 위치 : " + getStart_lat[i] + ", " + getStart_lng[i] +
+                        "\n도착 위치 : " + getEnd_lat[i] + ", " + getEnd_lng[i]);
+                System.out.println(sol);
+
+                if(entire_sol == null) {
+                    entire_sol = sol;
+                } else {
+                    entire_sol += sol;
                 }
             }
 
@@ -203,11 +254,42 @@ public class TrafficSearchActivity extends AppCompatActivity
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        title_view("출발 : " + depart);
+        method_view(entire_sol);
+        title_view("도착 : " + arrival);
+
+    }
+
+    public void method_view(String a) {
+        TextView method = new TextView(this);
+        method.setText(a);
+        method.setTextSize(15);
+        method.setTextColor(Color.GRAY);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        method.setLayoutParams(lp);
+
+        method_container.addView(method);
+    }
+
+    public void title_view(String a) {
+        TextView title = new TextView(this);
+        title.setText(a);
+        title.setTextSize(18);
+        title.setTextColor(Color.rgb(102, 102, 102));
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        title.setLayoutParams(lp);
+
+        method_container.addView(title);
     }
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
-        Log.d(TAG, "onMapReady :");
+        // Log.d(TAG, "onMapReady :");
 
         mMap = googleMap;
 
@@ -269,7 +351,7 @@ public class TrafficSearchActivity extends AppCompatActivity
             @Override
             public void onMapClick(LatLng latLng) {
 
-                Log.d(TAG, "onMapClick :");
+                // Log.d(TAG, "onMapClick :");
             }
         });
     }
@@ -293,7 +375,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                 String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
                         + " 경도:" + String.valueOf(location.getLongitude());
 
-                // Log.d(TAG, "onLocationResult : " + markerSnippet);
+                Log.d(TAG, "onLocationResult : " + markerSnippet);
 
 
                 //현재 위치에 마커 생성하고 이동
@@ -306,7 +388,6 @@ public class TrafficSearchActivity extends AppCompatActivity
         }
 
     };
-
 
     private void startLocationUpdates() {
 
