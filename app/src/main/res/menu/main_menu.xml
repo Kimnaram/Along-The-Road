@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- <item
+        android:id="@+id/walking"
+        android:title="걷기" /> -->
+    <item
+        android:id="@+id/transit"
+        android:title="대중교통 사용" />
+    <!-- <item
+        android:id="@+id/driving"
+        android:title="자가용" /> -->
+    <item
+        android:id="@+id/less_walk"
+        android:title="적게 걷기" />
+    <item
+        android:id="@+id/fewer_transfers"
+        android:title="적은 환승" />
+
+</menu>

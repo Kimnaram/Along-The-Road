@@ -29,12 +29,14 @@ import android.location.LocationManager;
 import android.os.Looper;
 import android.service.autofill.OnClickAction;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,6 +69,7 @@ public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
 
+    /****************************** Map API 관련 변수 *******************************/
     private GoogleMap mMap;
     private Marker currentMarker = null;
 
@@ -78,14 +81,6 @@ public class TrafficSearchActivity extends AppCompatActivity
     // onRequestPermissionsResult에서 수신된 결과에서 ActivityCompat.requestPermissions를 사용한 퍼미션 요청을 구별하기 위해 사용됩니다.
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     boolean needRequest = false;
-
-    private LinearLayout method_container;
-    private String str_url = null;
-    private String sol = null;
-    private String entire_sol = null;
-    private int count = 0;
-
-    private int list_len = 0;
 
     // 앱을 실행하기 위해 필요한 퍼미션을 정의합니다.
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
@@ -99,6 +94,17 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     private View mLayout;  // Snackbar 사용하기 위해서는 View가 필요합니다.
     // (참고로 Toast에서는 Context가 필요했습니다.)
+
+    /****************************** Directions API 관련 변수 *******************************/
+    private static final String API_KEY="";
+    private LinearLayout method_container;
+    private String str_url = null;
+    private String option = "";
+    private String travel_mode = "transit";
+    private String sol = null;
+    private String entire_sol = null;
+
+    private int list_len = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,9 +138,43 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
-    public void sendClick(View view) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
 
-        count += 1;
+        inflater.inflate(R.menu.main_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+
+        switch (item.getItemId()) {
+            /* case R.id.walking:
+                travel_mode = "walking";
+                break;
+            */
+            case R.id.transit:
+                travel_mode = "transit";
+                break;
+            /*
+            case R.id.driving:
+                travel_mode = "driving";
+                break;
+            */
+            case R.id.less_walk:
+                option = "&transit_routing_preference=less_walking";
+                break;
+            case R.id.fewer_transfers:
+                option = "&transit_routing_preference=fewer_transfers";
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void sendClick(View view) {
 
         method_container = findViewById(R.id.method_container);
         EditText dep_loc = findViewById(R.id.depart_loc);
@@ -143,9 +183,17 @@ public class TrafficSearchActivity extends AppCompatActivity
         String depart = dep_loc.getText().toString();
         String arrival = arr_loc.getText().toString();
 
-        str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                "origin=" + depart + "&destination=" + arrival + "&mode=transit&departure_time=now" +
-                "APK KEY";
+        if(travel_mode.equals("transit")) {
+            str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                    "origin=" + depart + "&destination=" + arrival + "&mode=" + travel_mode + "&departure_time=now&alternatives=true" +
+                    option + "&language=Korean&key=" + API_KEY;
+        } else {
+            str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                    "origin=" + depart + "&destination=" + arrival + "&mode=" + travel_mode + "&departure_time=now&alternatives=true" +
+                    "&language=Korean&key=" + API_KEY;
+        }
+
+        System.out.println(str_url+"\n");
 
         String resultText = "값이 없음";
 
@@ -154,6 +202,8 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             JSONObject jsonObject = new JSONObject(resultText);
             String routes = jsonObject.getString("routes");
+            // routes
+
             JSONArray routesArray = new JSONArray(routes);
             JSONObject subJsonObject = routesArray.getJSONObject(0);
 
@@ -177,12 +227,11 @@ public class TrafficSearchActivity extends AppCompatActivity
             String[] getHeadsign = new String[list_len];
             String[] getBusNo = new String[list_len];
 
-            for(int i = 0; i < list_len; i++) {
-
+            for (int i = 0; i < list_len; i++) {
                 JSONObject stepsObject = stepsArray.getJSONObject(i);
                 getInstructions[i] = stepsObject.getString("html_instructions");
                 String[] Check = getInstructions[i].split(" ");
-                String BusCheck = Check[0];
+                String TransitCheck = Check[0];
 
                 String end_location = stepsObject.getString("end_location");
                 JSONObject endJsonObject = new JSONObject(end_location);
@@ -202,9 +251,11 @@ public class TrafficSearchActivity extends AppCompatActivity
                 JSONObject disJsonObject = new JSONObject(distance);
                 getDistance[i] = disJsonObject.getString("text");
 
-                if(BusCheck.equals("Bus")) {
+                if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
+                        || TransitCheck.equals("train") || TransitCheck.equals("rail")
+                        || TransitCheck.equals("버스") || TransitCheck.equals("지하철")) {
 
-                    System.out.println(BusCheck);
+                    System.out.println(TransitCheck);
 
                     String transit_details = stepsObject.getString("transit_details");
                     JSONObject transitObject = new JSONObject(transit_details);
@@ -225,27 +276,32 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                 }
 
-                if(!BusCheck.equals("Bus")) {
-                    sol = getInstructions[i] +
-                            "\n걸리는 시간 : " + getDuration[i] + "\n\n";
-                } else {
+                if (!TransitCheck.equals("Bus") && !TransitCheck.equals("Subway")
+                        && !TransitCheck.equals("train") && !TransitCheck.equals("rail")
+                        && TransitCheck.equals("버스") || TransitCheck.equals("지하철")) {
+
+                    sol = getInstructions[i] + "\n걸리는 시간 : " + getDuration[i] + "\n\n";
+                } else if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
+                        || TransitCheck.equals("train") || TransitCheck.equals("rail")
+                        || TransitCheck.equals("버스") || TransitCheck.equals("지하철")) {
                     sol = getInstructions[i] +
                             "\n걸리는 시간 : " + getDuration[i] +
-                            "\n" + arrival_name[i] + " 승차" +
-                            "\n" + depart_name[i] + " 하차" +
+                            "\n" + depart_name[i] + " 승차" +
+                            "\n" + arrival_name[i] + " 하차" +
+                            "\n + " + getHeadsign[i] + "방향" +
                             "\n버스 번호 : " + getBusNo[i] + "\n\n";
                 }
 
-                System.out.println("시작 위치 : " + getStart_lat[i] + ", " + getStart_lng[i] +
-                        "\n도착 위치 : " + getEnd_lat[i] + ", " + getEnd_lng[i]);
-                System.out.println(sol);
-
-                if(entire_sol == null) {
+                if (entire_sol == null) {
                     entire_sol = sol;
                 } else {
                     entire_sol += sol;
                 }
             }
+
+            title_view("출발 : " + depart);
+            method_view(entire_sol);
+            title_view("도착 : " + arrival + "\n");
 
         } catch(InterruptedException e) {
             e.printStackTrace();
@@ -254,10 +310,6 @@ public class TrafficSearchActivity extends AppCompatActivity
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        title_view("출발 : " + depart);
-        method_view(entire_sol);
-        title_view("도착 : " + arrival);
 
     }
 
@@ -277,7 +329,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     public void title_view(String a) {
         TextView title = new TextView(this);
         title.setText(a);
-        title.setTextSize(18);
+        title.setTextSize(17);
         title.setTextColor(Color.rgb(102, 102, 102));
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
