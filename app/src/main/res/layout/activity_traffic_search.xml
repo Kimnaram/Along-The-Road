@@ -12,7 +12,6 @@
         android:layout_height="match_parent" >
 
         <LinearLayout
-            android:id="@+id/method_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
@@ -71,15 +70,22 @@
 
                 </TableRow>
 
-
                 <fragment
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:id="@+id/map"
-                    tools:context=".MapsActivity"
+                    tools:context=".TrafficSearchActivity"
                     android:name="com.google.android.gms.maps.SupportMapFragment" />
 
             </TableLayout>
+
+            <LinearLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            </LinearLayout>
 
         </LinearLayout>
 

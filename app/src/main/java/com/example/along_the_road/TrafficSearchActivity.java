@@ -27,7 +27,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Looper;
-import android.service.autofill.OnClickAction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -96,15 +95,17 @@ public class TrafficSearchActivity extends AppCompatActivity
     // (참고로 Toast에서는 Context가 필요했습니다.)
 
     /****************************** Directions API 관련 변수 *******************************/
-    private static final String API_KEY="";
-    private LinearLayout method_container;
+    private static final String API_KEY="API KEY";
+    private LinearLayout container;
     private String str_url = null;
     private String option = "";
     private String travel_mode = "transit";
-    private String sol = null;
-    private String entire_sol = null;
+    private String step = null;
+    private String entire_step = null;
 
     private int list_len = 0;
+
+    private int text_count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,7 +177,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     public void sendClick(View view) {
 
-        method_container = findViewById(R.id.method_container);
+        container = findViewById(R.id.container);
         EditText dep_loc = findViewById(R.id.depart_loc);
         EditText arr_loc = findViewById(R.id.arrive_loc);
 
@@ -185,123 +186,134 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         if(travel_mode.equals("transit")) {
             str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                    "origin=" + depart + "&destination=" + arrival + "&mode=" + travel_mode + "&departure_time=now&alternatives=true" +
-                    option + "&language=Korean&key=" + API_KEY;
+                    "origin=" + depart + "&destination=" + arrival + "&mode=" + travel_mode + "&departure_time=now" +
+                    "&alternatives=true" + option + "&language=Korean&key=" + API_KEY;
         } else {
             str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                    "origin=" + depart + "&destination=" + arrival + "&mode=" + travel_mode + "&departure_time=now&alternatives=true" +
-                    "&language=Korean&key=" + API_KEY;
+                    "origin=" + depart + "&destination=" + arrival + "&mode=" + travel_mode + "&departure_time=now" +
+                    "&alternatives=true" + "&language=Korean&key=" + API_KEY;
         }
-
-        System.out.println(str_url+"\n");
 
         String resultText = "값이 없음";
 
         try {
+
+            if(text_count > 0) {
+                container.removeViewsInLayout(0, text_count);
+                text_count = 0;
+            } // 재검색 시, 이전의 TextView 삭제
+
             resultText = new Task().execute().get();
 
             JSONObject jsonObject = new JSONObject(resultText);
             String routes = jsonObject.getString("routes");
-            // routes
-
             JSONArray routesArray = new JSONArray(routes);
-            JSONObject subJsonObject = routesArray.getJSONObject(0);
 
-            String legs = subJsonObject.getString("legs");
-            JSONArray LegArray = new JSONArray(legs);
-            JSONObject legJsonObject = LegArray.getJSONObject(0);
 
-            String steps = legJsonObject.getString("steps");
-            JSONArray stepsArray = new JSONArray(steps);
-            list_len = stepsArray.length();
+            for(int j = 0; j <= routesArray.length(); j++) {
+                entire_step = null;
 
-            String[] getInstructions = new String[list_len];
-            String[] getDistance = new String[list_len];
-            String[] getDuration = new String[list_len];
-            String[] getEnd_lat = new String[list_len];
-            String[] getEnd_lng = new String[list_len];
-            String[] getStart_lat = new String[list_len];
-            String[] getStart_lng = new String[list_len];
-            String[] arrival_name = new String[list_len];
-            String[] depart_name = new String[list_len];
-            String[] getHeadsign = new String[list_len];
-            String[] getBusNo = new String[list_len];
+                JSONObject subJsonObject = routesArray.getJSONObject(j);
 
-            for (int i = 0; i < list_len; i++) {
-                JSONObject stepsObject = stepsArray.getJSONObject(i);
-                getInstructions[i] = stepsObject.getString("html_instructions");
-                String[] Check = getInstructions[i].split(" ");
-                String TransitCheck = Check[0];
+                String legs = subJsonObject.getString("legs");
+                JSONArray LegArray = new JSONArray(legs);
+                JSONObject legJsonObject = LegArray.getJSONObject(0);
+                // leg의 Object에서 총 걸리는 시간 구하기
 
-                String end_location = stepsObject.getString("end_location");
-                JSONObject endJsonObject = new JSONObject(end_location);
-                getEnd_lat[i] = endJsonObject.getString("lat");
-                getEnd_lng[i] = endJsonObject.getString("lng");
+                String steps = legJsonObject.getString("steps");
+                JSONArray stepsArray = new JSONArray(steps);
+                list_len = stepsArray.length();
 
-                String start_location = stepsObject.getString("start_location");
-                JSONObject startJsonObject = new JSONObject(start_location);
-                getStart_lat[i] = startJsonObject.getString("lat");
-                getStart_lng[i] = startJsonObject.getString("lng");
+                String[] getInstructions = new String[list_len];
+                String[] getDistance = new String[list_len];
+                String[] getDuration = new String[list_len];
+                String[] getEnd_lat = new String[list_len];
+                String[] getEnd_lng = new String[list_len];
+                String[] getStart_lat = new String[list_len];
+                String[] getStart_lng = new String[list_len];
+                String[] arrival_name = new String[list_len];
+                String[] depart_name = new String[list_len];
+                String[] getHeadsign = new String[list_len];
+                String[] getBusNo = new String[list_len];
 
-                String duration = stepsObject.getString("duration");
-                JSONObject durJsonObject = new JSONObject(duration);
-                getDuration[i] = durJsonObject.getString("text");
+                for (int i = 0; i < list_len; i++) {
+                    JSONObject stepsObject = stepsArray.getJSONObject(i);
+                    getInstructions[i] = stepsObject.getString("html_instructions");
+                    String[] Check = getInstructions[i].split(" ");
+                    String TransitCheck = Check[0];
 
-                String distance = stepsObject.getString("distance");
-                JSONObject disJsonObject = new JSONObject(distance);
-                getDistance[i] = disJsonObject.getString("text");
+                    String end_location = stepsObject.getString("end_location");
+                    JSONObject endJsonObject = new JSONObject(end_location);
+                    getEnd_lat[i] = endJsonObject.getString("lat");
+                    getEnd_lng[i] = endJsonObject.getString("lng");
 
-                if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
-                        || TransitCheck.equals("train") || TransitCheck.equals("rail")
-                        || TransitCheck.equals("버스") || TransitCheck.equals("지하철")) {
+                    String start_location = stepsObject.getString("start_location");
+                    JSONObject startJsonObject = new JSONObject(start_location);
+                    getStart_lat[i] = startJsonObject.getString("lat");
+                    getStart_lng[i] = startJsonObject.getString("lng");
 
-                    System.out.println(TransitCheck);
+                    String duration = stepsObject.getString("duration");
+                    JSONObject durJsonObject = new JSONObject(duration);
+                    getDuration[i] = durJsonObject.getString("text");
 
-                    String transit_details = stepsObject.getString("transit_details");
-                    JSONObject transitObject = new JSONObject(transit_details);
+                    String distance = stepsObject.getString("distance");
+                    JSONObject disJsonObject = new JSONObject(distance);
+                    getDistance[i] = disJsonObject.getString("text");
 
-                    String arrival_stop = transitObject.getString("arrival_stop");
-                    JSONObject arrivalObject = new JSONObject(arrival_stop);
-                    arrival_name[i] = arrivalObject.getString("name");
+                    if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
+                            || TransitCheck.equals("train") || TransitCheck.equals("rail")) {
 
-                    String depart_stop = transitObject.getString("departure_stop");
-                    JSONObject departObject = new JSONObject(depart_stop);
-                    depart_name[i] = departObject.getString("name");
+                        System.out.println(TransitCheck);
 
-                    getHeadsign[i] = transitObject.getString("headsign");
+                        String transit_details = stepsObject.getString("transit_details");
+                        JSONObject transitObject = new JSONObject(transit_details);
 
-                    String line = transitObject.getString("line");
-                    JSONObject lineObject = new JSONObject(line);
-                    getBusNo[i] = lineObject.getString("short_name");
+                        String arrival_stop = transitObject.getString("arrival_stop");
+                        JSONObject arrivalObject = new JSONObject(arrival_stop);
+                        arrival_name[i] = arrivalObject.getString("name");
 
+                        String depart_stop = transitObject.getString("departure_stop");
+                        JSONObject departObject = new JSONObject(depart_stop);
+                        depart_name[i] = departObject.getString("name");
+
+                        getHeadsign[i] = transitObject.getString("headsign");
+
+                        String line = transitObject.getString("line");
+                        JSONObject lineObject = new JSONObject(line);
+                        getBusNo[i] = lineObject.getString("short_name");
+
+                    }
+
+                    if (!TransitCheck.equals("Bus") && !TransitCheck.equals("Subway")
+                            && !TransitCheck.equals("train") && !TransitCheck.equals("rail")) {
+
+                        step = getInstructions[i] + "\n걸리는 시간 : " + getDuration[i] + "\n";
+
+                    } else if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
+                            || TransitCheck.equals("train") || TransitCheck.equals("rail")) {
+                        step = getInstructions[i] +
+                                "\n걸리는 시간 : " + getDuration[i] +
+                                "\n" + depart_name[i] + " 승차" +
+                                "\n" + arrival_name[i] + " 하차" +
+                                "\n + " + getHeadsign[i] + "방향" +
+                                "\n버스 번호 : " + getBusNo[i] + "\n";
+                    }
+
+                    if (entire_step == null) {
+                        entire_step = step;
+                        step = null;
+                    } else {
+                        entire_step += step;
+                        step = null;
+                    }
                 }
 
-                if (!TransitCheck.equals("Bus") && !TransitCheck.equals("Subway")
-                        && !TransitCheck.equals("train") && !TransitCheck.equals("rail")
-                        && TransitCheck.equals("버스") || TransitCheck.equals("지하철")) {
-
-                    sol = getInstructions[i] + "\n걸리는 시간 : " + getDuration[i] + "\n\n";
-                } else if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
-                        || TransitCheck.equals("train") || TransitCheck.equals("rail")
-                        || TransitCheck.equals("버스") || TransitCheck.equals("지하철")) {
-                    sol = getInstructions[i] +
-                            "\n걸리는 시간 : " + getDuration[i] +
-                            "\n" + depart_name[i] + " 승차" +
-                            "\n" + arrival_name[i] + " 하차" +
-                            "\n + " + getHeadsign[i] + "방향" +
-                            "\n버스 번호 : " + getBusNo[i] + "\n\n";
-                }
-
-                if (entire_sol == null) {
-                    entire_sol = sol;
-                } else {
-                    entire_sol += sol;
-                }
+                title_view("출발 : " + depart);
+                method_view(entire_step);
+                title_view("도착 : " + arrival + "\n\n");
+                text_count += 3;
+                // 동적 TextView 추가
             }
-
-            title_view("출발 : " + depart);
-            method_view(entire_sol);
-            title_view("도착 : " + arrival + "\n");
 
         } catch(InterruptedException e) {
             e.printStackTrace();
@@ -311,7 +323,7 @@ public class TrafficSearchActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-    }
+    } // 하나의 출발지-도착지에 대한 루트를 보여줌
 
     public void method_view(String a) {
         TextView method = new TextView(this);
@@ -323,7 +335,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         method.setLayoutParams(lp);
 
-        method_container.addView(method);
+        container.addView(method);
     }
 
     public void title_view(String a) {
@@ -336,7 +348,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         title.setLayoutParams(lp);
 
-        method_container.addView(title);
+        container.addView(title);
     }
 
     @Override
@@ -493,7 +505,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
-
     @Override
     protected void onStop() {
 
@@ -505,7 +516,6 @@ public class TrafficSearchActivity extends AppCompatActivity
             mFusedLocationClient.removeLocationUpdates(locationCallback);
         }
     }
-
 
     public String getCurrentAddress(LatLng latlng) {
 
@@ -530,7 +540,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         }
 
-
         if (addresses == null || addresses.size() == 0) {
             Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
             return "주소 미발견";
@@ -542,14 +551,12 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
-
     public boolean checkLocationServicesStatus() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
-
 
     public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
 
@@ -565,7 +572,6 @@ public class TrafficSearchActivity extends AppCompatActivity
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
 
-
         currentMarker = mMap.addMarker(markerOptions);
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
@@ -573,9 +579,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
-
     public void setDefaultLocation() {
-
 
         //디폴트 위치, Seoul
         LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
@@ -598,7 +602,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
-
     //여기부터는 런타임 퍼미션 처리을 위한 메소드들
     private boolean checkPermission() {
 
@@ -616,7 +619,6 @@ public class TrafficSearchActivity extends AppCompatActivity
         return false;
 
     }
-
 
     /*
      * ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
@@ -683,7 +685,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         }
     }
-
 
     //여기부터는 GPS 활성화를 위한 메소드들
     private void showDialogForLocationServiceSetting() {
