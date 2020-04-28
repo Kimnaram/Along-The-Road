@@ -84,7 +84,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     // 앱을 실행하기 위해 필요한 퍼미션을 정의합니다.
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
 
-    Location mCurrentLocatiion;
+    Location mCurrentLocation;
     LatLng currentPosition;
 
     private FusedLocationProviderClient mFusedLocationClient;
@@ -95,13 +95,17 @@ public class TrafficSearchActivity extends AppCompatActivity
     // (참고로 Toast에서는 Context가 필요했습니다.)
 
     /****************************** Directions API 관련 변수 *******************************/
-    private static final String API_KEY="API KEY";
+    private static final String API_KEY="";
     private LinearLayout container;
     private String str_url = null;
     private String option = "";
     private String travel_mode = "transit";
     private String step = null;
     private String entire_step = null;
+    private String departure_lat;
+    private String departure_lng;
+    private String arrival_lat;
+    private String arrival_lng;
 
     private int list_len = 0;
 
@@ -297,6 +301,8 @@ public class TrafficSearchActivity extends AppCompatActivity
                                 "\n" + arrival_name[i] + " 하차" +
                                 "\n + " + getHeadsign[i] + "방향" +
                                 "\n버스 번호 : " + getBusNo[i] + "\n";
+                        departure_lat = getStart_lat[i];
+                        departure_lng = getStart_lng[i];
                     }
 
                     if (entire_step == null) {
@@ -330,6 +336,28 @@ public class TrafficSearchActivity extends AppCompatActivity
         method.setText(a);
         method.setTextSize(15);
         method.setTextColor(Color.GRAY);
+        method.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double latitude = Double.parseDouble(departure_lat);
+                double lngtitude = Double.parseDouble(departure_lng);
+                LatLng dep_location = new LatLng(latitude, lngtitude);
+                String markerTitle = getCurrentAddress(dep_location);
+                String markerSnippet = "위도:" + latitude
+                        + " 경도:" + lngtitude;
+                Location dep = new Location("departure_loc");
+                dep.setLatitude(latitude);
+                dep.setLongitude(lngtitude);
+
+                Log.d(TAG, "onLocationResult : " + markerSnippet);
+
+                // 위치에 마커 생성하고 그 위치로 이동
+                setCurrentLocation(dep, markerTitle, markerSnippet);
+                mCurrentLocation = dep;
+                // 현재 위치 보여주는거 모두 지우고
+                // 폴리라인 그리기
+            }
+        });
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -445,7 +473,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                 //현재 위치에 마커 생성하고 이동
                 setCurrentLocation(location, markerTitle, markerSnippet);
 
-                mCurrentLocatiion = location;
+                mCurrentLocation = location;
             }
 
 
