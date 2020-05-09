@@ -3,6 +3,7 @@ package com.example.along_the_road;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -12,8 +13,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import android.Manifest;
-import android.location.Location;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,13 +54,21 @@ public class TrafficSearchActivity extends AppCompatActivity
     private String entire_step = null;
     private String departure_lat;
     private String departure_lng;
+    private String[][] going_lat;
+    private String[][] going_lng;
     private String arrival_lat;
     private String arrival_lng;
-    private int count = 0;
 
-    private int list_len = 0;
+    private int r_list_len = 0;
+    private int[] list_len;
 
     private int text_count = 0;
+    private int count = 0;
+    private int num = 0;
+
+    // Drawable bus_img = getResources().getDrawable(R.drawable.bus);
+    // Drawable walk_img = container.getContext().getResources().getDrawable(R.drawable.walking);
+    // Drawable subway_img = getApplicationContext().getResources().getDrawable(R.drawable.subway);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +129,12 @@ public class TrafficSearchActivity extends AppCompatActivity
         String depart = dep_loc.getText().toString();
         String arrival = arr_loc.getText().toString();
 
+        directions(depart, arrival);
+
+    }
+
+    public void directions(String depart, String arrival) {
+
         if(travel_mode.equals("transit")) {
             str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
                     "origin=" + depart + "&destination=" + arrival + "&mode=" + travel_mode + "&departure_time=now" +
@@ -149,6 +162,9 @@ public class TrafficSearchActivity extends AppCompatActivity
 
 
             for(int j = 0; j <= routesArray.length(); j++) {
+
+                r_list_len = routesArray.length();
+
                 entire_step = null;
 
                 JSONObject subJsonObject = routesArray.getJSONObject(j);
@@ -160,25 +176,28 @@ public class TrafficSearchActivity extends AppCompatActivity
                 String leg_duration = legJsonObject.getString("duration");
                 JSONObject legdurObject = new JSONObject(leg_duration);
                 String amountDuration = legdurObject.getString("text");
-                amountDuration = amountDuration.split(" ")[0];
 
                 String steps = legJsonObject.getString("steps");
                 JSONArray stepsArray = new JSONArray(steps);
-                list_len = stepsArray.length();
 
-                String[] getInstructions = new String[list_len];
-                String[] getDistance = new String[list_len];
-                String[] getDuration = new String[list_len];
-                String[] getEnd_lat = new String[list_len];
-                String[] getEnd_lng = new String[list_len];
-                String[] getStart_lat = new String[list_len];
-                String[] getStart_lng = new String[list_len];
-                String[] arrival_name = new String[list_len];
-                String[] depart_name = new String[list_len];
-                String[] getHeadsign = new String[list_len];
-                String[] getBusNo = new String[list_len];
+                list_len = new int[r_list_len];
+                list_len[j] = stepsArray.length();
 
-                for (int i = 0; i < list_len; i++) {
+                String[] getInstructions = new String[list_len[j]];
+                String[] getDistance = new String[list_len[j]];
+                String[] getDuration = new String[list_len[j]];
+                String[] getEnd_lat = new String[list_len[j]];
+                String[] getEnd_lng = new String[list_len[j]];
+                String[] getStart_lat = new String[list_len[j]];
+                String[] getStart_lng = new String[list_len[j]];
+                String[] arrival_name = new String[list_len[j]];
+                String[] depart_name = new String[list_len[j]];
+                String[] getHeadsign = new String[list_len[j]];
+                String[] getTransit = new String[list_len[j]];
+                going_lat = new String[r_list_len][list_len[j]];
+                going_lng = new String[r_list_len][list_len[j]];
+
+                for (int i = 0; i < list_len[j]; i++) {
                     JSONObject stepsObject = stepsArray.getJSONObject(i);
                     getInstructions[i] = stepsObject.getString("html_instructions");
                     String[] Check = getInstructions[i].split(" ");
@@ -188,13 +207,26 @@ public class TrafficSearchActivity extends AppCompatActivity
                     JSONObject endJsonObject = new JSONObject(end_location);
                     getEnd_lat[i] = endJsonObject.getString("lat");
                     getEnd_lng[i] = endJsonObject.getString("lng");
+                    if(i < (list_len[j] - 1)) {
+                        going_lat[j][i] = getEnd_lat[i];
+                        going_lng[j][i] = getEnd_lng[i];
+                        System.out.println("진행 : " + going_lat[j][i] + ", " + going_lng[j][i]);
+                    } else {
+                        arrival_lat = getEnd_lat[i];
+                        arrival_lng = getEnd_lng[i];
+                    }
 
                     String start_location = stepsObject.getString("start_location");
                     JSONObject startJsonObject = new JSONObject(start_location);
                     getStart_lat[i] = startJsonObject.getString("lat");
                     getStart_lng[i] = startJsonObject.getString("lng");
-                    arrival_lat = getEnd_lat[i];
-                    arrival_lng = getEnd_lng[i];
+                    if(i == 0) {
+                        departure_lat = getStart_lat[i];
+                        departure_lng = getStart_lng[i];
+                    } else {
+                        going_lat[j][i] = getStart_lat[i];
+                        going_lng[j][i] = getStart_lng[i];
+                    }
 
                     String duration = stepsObject.getString("duration");
                     JSONObject durJsonObject = new JSONObject(duration);
@@ -225,7 +257,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                         String line = transitObject.getString("line");
                         JSONObject lineObject = new JSONObject(line);
-                        getBusNo[i] = lineObject.getString("short_name");
+                        getTransit[i] = lineObject.getString("short_name");
 
                     }
 
@@ -233,36 +265,22 @@ public class TrafficSearchActivity extends AppCompatActivity
                             && !TransitCheck.equals("train") && !TransitCheck.equals("rail")) {
 
                         step = "도보 " + getDuration[i] + "분\n";
+                        System.out.println(getInstructions[i] + "\n");
 
                     } else if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
                             || TransitCheck.equals("train") || TransitCheck.equals("rail")) {
-                        step = "버스 번호 : " + getBusNo[i] + "\n";
-                        System.out.println(step);
-                        departure_lat = getStart_lat[i];
-                        departure_lng = getStart_lng[i];
+                        step = getTransit[i] + "\n";
+                        System.out.println(getInstructions[i] + "\n");
                     }
 
                     if (entire_step == null) {
-                        entire_step = amountDuration + "분\n";
-                        entire_step += step;
+                        entire_step = step;
                         step = null;
                     } else {
                         entire_step += step;
                         step = null;
                     }
                 }
-
-                double latitude = Double.parseDouble(departure_lat);
-                double lngtitude = Double.parseDouble(departure_lng);
-
-                LatLng Start = new LatLng(latitude, lngtitude);
-
-                marker = mMap.addMarker(new MarkerOptions().position(Start).title("출발"));
-
-                onMapReady(mMap);
-
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(Start));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
                 if(count == 0) {
                     recommend_view("추천 경로");
@@ -271,9 +289,10 @@ public class TrafficSearchActivity extends AppCompatActivity
                 } else if(count > 1) {
                     recommend_view(" ");
                 }
+                method_view(amountDuration);
                 method_view(entire_step);
                 count += 1;
-                text_count += 2;
+                text_count += 3;
                 // 동적 TextView 추가
             }
 
@@ -289,22 +308,58 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     public void method_view(String a) {
         TextView method = new TextView(this);
+
+        ++num;
+
+        method.setId(num);
+        System.out.println("텍스트뷰 : " + num + "\n");
         method.setText(a);
         method.setTextSize(15);
         method.setTextColor(Color.GRAY);
+        // method.setCompoundDrawables(bus_img, null, null, null);
+
         method.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                double latitude = Double.parseDouble(arrival_lat);
-                double lngtitude = Double.parseDouble(arrival_lng);
-                LatLng End = new LatLng(latitude, lngtitude);
+
+                mMap.clear();
+
+                double dlatitude = Double.parseDouble(departure_lat);
+                double dlngtitude = Double.parseDouble(departure_lng);
+
+                LatLng Start = new LatLng(dlatitude, dlngtitude);
+
+                marker = mMap.addMarker(new MarkerOptions().position(Start).title("출발"));
+
+                onMapReady(mMap);
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(Start));
+
+                for (int j = 0; j < r_list_len; j++) {
+
+                    for (int i = 0; i < list_len[j]; i++) {
+
+                        double glatitude = Double.parseDouble(going_lat[j][i]);
+                        double glngtitude = Double.parseDouble(going_lng[j][i]);
+                        LatLng End = new LatLng(glatitude, glngtitude);
+
+                        marker = mMap.addMarker(new MarkerOptions().position(End).title("진행 : " + glatitude + "," + glngtitude));
+
+                        onMapReady(mMap);
+
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(End));
+                    }
+                }
+
+                double alatitude = Double.parseDouble(arrival_lat);
+                double alngtitude = Double.parseDouble(arrival_lng);
+                LatLng End = new LatLng(alatitude, alngtitude);
 
                 marker = mMap.addMarker(new MarkerOptions().position(End).title("도착"));
 
                 onMapReady(mMap);
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(End));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
             }
         });
@@ -336,7 +391,7 @@ public class TrafficSearchActivity extends AppCompatActivity
         LatLng SEOUL = new LatLng(37.56, 126.97);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(SEOUL));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
 
     }
 
