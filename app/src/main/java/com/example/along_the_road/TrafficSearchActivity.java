@@ -3,7 +3,6 @@ package com.example.along_the_road;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -25,6 +24,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +43,8 @@ public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private Marker marker;
+    private Marker marker1;
+    private Marker marker2;
 
     /****************************** Directions API 관련 변수 *******************************/
     private static final String API_KEY="";
@@ -54,17 +56,21 @@ public class TrafficSearchActivity extends AppCompatActivity
     private String entire_step = null;
     private String departure_lat;
     private String departure_lng;
-    private String[][] going_lat;
-    private String[][] going_lng;
+    private String[][] goingS_lat;
+    private String[][] goingS_lng;
+    private String[][] goingE_lat;
+    private String[][] goingE_lng;
     private String arrival_lat;
     private String arrival_lng;
+    private String[][] TransitName;
 
     private int r_list_len = 0;
     private int[] list_len;
 
     private int text_count = 0;
     private int count = 0;
-    private int num = 0;
+
+    private Polyline polyline = null;
 
     // Drawable bus_img = getResources().getDrawable(R.drawable.bus);
     // Drawable walk_img = container.getContext().getResources().getDrawable(R.drawable.walking);
@@ -160,8 +166,7 @@ public class TrafficSearchActivity extends AppCompatActivity
             String routes = jsonObject.getString("routes");
             JSONArray routesArray = new JSONArray(routes);
 
-
-            for(int j = 0; j <= routesArray.length(); j++) {
+            for(int j = 0; j < routesArray.length(); j++) {
 
                 r_list_len = routesArray.length();
 
@@ -194,8 +199,11 @@ public class TrafficSearchActivity extends AppCompatActivity
                 String[] depart_name = new String[list_len[j]];
                 String[] getHeadsign = new String[list_len[j]];
                 String[] getTransit = new String[list_len[j]];
-                going_lat = new String[r_list_len][list_len[j]];
-                going_lng = new String[r_list_len][list_len[j]];
+                goingS_lat = new String[r_list_len][list_len[j]];
+                goingS_lng = new String[r_list_len][list_len[j]];
+                goingE_lat = new String[r_list_len][list_len[j]];
+                goingE_lng = new String[r_list_len][list_len[j]];
+                TransitName = new String[r_list_len][list_len[j]];
 
                 for (int i = 0; i < list_len[j]; i++) {
                     JSONObject stepsObject = stepsArray.getJSONObject(i);
@@ -207,14 +215,12 @@ public class TrafficSearchActivity extends AppCompatActivity
                     JSONObject endJsonObject = new JSONObject(end_location);
                     getEnd_lat[i] = endJsonObject.getString("lat");
                     getEnd_lng[i] = endJsonObject.getString("lng");
-                    if(i < (list_len[j] - 1)) {
-                        going_lat[j][i] = getEnd_lat[i];
-                        going_lng[j][i] = getEnd_lng[i];
-                        System.out.println("진행 : " + going_lat[j][i] + ", " + going_lng[j][i]);
-                    } else {
+                    if(i >= list_len[j] - 1) {
                         arrival_lat = getEnd_lat[i];
                         arrival_lng = getEnd_lng[i];
                     }
+                    goingE_lat[j][i] = getEnd_lat[i];
+                    goingE_lng[j][i] = getEnd_lng[i];
 
                     String start_location = stepsObject.getString("start_location");
                     JSONObject startJsonObject = new JSONObject(start_location);
@@ -223,10 +229,9 @@ public class TrafficSearchActivity extends AppCompatActivity
                     if(i == 0) {
                         departure_lat = getStart_lat[i];
                         departure_lng = getStart_lng[i];
-                    } else {
-                        going_lat[j][i] = getStart_lat[i];
-                        going_lng[j][i] = getStart_lng[i];
                     }
+                    goingS_lat[j][i] = getStart_lat[i];
+                    goingS_lng[j][i] = getStart_lng[i];
 
                     String duration = stepsObject.getString("duration");
                     JSONObject durJsonObject = new JSONObject(duration);
@@ -239,8 +244,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                     if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
                             || TransitCheck.equals("train") || TransitCheck.equals("rail")) {
-
-                        System.out.println(TransitCheck);
 
                         String transit_details = stepsObject.getString("transit_details");
                         JSONObject transitObject = new JSONObject(transit_details);
@@ -258,6 +261,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                         String line = transitObject.getString("line");
                         JSONObject lineObject = new JSONObject(line);
                         getTransit[i] = lineObject.getString("short_name");
+                        TransitName[j][i] = getTransit[i];
 
                     }
 
@@ -265,12 +269,10 @@ public class TrafficSearchActivity extends AppCompatActivity
                             && !TransitCheck.equals("train") && !TransitCheck.equals("rail")) {
 
                         step = "도보 " + getDuration[i] + "분\n";
-                        System.out.println(getInstructions[i] + "\n");
 
                     } else if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
                             || TransitCheck.equals("train") || TransitCheck.equals("rail")) {
                         step = getTransit[i] + "\n";
-                        System.out.println(getInstructions[i] + "\n");
                     }
 
                     if (entire_step == null) {
@@ -284,15 +286,15 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                 if(count == 0) {
                     recommend_view("추천 경로");
+                    text_count += 2;
                 } else if(count == 1) {
                     recommend_view("다른 경로 더 보기");
+                    text_count += 2;
                 } else if(count > 1) {
-                    recommend_view(" ");
+                    text_count += 1;
                 }
-                method_view(amountDuration);
-                method_view(entire_step);
+                method_view(amountDuration + "\n" + entire_step);
                 count += 1;
-                text_count += 3;
                 // 동적 TextView 추가
             }
 
@@ -304,15 +306,13 @@ public class TrafficSearchActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        count = 0;
+
     }
 
     public void method_view(String a) {
-        TextView method = new TextView(this);
+        final TextView method = new TextView(this);
 
-        ++num;
-
-        method.setId(num);
-        System.out.println("텍스트뷰 : " + num + "\n");
         method.setText(a);
         method.setTextSize(15);
         method.setTextColor(Color.GRAY);
@@ -329,37 +329,72 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                 LatLng Start = new LatLng(dlatitude, dlngtitude);
 
-                marker = mMap.addMarker(new MarkerOptions().position(Start).title("출발"));
+                marker1 = mMap.addMarker(new MarkerOptions().position(Start).title("출발"));
 
                 onMapReady(mMap);
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(Start));
 
-                for (int j = 0; j < r_list_len; j++) {
+                for(int j = 0; j < r_list_len; j++) {
 
-                    for (int i = 0; i < list_len[j]; i++) {
+                    int list_num = list_len[j];
 
-                        double glatitude = Double.parseDouble(going_lat[j][i]);
-                        double glngtitude = Double.parseDouble(going_lng[j][i]);
-                        LatLng End = new LatLng(glatitude, glngtitude);
+                    for (int i = 0; i < list_num; i++) {
 
-                        marker = mMap.addMarker(new MarkerOptions().position(End).title("진행 : " + glatitude + "," + glngtitude));
+                        if (goingE_lat[j][i] != null) {
 
-                        onMapReady(mMap);
+                            double gelatitude = Double.parseDouble(goingE_lat[j][i]);
+                            double gelngtitude = Double.parseDouble(goingE_lng[j][i]);
+                            String Transit_n = TransitName[j][i];
 
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(End));
+                            LatLng GoingE = new LatLng(gelatitude, gelngtitude);
+
+                            if (Transit_n == null) {
+                                Transit_n = "도보";
+                                marker1 = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " : " + gelatitude + "," + gelngtitude));
+
+                            } else {
+                                marker1 = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차 : " + gelatitude + "," + gelngtitude));
+                            }
+
+                            onMapReady(mMap);
+
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(GoingE));
+                        }
+
+                        if (goingS_lat[j][i] != null) {
+
+                            double gslatitude = Double.parseDouble(goingS_lat[j][i]);
+                            double gslngtitude = Double.parseDouble(goingS_lng[j][i]);
+                            String Transit_n = TransitName[j][i];
+
+                            LatLng GoingS = new LatLng(gslatitude, gslngtitude);
+
+                            if (Transit_n == null) {
+                                Transit_n = "도보";
+                                marker2 = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " : " + gslatitude + "," + gslngtitude));
+                            } else {
+                                marker2 = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " 승차 : " + gslatitude + "," + gslngtitude));
+                            }
+
+                            onMapReady(mMap);
+
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(GoingS));
+                        }
                     }
                 }
 
                 double alatitude = Double.parseDouble(arrival_lat);
                 double alngtitude = Double.parseDouble(arrival_lng);
+
                 LatLng End = new LatLng(alatitude, alngtitude);
 
-                marker = mMap.addMarker(new MarkerOptions().position(End).title("도착"));
+                marker2 = mMap.addMarker(new MarkerOptions().position(End).title("도착"));
 
                 onMapReady(mMap);
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(End));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
             }
         });
@@ -369,13 +404,14 @@ public class TrafficSearchActivity extends AppCompatActivity
         method.setLayoutParams(lp);
 
         container.addView(method);
+
     }
 
     public void recommend_view(String a) {
         TextView recommend = new TextView(this);
         recommend.setText(a);
         recommend.setTextSize(13);
-        recommend.setTextColor(Color.rgb(102, 102, 102));
+        recommend.setTextColor(Color.rgb(133, 133, 133));
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -393,6 +429,12 @@ public class TrafficSearchActivity extends AppCompatActivity
         mMap.moveCamera(CameraUpdateFactory.newLatLng(SEOUL));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
 
+        polyline = mMap.addPolyline(new PolylineOptions()
+                .clickable(true)
+                .color(Color.BLUE)
+                .add(
+                        new LatLng(37.56, 126.97)));
+        polyline.setTag("route");
     }
 
     public class Task extends AsyncTask<String, Void, String> {
