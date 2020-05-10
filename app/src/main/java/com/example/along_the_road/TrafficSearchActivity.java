@@ -43,8 +43,9 @@ public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private Marker marker1;
-    private Marker marker2;
+    private Marker start_m;
+    private Marker end_m;
+    private Marker[] marker_arr;
 
     /****************************** Directions API 관련 변수 *******************************/
     private static final String API_KEY="";
@@ -329,7 +330,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                 LatLng Start = new LatLng(dlatitude, dlngtitude);
 
-                marker1 = mMap.addMarker(new MarkerOptions().position(Start).title("출발"));
+                start_m = mMap.addMarker(new MarkerOptions().position(Start).title("출발"));
 
                 onMapReady(mMap);
 
@@ -338,23 +339,24 @@ public class TrafficSearchActivity extends AppCompatActivity
                 for(int j = 0; j < r_list_len; j++) {
 
                     int list_num = list_len[j];
+                    marker_arr = new Marker[list_num];
 
                     for (int i = 0; i < list_num; i++) {
 
                         if (goingE_lat[j][i] != null) {
 
                             double gelatitude = Double.parseDouble(goingE_lat[j][i]);
-                            double gelngtitude = Double.parseDouble(goingE_lng[j][i]);
+                            double gelngtitude = Double.parseDouble(goingE_lng[j][i]) + 0.1;
                             String Transit_n = TransitName[j][i];
 
                             LatLng GoingE = new LatLng(gelatitude, gelngtitude);
 
                             if (Transit_n == null) {
                                 Transit_n = "도보";
-                                marker1 = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " : " + gelatitude + "," + gelngtitude));
+                                marker_arr[i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " : " + gelatitude + "," + gelngtitude));
 
                             } else {
-                                marker1 = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차 : " + gelatitude + "," + gelngtitude));
+                                marker_arr[i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차 : " + gelatitude + "," + gelngtitude));
                             }
 
                             onMapReady(mMap);
@@ -372,9 +374,10 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                             if (Transit_n == null) {
                                 Transit_n = "도보";
-                                marker2 = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " : " + gslatitude + "," + gslngtitude));
+                                // 도보 전 지하철 하차, 버스 하차 등을 표시할 수 있도록
+                                marker_arr[i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " : " + gslatitude + "," + gslngtitude));
                             } else {
-                                marker2 = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " 승차 : " + gslatitude + "," + gslngtitude));
+                                marker_arr[i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " 승차 : " + gslatitude + "," + gslngtitude));
                             }
 
                             onMapReady(mMap);
@@ -389,7 +392,36 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                 LatLng End = new LatLng(alatitude, alngtitude);
 
-                marker2 = mMap.addMarker(new MarkerOptions().position(End).title("도착"));
+                end_m = mMap.addMarker(new MarkerOptions().position(End).title("도착"));
+
+                for(int i = 0; i < marker_arr.length - 1; i++) {
+
+                    if(i >= marker_arr.length - 2) {
+                        polyline = mMap.addPolyline(new PolylineOptions()
+                                .clickable(true)
+                                .color(Color.BLACK)
+                                .add(
+                                        marker_arr[i].getPosition(),
+                                        marker_arr[i + 1].getPosition(),
+                                        End));
+                        polyline.setTag("route2");
+                    } else {
+                        polyline = mMap.addPolyline(new PolylineOptions()
+                                .clickable(true)
+                                .color(Color.BLACK)
+                                .add(
+                                        marker_arr[i].getPosition(),
+                                        marker_arr[i + 1].getPosition()));
+                        polyline.setTag("route2");
+                    }
+                }
+
+                polyline = mMap.addPolyline(new PolylineOptions()
+                        .clickable(true)
+                        .color(Color.BLACK)
+                        .add(
+                                End));
+                polyline.setTag("route2");
 
                 onMapReady(mMap);
 
@@ -428,13 +460,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(SEOUL));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-
-        polyline = mMap.addPolyline(new PolylineOptions()
-                .clickable(true)
-                .color(Color.BLUE)
-                .add(
-                        new LatLng(37.56, 126.97)));
-        polyline.setTag("route");
     }
 
     public class Task extends AsyncTask<String, Void, String> {
