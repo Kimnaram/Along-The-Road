@@ -26,7 +26,7 @@ public class DaySelectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dayselect);
 
         Intent intent = getIntent();
-        final String city = intent.getExtras().getString("city");
+//        final String city = intent.getExtras().getString("city");
         final Button next_btn = findViewById(R.id.next);
         final TextView depart_date = findViewById(R.id.depart_date);
         final TextView arrive_date = findViewById(R.id.arrive_date);
@@ -138,7 +138,7 @@ public class DaySelectActivity extends AppCompatActivity {
                             public void onClick(View view) {
                                 Intent intent = new Intent(getApplicationContext(), HotelSelectActivity.class);
 
-                                intent.putExtra("city", city);
+                                // intent.putExtra("city", city);
                                 intent.putExtra("start_date ", start_date);
                                 intent.putExtra("end_date", end_date);
 
