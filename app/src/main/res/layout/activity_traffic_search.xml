@@ -7,59 +7,88 @@
     android:id="@+id/layout_traffic"
     tools:context=".TrafficSearchActivity">
 
-    <TableLayout
-        android:background="#00ff0000"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" >
 
-        <TableRow
-            android:paddingLeft="10sp"
-            android:paddingRight="10sp">
-
-            <EditText
-                android:id="@+id/depart_loc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:hint="출발지"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:gravity="center"
-                android:text="↔"
-                android:textSize="18sp" />
-
-            <EditText
-                android:id="@+id/arrive_loc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:hint="도착지"
-                android:layout_weight="1.5"
-                android:textSize="15sp"/>
-
-        </TableRow>
-        <!--
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10sp"
-                android:paddingRight="10sp">
-        -->
-        <fragment
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/map"
-            tools:context=".MapsActivity"
-            android:name="com.google.android.gms.maps.SupportMapFragment" />
-        <!--
-            </TableRow>
+            android:orientation="vertical"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp" >
 
-        -->
-    </TableLayout>
+
+            <TableLayout
+                android:background="#00ff0000"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:stretchColumns="*">
+
+                <TableRow>
+
+                    <EditText
+                        android:id="@+id/depart_loc"
+                        android:layout_width="220sp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:hint="출발지"
+                        android:textSize="15sp" />
+
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/arrow"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="↔"
+                        android:textSize="23sp" />
+
+                    <EditText
+                        android:id="@+id/arrive_loc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:gravity="center"
+                        android:hint="도착지"
+                        android:layout_weight="2"
+                        android:textSize="15sp"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text" />
+
+                    <Button
+                        android:id="@+id/send"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:onClick="sendClick"
+                        android:text="검색"/>
+
+                </TableRow>
+
+                <fragment
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:id="@+id/map"
+                    tools:context=".TrafficSearchActivity"
+                    android:name="com.google.android.gms.maps.SupportMapFragment" />
+
+            </TableLayout>
+
+            <LinearLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
