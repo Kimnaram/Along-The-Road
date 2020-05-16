@@ -37,6 +37,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class TrafficSearchActivity extends AppCompatActivity
@@ -45,7 +46,11 @@ public class TrafficSearchActivity extends AppCompatActivity
     private GoogleMap mMap;
     private Marker start_m;
     private Marker end_m;
-    private Marker[] marker_arr;
+    private Marker[][] marker_arr;
+    private Polyline polyline = null;
+    // private ArrayList<LatLng> entire_path;
+    private LatLng[] getPath;
+    private LatLng End_location;
 
     /****************************** Directions API 관련 변수 *******************************/
     private static final String API_KEY="";
@@ -64,14 +69,14 @@ public class TrafficSearchActivity extends AppCompatActivity
     private String arrival_lat;
     private String arrival_lng;
     private String[][] TransitName;
+    private String[][] getPolyline;
+    private String getOverview = null;
 
     private int r_list_len = 0;
     private int[] list_len;
 
     private int text_count = 0;
     private int count = 0;
-
-    private Polyline polyline = null;
 
     // Drawable bus_img = getResources().getDrawable(R.drawable.bus);
     // Drawable walk_img = container.getContext().getResources().getDrawable(R.drawable.walking);
@@ -138,6 +143,39 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         directions(depart, arrival);
 
+        if(getOverview != null) {
+            ArrayList<LatLng> entire_path = decodePolyPoints(getOverview);
+
+            for(int i = 0; i < entire_path.size(); i++) {
+                if(i == 0) {
+                    mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("출발"));
+                } else if(i >= entire_path.size() - 1) {
+                    mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("도착"));
+                    End_location = entire_path.get(i);
+                }
+            }
+
+            Polyline line = null;
+
+                if (line ==null){
+                    line = mMap.addPolyline(new PolylineOptions()
+                    .color(Color.rgb(0, 153, 255))
+                    .geodesic(true)
+                    .addAll(entire_path));
+                } else {
+                    line.remove();
+                    line = mMap.addPolyline(new PolylineOptions()
+                    .color(Color.rgb(0, 153, 255))
+                    .geodesic(true)
+                    .addAll(entire_path));
+            }
+        }
+
+        onMapReady(mMap);
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(End_location));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
     }
 
     public void directions(String depart, String arrival) {
@@ -166,6 +204,12 @@ public class TrafficSearchActivity extends AppCompatActivity
             JSONObject jsonObject = new JSONObject(resultText);
             String routes = jsonObject.getString("routes");
             JSONArray routesArray = new JSONArray(routes);
+
+            JSONObject preferredObject = routesArray.getJSONObject(0);
+            String singleRoute = preferredObject.getString("overview_polyline");
+            JSONObject pointsObject = new JSONObject(singleRoute);
+            String points = pointsObject.getString("points");
+            getOverview = points;
 
             for(int j = 0; j < routesArray.length(); j++) {
 
@@ -204,9 +248,11 @@ public class TrafficSearchActivity extends AppCompatActivity
                 goingS_lng = new String[r_list_len][list_len[j]];
                 goingE_lat = new String[r_list_len][list_len[j]];
                 goingE_lng = new String[r_list_len][list_len[j]];
+                getPolyline = new String[r_list_len][list_len[j]];
                 TransitName = new String[r_list_len][list_len[j]];
 
                 for (int i = 0; i < list_len[j]; i++) {
+
                     JSONObject stepsObject = stepsArray.getJSONObject(i);
                     getInstructions[i] = stepsObject.getString("html_instructions");
                     String[] Check = getInstructions[i].split(" ");
@@ -233,6 +279,10 @@ public class TrafficSearchActivity extends AppCompatActivity
                     }
                     goingS_lat[j][i] = getStart_lat[i];
                     goingS_lng[j][i] = getStart_lng[i];
+
+                    String polyline = stepsObject.getString("polyline");
+                    JSONObject polyJsonObject = new JSONObject(polyline);
+                    getPolyline[j][i] = polyJsonObject.getString("points");
 
                     String duration = stepsObject.getString("duration");
                     JSONObject durJsonObject = new JSONObject(duration);
@@ -268,7 +318,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                     if (!TransitCheck.equals("Bus") && !TransitCheck.equals("Subway")
                             && !TransitCheck.equals("train") && !TransitCheck.equals("rail")) {
-
                         step = "도보 " + getDuration[i] + "분\n";
 
                     } else if (TransitCheck.equals("Bus") || TransitCheck.equals("Subway")
@@ -311,6 +360,40 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
+    public static ArrayList<LatLng> decodePolyPoints(String encodedPath){
+        int len = encodedPath.length();
+
+        final ArrayList<LatLng> path = new ArrayList<LatLng>();
+        int index = 0;
+        int lat = 0;
+        int lng = 0;
+
+        while (index < len) {
+            int result = 1;
+            int shift = 0;
+            int b;
+            do {
+                b = encodedPath.charAt(index++) - 63 - 1;
+                result += b << shift;
+                shift += 5;
+            } while (b >= 0x1f);
+            lat += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+            result = 1;
+            shift = 0;
+            do {
+                b = encodedPath.charAt(index++) - 63 - 1;
+                result += b << shift;
+                shift += 5;
+            } while (b >= 0x1f);
+            lng += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+            path.add(new LatLng(lat * 1e-5, lng * 1e-5));
+        }
+
+        return path;
+    }
+
     public void method_view(String a) {
         final TextView method = new TextView(this);
 
@@ -339,29 +422,43 @@ public class TrafficSearchActivity extends AppCompatActivity
                 for(int j = 0; j < r_list_len; j++) {
 
                     int list_num = list_len[j];
-                    marker_arr = new Marker[list_num];
+                    marker_arr = new Marker[2][list_num];
 
                     for (int i = 0; i < list_num; i++) {
 
                         if (goingE_lat[j][i] != null) {
 
                             double gelatitude = Double.parseDouble(goingE_lat[j][i]);
-                            double gelngtitude = Double.parseDouble(goingE_lng[j][i]) + 0.1;
+                            double gelngtitude = Double.parseDouble(goingE_lng[j][i]);
                             String Transit_n = TransitName[j][i];
+                            String next_Transit_n = null;
+
+                            if(i + 1 < list_num) {
+                                if(TransitName[j][i + 1] != null)
+                                next_Transit_n = TransitName[j][i + 1];
+                            }
 
                             LatLng GoingE = new LatLng(gelatitude, gelngtitude);
 
                             if (Transit_n == null) {
                                 Transit_n = "도보";
-                                marker_arr[i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " : " + gelatitude + "," + gelngtitude));
-
+                                if(next_Transit_n != null) {
+                                    marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 후, " + next_Transit_n + " 승차"));
+                                }
+                                else {
+                                    if(i == list_num - 1) {
+                                        marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 후, 도착"));
+                                    }
+                                    marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n));
+                                }
                             } else {
-                                marker_arr[i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차 : " + gelatitude + "," + gelngtitude));
+                                if(i == list_num - 1) {
+                                    marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차 후, 도착"));
+                                }
+                                marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차 : " + gelatitude + "," + gelngtitude));
                             }
 
                             onMapReady(mMap);
-
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(GoingE));
                         }
 
                         if (goingS_lat[j][i] != null) {
@@ -369,20 +466,26 @@ public class TrafficSearchActivity extends AppCompatActivity
                             double gslatitude = Double.parseDouble(goingS_lat[j][i]);
                             double gslngtitude = Double.parseDouble(goingS_lng[j][i]);
                             String Transit_n = TransitName[j][i];
+                            String prev_Transit_n = null;
+                            if(i != 0) {
+                               prev_Transit_n = TransitName[j][i - 1];
+                            }
 
                             LatLng GoingS = new LatLng(gslatitude, gslngtitude);
 
                             if (Transit_n == null) {
                                 Transit_n = "도보";
                                 // 도보 전 지하철 하차, 버스 하차 등을 표시할 수 있도록
-                                marker_arr[i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " : " + gslatitude + "," + gslngtitude));
+                                if(prev_Transit_n != null) {
+                                    marker_arr[0][i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(prev_Transit_n + "하차 후, " + Transit_n));
+                                } else {
+                                    marker_arr[0][i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n));
+                                }
                             } else {
-                                marker_arr[i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " 승차 : " + gslatitude + "," + gslngtitude));
+                                marker_arr[0][i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " 승차 : " + gslatitude + "," + gslngtitude));
                             }
 
                             onMapReady(mMap);
-
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(GoingS));
                         }
                     }
                 }
@@ -394,34 +497,18 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                 end_m = mMap.addMarker(new MarkerOptions().position(End).title("도착"));
 
-                for(int i = 0; i < marker_arr.length - 1; i++) {
+                for(int i = 0; i < marker_arr[0].length - 1; i++) {
 
-                    if(i >= marker_arr.length - 2) {
-                        polyline = mMap.addPolyline(new PolylineOptions()
-                                .clickable(true)
-                                .color(Color.BLACK)
-                                .add(
-                                        marker_arr[i].getPosition(),
-                                        marker_arr[i + 1].getPosition(),
-                                        End));
-                        polyline.setTag("route2");
-                    } else {
-                        polyline = mMap.addPolyline(new PolylineOptions()
-                                .clickable(true)
-                                .color(Color.BLACK)
-                                .add(
-                                        marker_arr[i].getPosition(),
-                                        marker_arr[i + 1].getPosition()));
-                        polyline.setTag("route2");
-                    }
+                    polyline = mMap.addPolyline(new PolylineOptions()
+                            .clickable(true)
+                            .color(Color.BLACK)
+                            .add(
+                                    marker_arr[0][i].getPosition(),
+                                    marker_arr[1][i].getPosition(),
+                                    marker_arr[0][i + 1].getPosition(),
+                                    marker_arr[1][i + 1].getPosition()));
+                    polyline.setTag("route");
                 }
-
-                polyline = mMap.addPolyline(new PolylineOptions()
-                        .clickable(true)
-                        .color(Color.BLACK)
-                        .add(
-                                End));
-                polyline.setTag("route2");
 
                 onMapReady(mMap);
 
