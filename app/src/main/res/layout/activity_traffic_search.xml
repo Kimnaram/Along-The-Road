@@ -18,7 +18,6 @@
             android:paddingLeft="10sp"
             android:paddingRight="10sp" >
 
-
             <TableLayout
                 android:background="#00ff0000"
                 android:layout_width="match_parent"
