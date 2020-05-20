@@ -118,6 +118,9 @@ public class TrafficSearchActivity extends AppCompatActivity
         mMap.clear(); // 맵을 clear
         num = 0; // 텍스트뷰 id를 0으로 초기화
 
+        r_list_len = 0;
+        list_len = null;
+
         container = findViewById(R.id.container);
         EditText dep_loc = findViewById(R.id.depart_loc);
         EditText arr_loc = findViewById(R.id.arrive_loc);
@@ -231,7 +234,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             }
 
-            for (int j = 0; j < r_list_len; j++) {
+            for (int j = 0; j < routesArray.length(); j++) {
 
                 entire_step = null; // 경로를 저장하는 변수 초기화
 
@@ -249,6 +252,8 @@ public class TrafficSearchActivity extends AppCompatActivity
                 JSONArray stepsArray = new JSONArray(steps);
 
                 String[] getTravelMode = new String[list_len[j]]; // j번째 route의 step 수만큼 배열 동적 생성
+                String[] getInstructions = new String[list_len[j]]; // 기차인지 판별하는 변수
+                String isTrain = null;
                 //String[] getDistance = new String[list_len[j]];
                 String[] getDuration = new String[list_len[j]];
                 String[] arrival_name = new String[list_len[j]];
@@ -261,6 +266,9 @@ public class TrafficSearchActivity extends AppCompatActivity
                     JSONObject stepsObject = stepsArray.getJSONObject(i);
                     getTravelMode[i] = stepsObject.getString("travel_mode");
 
+                    getInstructions[i] = stepsObject.getString("html_instructions");
+                    isTrain = getInstructions[i].split(" ")[0];
+
                     String end_location = stepsObject.getString("end_location");
                     JSONObject endJsonObject = new JSONObject(end_location);
                     if (i >= list_len[j] - 1) {
@@ -269,7 +277,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                     } else {
                         goingE_lat[j][i] = endJsonObject.getString("lat");
                         goingE_lng[j][i] = endJsonObject.getString("lng");
-                    }
+                    } // 오류 수정 필요
 
                     String start_location = stepsObject.getString("start_location");
                     JSONObject startJsonObject = new JSONObject(start_location);
@@ -310,7 +318,11 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                         String line = transitObject.getString("line");
                         JSONObject lineObject = new JSONObject(line);
-                        getTransit[i] = lineObject.getString("short_name");
+                        if(isTrain.equals("Train")) {
+                            getTransit[i] = lineObject.getString("name");
+                        } else {
+                            getTransit[i] = lineObject.getString("short_name");
+                        }
                         TransitName[j][i] = getTransit[i];
 
                     }
@@ -359,6 +371,8 @@ public class TrafficSearchActivity extends AppCompatActivity
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
         }
 
