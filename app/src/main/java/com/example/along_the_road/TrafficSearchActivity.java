@@ -1,7 +1,9 @@
 package com.example.along_the_road;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -50,9 +52,13 @@ public class TrafficSearchActivity extends AppCompatActivity
     private Marker[][] marker_arr; // 중간 마커 배열
     private LatLng End_location; // 도착 위치 표시
 
+    private Drawable img = null;
+
     /****************************** Directions API 관련 변수 *******************************/
     private static final String API_KEY = "";
+    //private RelativeLayout container;
     private LinearLayout container;
+    private LinearLayout Route_Layout;
     private String str_url = null; // URL
     private String option = null;
     private String travel_mode = "transit";
@@ -73,9 +79,12 @@ public class TrafficSearchActivity extends AppCompatActivity
     private int r_list_len = 0;
     private int[] list_len = null;
 
-    private int text_count = 0;
+    private int C_text_count = 0;
+    private int R_text_count = 0;
     private int count = 0;
-    private int num = 0;
+    // private int M_num = 0;
+    private int Max_num = 0;
+    private int BR_num = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +125,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     public void sendClick(View view) { // 검색 버튼을 클릭하면
 
         mMap.clear(); // 맵을 clear
-        num = 0; // 텍스트뷰 id를 0으로 초기화
+        BR_num = 0;
 
         r_list_len = 0;
         list_len = null;
@@ -169,18 +178,20 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=" + depart + "&destination=" + arrival + "&mode=transit" + "&departure_time=now" +
-                "&alternatives=true&language=Korean&key=" + API_KEY;
-
-        System.out.println(str_url);
+                "&alternatives=true&key=" + API_KEY;
 
         String resultText = "값이 없음";
 
         try {
 
-            if (text_count > 0) {
-                container.removeViewsInLayout(0, text_count);
-                text_count = 0;
+            if (C_text_count > 0) {
+                container.removeAllViews();
+                C_text_count = 0;
             } // 재검색 시, 이전의 TextView 삭제
+            if (R_text_count > 0) {
+                Route_Layout.removeAllViews();
+                R_text_count = 0;
+            }
 
             resultText = new Task().execute().get(); // URL에 있는 내용을 받아옴
 
@@ -212,14 +223,15 @@ public class TrafficSearchActivity extends AppCompatActivity
                 JSONArray stepsArray = new JSONArray(steps);
 
                 list_len[j] = stepsArray.length(); // j번째 route에 step이 몇개인지 저장
+                System.out.println("list_len[j] : " + list_len[j]);
 
-                goingS_lat = new String[r_list_len][list_len[j]]; // route의 개수만큼 그리고 j번째 route의 step 수만큼 배열 동적 생성
-                goingS_lng = new String[r_list_len][list_len[j]];
-                goingE_lat = new String[r_list_len][list_len[j]];
-                goingE_lng = new String[r_list_len][list_len[j]];
-                getPolyline = new String[r_list_len][list_len[j]];
-                TransitName = new String[r_list_len][list_len[j]];
-                marker_arr = new Marker[2][list_len[j]];
+                goingS_lat = new String[r_list_len][20]; // route의 개수만큼 그리고 그 안에 자잘한 route들을 최대 20으로 배열을 생성
+                goingS_lng = new String[r_list_len][20];
+                goingE_lat = new String[r_list_len][20];
+                goingE_lng = new String[r_list_len][20];
+                getPolyline = new String[r_list_len][20];
+                TransitName = new String[r_list_len][20];
+                marker_arr = new Marker[2][20];
 
                 for(int i = 0; i < list_len[j]; i++) {
                     goingS_lat[j][i] = null;
@@ -236,7 +248,19 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             for (int j = 0; j < routesArray.length(); j++) {
 
-                entire_step = null; // 경로를 저장하는 변수 초기화
+                if (count == 0) {
+                    recommend_view("추천 경로");
+                    C_text_count += 1;
+                } else if (count == 1) {
+                    recommend_view("다른 경로 더 보기");
+                    C_text_count += 1;
+                }
+
+                Route_Layout = new LinearLayout(TrafficSearchActivity.this);
+                Route_Layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                Route_Layout.setOrientation(LinearLayout.HORIZONTAL);
+                container.addView(Route_Layout);
 
                 JSONObject subJsonObject = routesArray.getJSONObject(j);
 
@@ -285,6 +309,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                         departure_lat = startJsonObject.getString("lat");
                         departure_lng = startJsonObject.getString("lng");
                     } else {
+                        System.out.println("(j, i)" + j + i);
                         goingS_lat[j][i] = startJsonObject.getString("lat");
                         goingS_lng[j][i] = startJsonObject.getString("lng");
                     }
@@ -343,27 +368,28 @@ public class TrafficSearchActivity extends AppCompatActivity
                         }
                     }
 
-                    if (entire_step == null) {
-                        entire_step = step;
-                        step = null;
-                    } else {
-                        entire_step += step;
-                        step = null;
+                    Resources res = getResources();
+
+                    switch(isTrain) {
+                        case "Train" :
+                        case "Subway" :
+                            img = img = ResourcesCompat.getDrawable(res, R.drawable.subway, null);
+                            break;
+                        case "Bus" :
+                            img = img = ResourcesCompat.getDrawable(res, R.drawable.bus, null);
+                            break;
+//                        case "Walk" :
+//                            img = ResourcesCompat.getDrawable(res, R.drawable.walk, null);
+//                            break;
+                        default:
+                            img = ResourcesCompat.getDrawable(res, R.drawable.walk, null);
                     }
+
+                    method_view(step, img, j);
+                    R_text_count += 1;
                 }
 
-                if (count == 0) {
-                    recommend_view("추천 경로");
-                    text_count += 2;
-                } else if (count == 1) {
-                    recommend_view("다른 경로 더 보기");
-                    text_count += 2;
-                } else if (count > 1) {
-                    text_count += 1;
-                }
-                method_view(amountDuration + "\n" + entire_step);
                 count += 1;
-                // 동적 TextView 추가
             }
 
         } catch (InterruptedException e) {
@@ -414,27 +440,29 @@ public class TrafficSearchActivity extends AppCompatActivity
         return path;
     }
 
-    public void method_view(String a) {
-        final TextView method = new TextView(this);
+    public void method_view(String a, Drawable img, int j) {
 
-        method.setId(num);
-        method.setText(a);
-        method.setTextSize(15);
-        method.setTextColor(Color.GRAY);
-        //method.setCompoundDrawables(getResources().getDrawable(R.drawable.subway), null, null, null);
-        // 이미지 추가 고민...
+        System.out.println("img : " + img);
 
-        final int t_num = method.getId();
+        TextView Method = new TextView(this);
 
-        if (num < r_list_len - 1) {
-            num += 1;
-        }
+        Method.setId(j);
+        Method.setText(a);
+        Method.setTextSize(16);
+        Method.setTextColor(Color.GRAY);
+        int h = 70;
+        int w = 70;
+        img.setBounds(0, 0, w, h);
+        Method.setCompoundDrawables(img, null, null, null);
 
-        method.setOnClickListener(new View.OnClickListener() {
+        final int t_num = Method.getId();
+
+        Method.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 mMap.clear();
+
                 int j = t_num;
 
                 double dlatitude = Double.parseDouble(departure_lat);
@@ -541,27 +569,189 @@ public class TrafficSearchActivity extends AppCompatActivity
             }
         });
 
-
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        method.setLayoutParams(lp);
+        Method.setLayoutParams(lp);
 
-        container.addView(method);
+        Route_Layout.addView(Method);
 
     }
 
     public void recommend_view(String a) {
-        TextView recommend = new TextView(this);
-        recommend.setText(a);
-        recommend.setTextSize(13);
-        recommend.setTextColor(Color.rgb(133, 133, 133));
 
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        TextView Route = new TextView(this);
+
+        Route = new TextView(this);
+        Route.setId(BR_num);
+        Route.setText(a);
+        Route.setTextSize(14);
+        Route.setTextColor(Color.rgb(133, 133, 133));
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        recommend.setLayoutParams(lp);
+        Route.setLayoutParams(lp);
 
-        container.addView(recommend);
+        container.addView(Route);
     }
+
+//    public void method_view(String a, Drawable img) {
+//        Method = new TextView(this);
+//
+//        Method.setId(M_num);
+//        Method.setText(a);
+//        Method.setTextSize(16);
+//        Method.setTextColor(Color.GRAY);
+//        Method.setCompoundDrawables(img, null, null, null);
+//
+//        final int t_num = Method.getId();
+//
+//        if (M_num < r_list_len - 1) {
+//            M_num += 1;
+//        }
+//
+//        Method.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                mMap.clear();
+//                int j = t_num;
+//
+//                double dlatitude = Double.parseDouble(departure_lat);
+//                double dlngtitude = Double.parseDouble(departure_lng);
+//
+//                LatLng Start = new LatLng(dlatitude, dlngtitude);
+//
+//                start_m = mMap.addMarker(new MarkerOptions().position(Start).title("출발"));
+//
+//                for (int i = 0; i < list_len[j]; i++) {
+//
+//                    ArrayList<LatLng> path_points = decodePolyPoints(getPolyline[j][i]); // 폴리라인 포인트 디코드 후 ArrayList에 저장
+//                    System.out.println("polyline["+j+"]["+i+"] : " + getPolyline[j][i]);
+//
+//                    Polyline line = null;
+//
+//                    if (line == null) {
+//                        line = mMap.addPolyline(new PolylineOptions()
+//                                .color(Color.rgb(0, 153, 255))
+//                                .geodesic(true)
+//                                .addAll(path_points));
+//                    } else {
+//                        line.remove();
+//                        line = mMap.addPolyline(new PolylineOptions()
+//                                .color(Color.rgb(0, 153, 255))
+//                                .geodesic(true)
+//                                .addAll(path_points));
+//                    }
+//
+//                    if (goingE_lat[j][i] != null) {
+//
+//                        double gelatitude = Double.parseDouble(goingE_lat[j][i]);
+//                        double gelngtitude = Double.parseDouble(goingE_lng[j][i]);
+//                        String Transit_n = TransitName[j][i];
+//                        String next_Transit_n = null;
+//
+//                        if (i + 1 < list_len[j]) {
+//                            if (TransitName[j][i + 1] != null)
+//                                next_Transit_n = TransitName[j][i + 1];
+//                        }
+//
+//                        LatLng GoingE = new LatLng(gelatitude, gelngtitude);
+//
+//                        if (Transit_n == null) {
+//                            Transit_n = "도보";
+//                            if (next_Transit_n != null) {
+//                                marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 후, " + next_Transit_n + " 승차"));
+//                            } else {
+//                                if (i == list_len[j] - 1) {
+//                                    marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 후, 도착"));
+//                                }
+//                                marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n));
+//                            }
+//                        } else {
+//                            if (i == list_len[j] - 1) {
+//                                marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차 후, 도착"));
+//                            }
+//                            marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차"));
+//                        }
+//
+//                        onMapReady(mMap);
+//                    }
+//
+//                    if (goingS_lat[j][i] != null) {
+//
+//                        double gslatitude = Double.parseDouble(goingS_lat[j][i]);
+//                        double gslngtitude = Double.parseDouble(goingS_lng[j][i]);
+//                        String Transit_n = TransitName[j][i];
+//                        String prev_Transit_n = null;
+//                        if (i != 0) {
+//                            prev_Transit_n = TransitName[j][i - 1];
+//                        }
+//
+//                        LatLng GoingS = new LatLng(gslatitude, gslngtitude);
+//
+//                        if (Transit_n == null) {
+//                            Transit_n = "도보";
+//                            // 도보 전 지하철 하차, 버스 하차 등을 표시할 수 있도록
+//                            if (prev_Transit_n != null) {
+//                                marker_arr[0][i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(prev_Transit_n + "하차 후, " + Transit_n));
+//                            } else {
+//                                marker_arr[0][i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n));
+//                            }
+//                        } else {
+//                            marker_arr[0][i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " 승차"));
+//                        }
+//
+//                        onMapReady(mMap);
+//                    }
+//                }
+//
+//                double alatitude = Double.parseDouble(arrival_lat);
+//                double alngtitude = Double.parseDouble(arrival_lng);
+//
+//                LatLng End = new LatLng(alatitude, alngtitude);
+//
+//                end_m = mMap.addMarker(new MarkerOptions().position(End).title("도착"));
+//
+//                onMapReady(mMap);
+//
+//                mMap.moveCamera(CameraUpdateFactory.newLatLng(End));
+//                //mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+//
+//            }
+//        });
+//
+//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT);
+//        Method.setLayoutParams(lp);
+//
+//        if(BR_num > 0) {
+//            lp.addRule(RelativeLayout.BELOW, BestRoute.getId());
+//        }
+//        if(t_num > 0) { //
+//            lp.addRule(RelativeLayout.RIGHT_OF, Method.getId());
+//        }
+//
+//        container.addView(Method);
+//
+//    }
+//
+//    public void recommend_view(String a) {
+//        ++BR_num;
+//
+//        BestRoute = new TextView(this);
+//        BestRoute.setId(BR_num);
+//        BestRoute.setText(a);
+//        BestRoute.setTextSize(13);
+//        BestRoute.setTextColor(Color.rgb(133, 133, 133));
+//
+//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT);
+//        BestRoute.setLayoutParams(lp);
+//
+//        lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+//
+//        container.addView(BestRoute);
+//    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
