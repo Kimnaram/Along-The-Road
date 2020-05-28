@@ -15,6 +15,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -59,6 +60,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     //private RelativeLayout container;
     private LinearLayout container;
     private LinearLayout Route_Layout;
+    private LinearLayout Addition_Layout;
     private String str_url = null; // URL
     private String option = null;
     private String travel_mode = "transit";
@@ -84,7 +86,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     private int count = 0;
     // private int M_num = 0;
     private int Max_num = 0;
-    private int BR_num = 0;
+    // private int BR_num = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +127,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     public void sendClick(View view) { // 검색 버튼을 클릭하면
 
         mMap.clear(); // 맵을 clear
-        BR_num = 0;
+        // BR_num = 0;
 
         r_list_len = 0;
         list_len = null;
@@ -262,6 +264,12 @@ public class TrafficSearchActivity extends AppCompatActivity
                 Route_Layout.setOrientation(LinearLayout.HORIZONTAL);
                 container.addView(Route_Layout);
 
+                Addition_Layout = new LinearLayout(TrafficSearchActivity.this);
+                Addition_Layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                Addition_Layout.setOrientation(LinearLayout.HORIZONTAL);
+                container.addView(Addition_Layout);
+
                 JSONObject subJsonObject = routesArray.getJSONObject(j);
 
                 String legs = subJsonObject.getString("legs");
@@ -361,10 +369,10 @@ public class TrafficSearchActivity extends AppCompatActivity
                         }
                     } else {
                         if (getTravelMode[i].equals("WALKING")) {
-                            step = "도보 " + getDuration[i] + "분\n";
+                            step = "도보 " + getDuration[i] + "분";
 
                         } else if (getTravelMode[i].equals("TRANSIT")) {
-                            step = getTransit[i] + "\n";
+                            step = getTransit[i];
                         }
                     }
 
@@ -373,15 +381,12 @@ public class TrafficSearchActivity extends AppCompatActivity
                     switch(isTrain) {
                         case "Train" :
                         case "Subway" :
-                            img = img = ResourcesCompat.getDrawable(res, R.drawable.subway, null);
+                            img = ResourcesCompat.getDrawable(res, R.drawable.subway, null);
                             break;
                         case "Bus" :
-                            img = img = ResourcesCompat.getDrawable(res, R.drawable.bus, null);
+                            img = ResourcesCompat.getDrawable(res, R.drawable.bus, null);
                             break;
-//                        case "Walk" :
-//                            img = ResourcesCompat.getDrawable(res, R.drawable.walk, null);
-//                            break;
-                        default:
+                        default :
                             img = ResourcesCompat.getDrawable(res, R.drawable.walk, null);
                     }
 
@@ -389,6 +394,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                     R_text_count += 1;
                 }
 
+                Max_num = 0;
                 count += 1;
             }
 
@@ -442,20 +448,28 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     public void method_view(String a, Drawable img, int j) {
 
-        System.out.println("img : " + img);
+        String t_method = a.split("\\(")[0];
+
+        System.out.println(t_method + ": " + Max_num);
 
         TextView Method = new TextView(this);
 
         Method.setId(j);
-        Method.setText(a);
+        Method.setText(t_method);
         Method.setTextSize(16);
         Method.setTextColor(Color.GRAY);
+
+        if(Max_num < 4) {
+            Method.setPadding(0, 0, 0, 30);
+        } else {
+            Method.setPadding(0, 0, 0, 100);
+        }
         int h = 70;
         int w = 70;
         img.setBounds(0, 0, w, h);
         Method.setCompoundDrawables(img, null, null, null);
 
-        final int t_num = Method.getId();
+        final int t_num = j;
 
         Method.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -475,7 +489,6 @@ public class TrafficSearchActivity extends AppCompatActivity
                 for (int i = 0; i < list_len[j]; i++) {
 
                     ArrayList<LatLng> path_points = decodePolyPoints(getPolyline[j][i]); // 폴리라인 포인트 디코드 후 ArrayList에 저장
-                    System.out.println("polyline["+j+"]["+i+"] : " + getPolyline[j][i]);
 
                     Polyline line = null;
 
@@ -569,12 +582,40 @@ public class TrafficSearchActivity extends AppCompatActivity
             }
         });
 
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        Method.setLayoutParams(lp);
+        if(Max_num < 4) {
 
-        Route_Layout.addView(Method);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            Method.setLayoutParams(lp);
 
+            Route_Layout.addView(Method);
+
+            Max_num += 1;
+
+        } else if (Max_num >= 4) {
+
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            Method.setLayoutParams(lp);
+
+            Addition_Layout.addView(Method);
+
+//            if(list_len[j] - 1 <= list_num) {
+//                LinearLayout.LayoutParams params;
+//
+//                params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1);
+//
+//                View divider = new View(this);
+//                divider.setBackgroundColor(Color.rgb(0, 153, 255));
+//
+//                divider.setLayoutParams(params);
+//
+//                Addition_Layout.addView(divider);
+//            }
+
+            Max_num += 1;
+
+        }
     }
 
     public void recommend_view(String a) {
@@ -582,7 +623,6 @@ public class TrafficSearchActivity extends AppCompatActivity
         TextView Route = new TextView(this);
 
         Route = new TextView(this);
-        Route.setId(BR_num);
         Route.setText(a);
         Route.setTextSize(14);
         Route.setTextColor(Color.rgb(133, 133, 133));
