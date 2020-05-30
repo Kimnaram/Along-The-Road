@@ -3,4 +3,10 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <!-- Calendar Color -->
+    <color name="selected_day_background_color">#4E3BBD</color>
+    <color name="selected_day_background_start_color">#5021D6</color>
+    <color name="selected_day_background_end_color">#5021D6</color>
+    <color name="weekend_day_text_color">#3B47CC</color>
 </resources>

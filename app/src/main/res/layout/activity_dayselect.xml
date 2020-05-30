@@ -1,107 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context=".DaySelectActivity" >
+    android:background="@color/default_calendar_background_color">
 
-    <TableLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stretchColumns="*">
+        android:minHeight="?attr/actionBarSize" />
 
-        <TableRow
-            android:paddingTop="10sp"
-            android:paddingLeft="10sp"
-            android:paddingRight="10sp">
-
-            <TextView
-                android:id="@+id/checkin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="start"
-                android:singleLine="true"
-                android:text="체크인"
-                android:textColor="#8F8F8F"
-                android:textSize="13sp"></TextView>
-
-            <TextView
-                android:id="@+id/arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text=""
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/checkout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:text="체크아웃"
-                android:textColor="#8F8F8F"
-                android:textSize="13sp"
-                android:ellipsize="end"
-                android:singleLine="true" />
-
-        </TableRow>
-
-        <TableRow
-            android:paddingLeft="10sp"
-            android:paddingRight="10sp">
-
-            <TextView
-                android:id="@+id/depart_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:text=""
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/space"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text=""
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/arrive_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:text=""
-                android:layout_weight="0"
-                android:textSize="20sp"/>
-
-        </TableRow>
-
-    </TableLayout>
-
-    <CalendarView
-        android:id="@+id/calendar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TableLayout
+    <com.applikeysolutions.cosmocalendar.view.CalendarView
+        android:id="@+id/calendar_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stretchColumns="*">
+        android:layout_below="@id/toolbar"
+        app:selectedDayBackgroundColor="@color/selected_day_background_color"
+        app:selectedDayBackgroundStartColor="@color/selected_day_background_start_color"
+        app:selectedDayBackgroundEndColor="@color/selected_day_background_end_color"
+        app:weekendDayTextColor="@color/weekend_day_text_color"
+        app:selectionType="range"/>
 
-        <TableRow>
+<!--    <TableLayout-->
+<!--        android:id="@+id/button_layout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:stretchColumns="*">-->
 
-            <Button
-                android:id="@+id/next"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="2"
-                android:text="다음" />
+<!--        <TableRow>-->
 
-        </TableRow>
+<!--            <Button-->
+<!--                android:id="@+id/next"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="right"-->
+<!--                android:layout_weight="2"-->
+<!--                android:text="다음" />-->
 
-    </TableLayout>
+<!--        </TableRow>-->
 
-</LinearLayout>
+<!--    </TableLayout>-->
+
+</RelativeLayout>

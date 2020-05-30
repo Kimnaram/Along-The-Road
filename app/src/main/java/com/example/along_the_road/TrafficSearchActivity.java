@@ -1,6 +1,7 @@
 package com.example.along_the_road;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.content.res.Resources;
@@ -15,7 +16,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -94,6 +94,13 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_traffic_search);
 
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setTitle("길따라");
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_40);
+
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -104,7 +111,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
 
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.traffic_menu, menu);
 
         return true;
     }
@@ -355,8 +362,12 @@ public class TrafficSearchActivity extends AppCompatActivity
                             getTransit[i] = lineObject.getString("name");
                         } else {
                             getTransit[i] = lineObject.getString("short_name");
+                            if(isTrain.equals("Subway") && getTransit[i].equals("1")) {
+                                getTransit[i] += "호선";
+                            }
                         }
                         TransitName[j][i] = getTransit[i];
+                        System.out.println("방법 : " + getTransit[i]);
 
                     }
 
@@ -381,16 +392,16 @@ public class TrafficSearchActivity extends AppCompatActivity
                     switch(isTrain) {
                         case "Train" :
                         case "Subway" :
-                            img = ResourcesCompat.getDrawable(res, R.drawable.subway, null);
+                            img = ResourcesCompat.getDrawable(res, R.drawable.subway_100, null);
                             break;
                         case "Bus" :
-                            img = ResourcesCompat.getDrawable(res, R.drawable.bus, null);
+                            img = ResourcesCompat.getDrawable(res, R.drawable.bus_96, null);
                             break;
                         default :
-                            img = ResourcesCompat.getDrawable(res, R.drawable.walk, null);
+                            img = ResourcesCompat.getDrawable(res, R.drawable.walk_96, null);
                     }
 
-                    method_view(step, img, j);
+                    method_view(step, img, j, i);
                     R_text_count += 1;
                 }
 
@@ -446,21 +457,25 @@ public class TrafficSearchActivity extends AppCompatActivity
         return path;
     }
 
-    public void method_view(String a, Drawable img, int j) {
+    public void method_view(String a, Drawable img, int j, int i) {
 
-        String t_method = a.split("\\(")[0];
+        // String t_method = a.split("\\(")[0];
 
-        System.out.println(t_method + ": " + Max_num);
+        // System.out.println(t_method + ": " + Max_num);
 
         TextView Method = new TextView(this);
 
-        Method.setId(j);
-        Method.setText(t_method);
+        Method.setId(i);
+        Method.setText(a);
         Method.setTextSize(16);
         Method.setTextColor(Color.GRAY);
 
         if(Max_num < 4) {
-            Method.setPadding(0, 0, 0, 30);
+            if(i >= list_len[j] - 1) {
+                Method.setPadding(0, 0, 0, 100);
+            } else {
+                Method.setPadding(0, 0, 0, 30);
+            }
         } else {
             Method.setPadding(0, 0, 0, 100);
         }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group>
+        <item
+            android:id="@+id/clear_selections"
+            android:icon="@drawable/trash_40"
+            android:title="clear_selections"
+            app:showAsAction="always" />
+
+        <item
+            android:id="@+id/show_selections"
+            android:icon="@drawable/information_40"
+            android:title="show_selections"
+            app:showAsAction="always" />
+    </group>
+
+    </menu>
