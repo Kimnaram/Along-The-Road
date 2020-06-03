@@ -22,8 +22,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.Marker;
@@ -46,6 +48,9 @@ import java.util.concurrent.ExecutionException;
 
 public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback {
+
+    private Spinner spinner;
+    private static final String[] traffic = new String[]{"최소 환승", "최소 도보"};
 
     private GoogleMap mMap; // 구글 지도
     private Marker start_m; // 시작 마커
@@ -100,6 +105,24 @@ public class TrafficSearchActivity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_40);
 
+        spinner = findViewById(R.id.spinner_menu);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(parent.getItemAtPosition(position).toString().equals("최소 환승")) {
+                    option = "&transit_routing_preference=fewer_transfers";
+                } else if (parent.getItemAtPosition(position).toString().equals("최소 도보")) {
+                    option = "&transit_routing_preference=less_walking";
+                } else {
+                    option = "";
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -107,29 +130,29 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-
-        inflater.inflate(R.menu.traffic_menu, menu);
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.less_walk:
-                option = "&transit_routing_preference=less_walking";
-                break;
-            case R.id.fewer_transfers:
-                option = "&transit_routing_preference=fewer_transfers";
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        MenuInflater inflater = getMenuInflater();
+//
+//        inflater.inflate(R.menu.traffic_menu, menu);
+//
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//
+//        switch (item.getItemId()) {
+//            case R.id.less_walk:
+//                option = "&transit_routing_preference=less_walking";
+//                break;
+//            case R.id.fewer_transfers:
+//                option = "&transit_routing_preference=fewer_transfers";
+//                break;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     public void sendClick(View view) { // 검색 버튼을 클릭하면
 
@@ -156,7 +179,6 @@ public class TrafficSearchActivity extends AppCompatActivity
                     mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("출발"));
                 } else if (i >= entire_path.size() - 1) {
                     mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("도착"));
-                    End_location = entire_path.get(i);
                 }
             }
 
@@ -187,7 +209,9 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=" + depart + "&destination=" + arrival + "&mode=transit" + "&departure_time=now" +
-                "&alternatives=true&key=" + API_KEY;
+                option + "&alternatives=true&key=" + API_KEY;
+
+        System.out.println("str_url : " + str_url);
 
         String resultText = "값이 없음";
 
@@ -313,6 +337,10 @@ public class TrafficSearchActivity extends AppCompatActivity
                     if (i >= list_len[j] - 1) {
                         arrival_lat = endJsonObject.getString("lat");
                         arrival_lng = endJsonObject.getString("lng");
+
+                        Double End_lat = Double.parseDouble(arrival_lat);
+                        Double End_lng = Double.parseDouble(arrival_lng);
+                        End_location = new LatLng(End_lat, End_lng);
                     } else {
                         goingE_lat[j][i] = endJsonObject.getString("lat");
                         goingE_lng[j][i] = endJsonObject.getString("lng");

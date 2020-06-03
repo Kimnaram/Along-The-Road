@@ -26,7 +26,6 @@
                 android:background="#00ff0000"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:stretchColumns="*"
                 android:paddingLeft="10sp"
                 android:paddingRight="10sp" >
 
@@ -34,15 +33,27 @@
 
                     <EditText
                         android:id="@+id/depart_loc"
-                        android:layout_width="220sp"
+                        android:layout_width="250sp"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:hint="출발지"
                         android:textSize="15sp" />
 
+                    <Spinner
+                        android:id="@+id/spinner_menu"
+                        android:layout_width="140dp"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/traffic"
+                        android:gravity="right"
+                        android:paddingTop="10sp"
+                        android:layout_marginLeft="15sp"
+                        android:spinnerMode="dropdown"/>
+
                 </TableRow>
 
-                <TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:id="@+id/arrow"
@@ -57,13 +68,12 @@
                         android:id="@+id/arrive_loc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="right"
+                        android:layout_weight="2"
                         android:gravity="center"
                         android:hint="도착지"
-                        android:layout_weight="2"
-                        android:textSize="15sp"
                         android:imeOptions="actionSearch"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textSize="15sp" />
 
                     <Button
                         android:id="@+id/send"
