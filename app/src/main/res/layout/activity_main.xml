@@ -1,111 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3A7AFF"
     tools:context=".MainActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
-        <!--메인 하단 배경 무늬 디자인-->
-        <ImageView
-            android:id="@+id/background_deco"
-            android:layout_width="364dp"
-            android:layout_height="324dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="-2dp"
-            android:layout_marginBottom="-70dp"
-            android:src="@drawable/background_deco" />
-
-
         <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
+            android:id="@+id/main"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="68dp"
-            android:layout_marginTop="115dp"
-            android:fontFamily="@font/fontstyle"
-            android:text="어디로 떠날까요?"
-            android:textColor="#FFFFFF"
-            android:textSize="38dp" />
+            android:text="메뉴를 선택해주세요"
+            android:gravity="center_horizontal">
 
-        <ImageButton
-            android:id="@+id/local_select"
-            android:layout_width="317dp"
-            android:layout_height="233dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="47dp"
-            android:layout_marginBottom="335dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/local_go" />
+        </TextView>
 
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*">
 
-        <!--교통편 확인 버튼-->
-        <ImageButton
-            android:id="@+id/traffic_button"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="44dp"
-            android:layout_marginBottom="225dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check_traffic" />
+            <TableRow>
 
+                <Button
+                    android:id="@+id/local_select"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:layout_x="10dp"
+                    android:layout_y="80dp"
+                    android:text="여행지역 선택" />
 
-        <!--예산 관리 버튼-->
-        <ImageButton
-            android:id="@+id/budget_setting"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="210dp"
-            android:layout_marginBottom="225dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check_budget" />
+                <Button
+                    android:id="@+id/traffic_button"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:layout_x= "240dp"
+                    android:layout_y="80dp"
+                    android:text="교통편 확인" />
 
+                <Button
+                    android:id="@+id/budget_setting"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:layout_x="125dp"
+                    android:layout_y="80dp"
+                    android:text="지출 점검" />
 
-        <!--준비물 체크 버튼-->
-        <ImageButton
-            android:id="@+id/check_list"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="44dp"
-            android:layout_marginBottom="61dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check_list" />
+            </TableRow>
 
+        </TableLayout>
 
-        <!--후기 구경 버튼-->
-        <ImageButton
-            android:id="@+id/check_review"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="210dp"
-            android:layout_marginBottom="61dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check_review" />
+    </LinearLayout>
 
-    </RelativeLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

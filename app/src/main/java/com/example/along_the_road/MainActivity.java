@@ -1,12 +1,12 @@
 package com.example.along_the_road;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,7 +15,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ImageButton local_btn = (ImageButton) findViewById(R.id.local_select); // 페이지 전환 버튼 (지역 선택)
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setTitle("길따라");
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_40);
+
+        Button local_btn = (Button) findViewById(R.id.local_select); // 페이지 전환 버튼
 
         local_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -26,25 +32,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageButton budget_btn = (ImageButton) findViewById(R.id.budget_setting); // 페이지 전환 버튼 (예산 관리)
+        Button budget_btn = (Button) findViewById(R.id.budget_setting); // 페이지 전환 버튼
 
         budget_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent bntent = new Intent(getApplicationContext(), managebudgetActivity.class);
+                Intent intent = new Intent(getApplicationContext(), managebudgetActivity.class);
 
-                startActivity(bntent);
+                startActivity(intent);
             }
         });
 
-        ImageButton traffic_btn = (ImageButton) findViewById(R.id.traffic_button); // 페이지 전환 버튼 (교통 확인)
+        Button traffic_btn = findViewById(R.id.traffic_button);
 
         traffic_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent tntent = new Intent(getApplicationContext(), TrafficSearchActivity.class);
+                Intent intent = new Intent(getApplicationContext(), TrafficSearchActivity.class);
 
-                startActivity(tntent);
+                startActivity(intent);
+            }
+        });
+
+        Button temp_btn = findViewById(R.id.tempDate);
+
+        temp_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), TempDayActivity.class);
+
+                startActivity(intent);
             }
         });
 

@@ -5,8 +5,11 @@
     <color name="colorAccent">#D81B60</color>
 
     <!-- Calendar Color -->
-    <color name="selected_day_background_color">#4E3BBD</color>
-    <color name="selected_day_background_start_color">#5021D6</color>
-    <color name="selected_day_background_end_color">#5021D6</color>
+    <color name="selected_day_background_color">#3333FF</color>
+    <color name="selected_day_background_start_color">#2357E8</color>
+    <color name="selected_day_background_end_color">#2357E8</color>
     <color name="weekend_day_text_color">#3B47CC</color>
+    <color name="selectionbar_text_color">#4E3BBD</color>
+    <color name="selected_day_background_color_3333FF">#3333FF</color>
+    <color name="selected_day_text_color_FFFFFF">#FFFFFF</color>
 </resources>
