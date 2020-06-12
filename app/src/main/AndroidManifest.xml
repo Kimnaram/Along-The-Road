@@ -13,7 +13,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TempDayActivity"/>
         <activity android:name="com.yongbeom.aircalendar.AirCalendarDatePickerActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".TrafficSearchActivity" />
@@ -34,7 +33,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC9tr3KLv0Df1DFt4aqY1lqpZm46Dq-pyk" />
+            android:value="API KEY" />
     </application>
 
 </manifest>
