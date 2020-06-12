@@ -30,8 +30,6 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'com.google.android.material:material:1.1.0-alpha09'
-    implementation files('C:/Users/tlsdm/StudioProjects/Along-The-Road-Project/.idea/libraries/jsoup-1.13.1.jar')
     // implementation 'org.json:json:20190722'
-    implementation files('C:/Users/tlsdm/StudioProjects/Along-The-Road-Project/.idea/libraries/json-simple-1.1.jar')
     implementation 'com.github.applikeysolutions:cosmocalendar:1.0.4'
 }

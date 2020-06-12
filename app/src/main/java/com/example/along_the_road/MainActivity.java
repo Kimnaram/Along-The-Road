@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button local_btn = (Button) findViewById(R.id.local_select); // 페이지 전환 버튼
+        ImageButton local_btn = (ImageButton) findViewById(R.id.local_select); // 페이지 전환 버튼 (지역 선택)
 
         local_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button budget_btn = (Button) findViewById(R.id.budget_setting); // 페이지 전환 버튼
+        ImageButton budget_btn = (ImageButton) findViewById(R.id.budget_setting); // 페이지 전환 버튼 (예산 관리)
 
         budget_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button traffic_btn = findViewById(R.id.traffic_button);
+        ImageButton traffic_btn = (ImageButton) findViewById(R.id.traffic_button); // 페이지 전환 버튼 (교통 확인)
 
         traffic_btn.setOnClickListener(new View.OnClickListener() {
             @Override
