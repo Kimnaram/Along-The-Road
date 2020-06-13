@@ -61,7 +61,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     private Drawable img = null;
 
     /****************************** Directions API 관련 변수 *******************************/
-    private static final String API_KEY = "";
+    private static final String API_KEY = "AIzaSyDOKn6s7rULeFy1IteNOCcYwxwl5un_4zA";
     //private RelativeLayout container;
     private LinearLayout container;
     private LinearLayout Route_Layout;
@@ -200,8 +200,10 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         onMapReady(mMap);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(End_location));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+        if(End_location != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(End_location));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+        }
 
     }
 

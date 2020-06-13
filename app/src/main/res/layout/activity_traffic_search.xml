@@ -81,7 +81,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:onClick="sendClick"
-                        android:text="검색"/>
+                        android:text="검색" />
 
                 </TableRow>
 

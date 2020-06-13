@@ -1,89 +1,72 @@
 package com.example.along_the_road;
 
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.OrientationHelper;
 
-import com.applikeysolutions.cosmocalendar.view.CalendarView;
+import android.content.Intent;
+import android.os.Bundle;
+
+import com.yongbeom.aircalendar.core.AirCalendarIntent;
+import com.yongbeom.aircalendar.AirCalendarDatePickerActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
-
 
 public class DaySelectActivity extends AppCompatActivity {
 
-    private CalendarView calendarView;
+    public static final int REQUEST_CODE = 1001;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dayselect);
+        setContentView(R.layout.activity_temp_day);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        getSupportActionBar().setTitle("길따라");
+        AirCalendarIntent intent = new AirCalendarIntent(this);
+        intent.isBooking(false);
+        intent.isSelect(false);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_40);
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat Year = new SimpleDateFormat("yyyy");
+        String Start_Year = Year.format(cal.getTime());
+        int yyyy = Integer.parseInt(Start_Year);
+        SimpleDateFormat Month = new SimpleDateFormat("MM");
+        String Start_Month = Month.format(cal.getTime());
+        int MM = Integer.parseInt(Start_Month);
+        SimpleDateFormat Date = new SimpleDateFormat("dd");
+        String Start_Date = Date.format(cal.getTime());
+        int dd = Integer.parseInt(Start_Date);
+        // 오늘 날짜 계산
 
-        initViews();
-    }
+        if(MM >= 10) {
+            yyyy += 1;
+        }
+        cal.add(Calendar.MONTH, 3);
+        String End_Month = Month.format(cal.getTime());
+        int End_MM = Integer.parseInt(End_Month);
 
-    private void initViews() {
-        calendarView = findViewById(R.id.calendar_view);
-        calendarView.setCalendarOrientation(OrientationHelper.HORIZONTAL);
+        intent.setStartDate(yyyy, MM, dd); // int
+        intent.setEndDate(yyyy, End_MM, dd); // int
+        intent.isMonthLabels(false);
+        intent.setSelectButtonText("선택"); //the select button text
+        intent.setResetBtnText("Reset"); //the reset button text
+        intent.setWeekStart(Calendar.SUNDAY);
+        intent.setWeekDaysLanguage(AirCalendarIntent.Language.KO); //language for the weekdays
 
+        startActivityForResult(intent, REQUEST_CODE);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.calendar_menu, menu);
-        return true;
-    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            if(data != null){
+                Intent intent = new Intent(getApplicationContext(), HotelSelectActivity.class);
+                intent.putExtra("Start_Date", data.getStringArrayExtra(AirCalendarDatePickerActivity.RESULT_SELECT_START_DATE));
+                intent.putExtra("End_Date", data.getStringExtra(AirCalendarDatePickerActivity.RESULT_SELECT_END_DATE));
 
-            case R.id.clear_selections:
-                clearSelectionsMenuClick();
-                return true;
-
-            case R.id.show_selections:
-                List<Calendar> days = calendarView.getSelectedDates();
-
-                System.out.println("Days" + days);
-
-                String result="";
-                for( int i=0; i<days.size(); i++)
-                {
-                    Calendar calendar = days.get(i);
-                    final int day = calendar.get(Calendar.DAY_OF_MONTH);
-                    final int month = calendar.get(Calendar.MONTH);
-                    final int year = calendar.get(Calendar.YEAR);
-                    String week = new SimpleDateFormat("EE").format(calendar.getTime());
-                    String day_full = year + "년 "+ (month+1)  + "월 " + day + "일 " + week + "요일";
-                    result += (day_full + "\n");
-                }
-                Toast.makeText(DaySelectActivity.this, result, Toast.LENGTH_LONG).show();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+                startActivity(intent);
+            }
         }
     }
-
-    private void clearSelectionsMenuClick() {
-        calendarView.clearSelections();
-
-    }
-
 }

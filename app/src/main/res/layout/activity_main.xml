@@ -25,7 +25,6 @@
             android:src="@drawable/background_deco" />
 
 
-        <!--어디로 떠날까요 텍스트-->
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
@@ -39,8 +38,6 @@
             android:textColor="#FFFFFF"
             android:textSize="38dp" />
 
-
-        <!--지역 선택 버튼-->
         <ImageButton
             android:id="@+id/local_select"
             android:layout_width="317dp"
@@ -84,7 +81,7 @@
 
         <!--준비물 체크 버튼-->
         <ImageButton
-            android:id="@+id/checklist_button"
+            android:id="@+id/check_list"
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_alignParentStart="true"

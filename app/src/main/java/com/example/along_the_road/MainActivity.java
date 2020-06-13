@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,9 +30,9 @@ public class MainActivity extends AppCompatActivity {
         budget_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent bntent = new Intent(getApplicationContext(), managebudgetActivity.class);
+                Intent intent = new Intent(getApplicationContext(), managebudgetActivity.class);
 
-                startActivity(bntent);
+                startActivity(intent);
             }
         });
 
@@ -42,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
         traffic_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent tntent = new Intent(getApplicationContext(), TrafficSearchActivity.class);
+                Intent intent = new Intent(getApplicationContext(), TrafficSearchActivity.class);
 
-                startActivity(tntent);
+                startActivity(intent);
             }
         });
 
