@@ -29,6 +29,7 @@
                     android:id="@+id/imageView"
                     android:layout_width="wrap_content"
                     android:layout_height="575dp"
+                    android:layout_marginLeft="-15dp"
                     android:src="@drawable/map_main" />
 
                 <ToggleButton
@@ -38,140 +39,145 @@
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="246dp"
-                    android:layout_marginLeft="246dp"
-                    android:layout_marginTop="355dp"
+                    android:layout_marginStart="251dp"
+                    android:layout_marginLeft="251dp"
+                    android:layout_marginTop="365dp"
                     android:background="@drawable/loc_busan"
                     android:scaleType="fitXY"
                     android:textOff=""
                     android:textOn="" />
 
-                <ImageButton
+                <ToggleButton
                     android:id="@+id/locate_btn_daegu"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="234dp"
-                    android:layout_marginLeft="234dp"
-                    android:layout_marginTop="290dp"
-                    android:background="@android:color/transparent"
+                    android:layout_marginStart="233dp"
+                    android:layout_marginLeft="233dp"
+                    android:layout_marginTop="276dp"
+                    android:background="@drawable/loc_daegu"
                     android:scaleType="fitXY"
-                    android:src="@drawable/loc_daegu" />
+                    android:textOff=""
+                    android:textOn="" />
 
-                <ImageButton
+                <ToggleButton
                     android:id="@+id/locate_btn_gangneung"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="289dp"
-                    android:layout_marginLeft="289dp"
-                    android:layout_marginTop="118dp"
-                    android:background="@android:color/transparent"
+                    android:layout_marginStart="287dp"
+                    android:layout_marginLeft="287dp"
+                    android:layout_marginTop="102dp"
+                    android:background="@drawable/loc_gangneung"
                     android:scaleType="fitXY"
-                    android:src="@drawable/loc_gangneung" />
+                    android:textOff=""
+                    android:textOn="" />
 
-                <ImageButton
+                <ToggleButton
                     android:id="@+id/locate_btn_gyeongju"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="301dp"
-                    android:layout_marginLeft="301dp"
-                    android:layout_marginTop="321dp"
-                    android:background="@android:color/transparent"
+                    android:layout_marginStart="320dp"
+                    android:layout_marginLeft="320dp"
+                    android:layout_marginTop="278dp"
+                    android:background="@drawable/loc_gyeongju"
                     android:scaleType="fitXY"
-                    android:src="@drawable/loc_gyeongju" />
+                    android:textOff=""
+                    android:textOn="" />
 
-                <ImageButton
+                <ToggleButton
                     android:id="@+id/locate_btn_jeju"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginStart="127dp"
-                    android:layout_marginLeft="127dp"
-                    android:layout_marginTop="482dp"
-                    android:background="@android:color/transparent"
+                    android:layout_marginStart="93dp"
+                    android:layout_marginLeft="93dp"
+                    android:layout_marginTop="476dp"
+                    android:background="@drawable/loc_jeju"
                     android:scaleType="fitXY"
-                    android:src="@drawable/loc_jeju" />
+                    android:textOff=""
+                    android:textOn="" />
 
-                <ImageButton
+                <ToggleButton
                     android:id="@+id/locate_btn_jeonju"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="120dp"
-                    android:layout_marginLeft="120dp"
-                    android:layout_marginTop="284dp"
-                    android:background="@android:color/transparent"
+                    android:layout_marginStart="113dp"
+                    android:layout_marginLeft="113dp"
+                    android:layout_marginTop="281dp"
+                    android:background="@drawable/loc_jeonju"
                     android:scaleType="fitXY"
-                    android:src="@drawable/loc_jeonju" />
+                    android:textOff=""
+                    android:textOn="" />
 
-                <ImageButton
+                <ToggleButton
                     android:id="@+id/locate_btn_seoul"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="108dp"
-                    android:layout_marginLeft="108dp"
-                    android:layout_marginTop="106dp"
-                    android:background="@android:color/transparent"
+                    android:layout_marginStart="97dp"
+                    android:layout_marginLeft="97dp"
+                    android:layout_marginTop="100dp"
+                    android:background="@drawable/loc_seoul"
                     android:scaleType="fitXY"
-                    android:src="@drawable/loc_seoul" />
+                    android:textOff=""
+                    android:textOn="" />
 
-                <ImageButton
+                <ToggleButton
                     android:id="@+id/locate_btn_sokcho"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="251dp"
-                    android:layout_marginLeft="251dp"
-                    android:layout_marginTop="70dp"
-                    android:background="@android:color/transparent"
+                    android:layout_marginStart="247dp"
+                    android:layout_marginLeft="247dp"
+                    android:layout_marginTop="49dp"
+                    android:background="@drawable/loc_sokcho"
                     android:scaleType="fitXY"
-                    android:src="@drawable/loc_sokcho" />
+                    android:textOff=""
+                    android:textOn="" />
 
-                <ImageButton
+                <ToggleButton
                     android:id="@+id/locate_btn_yeosu"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="133dp"
-                    android:layout_marginLeft="133dp"
-                    android:layout_marginTop="402dp"
-                    android:background="@android:color/transparent"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginLeft="140dp"
+                    android:layout_marginTop="401dp"
+                    android:background="@drawable/loc_yeosu"
                     android:scaleType="fitXY"
-                    android:src="@drawable/loc_yeosu" />
+                    android:textOff=""
+                    android:textOn="" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/local_conf_btn"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="550dp"
-                    android:gravity="center"
-                    android:text="선택하기" />
-                <!--android:layout_below="@id/imageView" -->
+                    android:layout_width="133dp"
+                    android:layout_height="111dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginStart="234dp"
+                    android:layout_marginBottom="0dp"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/local_conf_btn" />
 
             </RelativeLayout>
 
