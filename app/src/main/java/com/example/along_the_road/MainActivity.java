@@ -48,6 +48,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ImageButton checklist_btn = (ImageButton) findViewById(R.id.checklist_button); // 페이지 전환 버튼 (준비물 체크)
+
+        checklist_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cntent = new Intent(getApplicationContext(), CheckListActivity.class);
+
+                startActivity(cntent);
+            }
+        });
+
     }
 }
 
