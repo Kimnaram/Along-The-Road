@@ -1,49 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/default_calendar_background_color"
     android:orientation="vertical">
-
-    <RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/default_calendar_background_color">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize" />
-
-        <com.yongbeom.aircalendar.core.DayPickerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/toolbar"
-            app:colorSelectedDayBackground="@color/selected_day_background_color"
-            app:colorSelectedDayText="@color/selected_day_text_color_FFFFFF" />
-
-        <!--    <com.applikeysolutions.cosmocalendar.view.CalendarView-->
-        <!--        android:id="@+id/calendar_view"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="wrap_content"-->
-        <!--        android:layout_below="@id/toolbar"-->
-        <!--        app:selectedDayBackgroundColor="@color/selected_day_background_color"-->
-        <!--        app:selectedDayBackgroundStartColor="@color/selected_day_background_start_color"-->
-        <!--        app:selectedDayBackgroundEndColor="@color/selected_day_background_end_color"-->
-        <!--        app:weekendDayTextColor="@color/weekend_day_text_color"-->
-        <!--        app:selectionType="range"-->
-        <!--        app:selectionBarMonthTextColor="@color/selectionbar_text_color"/>-->
-
-    </RelativeLayout>
-
-    <Button
-        android:id="@+id/next_page"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/calendar_view"
-        android:layout_gravity="right"
-        android:text="다음" />
 
 </LinearLayout>

@@ -6,12 +6,14 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 public class localselectActivity extends AppCompatActivity {
 
-    private int state = 0;
+    private boolean state = false;
+    private String city = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,17 +26,18 @@ public class localselectActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_40);
 
-        ImageButton local_btn = (ImageButton)findViewById(R.id.local_conf_btn); //다음페이지
+        ImageButton local_btn = (ImageButton) findViewById(R.id.local_conf_btn); //다음페이지
 
         local_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(state == 1) {
+                if (state == true) {
                     Intent local_to_day = new Intent(getApplicationContext(), DaySelectActivity.class);
+                    local_to_day.putExtra("city", city);
 
                     startActivity(local_to_day);
-                } else if (state == 0) {
+                } else {
                     Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT);
                 }
             }
@@ -73,15 +76,16 @@ public class localselectActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(busan_toggle.isChecked()){
-                    state = 1;
+                if (busan_toggle.isChecked()) {
+                    city = "부산";
+                    state = true;
                     busan_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.s_loc_busan)
                     );
-                }
-                else{
-                    state = 0;
+                } else {
+                    city = null;
+                    state = false;
                     busan_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.loc_busan)
@@ -94,15 +98,16 @@ public class localselectActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(daegu_toggle.isChecked()){
-                    state = 1;
+                if (daegu_toggle.isChecked()) {
+                    city = "대구";
+                    state = true;
                     daegu_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.s_loc_daegu)
                     );
-                }
-                else{
-                    state = 0;
+                } else {
+                    city = null;
+                    state = false;
                     daegu_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.loc_daegu)
@@ -115,15 +120,16 @@ public class localselectActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(gangneung_toggle.isChecked()){
-                    state = 1;
+                if (gangneung_toggle.isChecked()) {
+                    city = "강릉";
+                    state = true;
                     gangneung_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.s_loc_gangneung)
                     );
-                }
-                else{
-                    state = 0;
+                } else {
+                    city = null;
+                    state = false;
                     gangneung_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.loc_gangneung)
@@ -136,15 +142,16 @@ public class localselectActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(gyeongju_toggle.isChecked()){
-                    state = 1;
+                if (gyeongju_toggle.isChecked()) {
+                    state = true;
+                    city = "경주";
                     gyeongju_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.s_loc_gyeongju)
                     );
-                }
-                else{
-                    state = 0;
+                } else {
+                    city = null;
+                    state = false;
                     gyeongju_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.loc_gyeongju)
@@ -157,15 +164,16 @@ public class localselectActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(jeju_toggle.isChecked()){
-                    state = 1;
+                if (jeju_toggle.isChecked()) {
+                    state = true;
+                    city = "제주";
                     jeju_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.s_loc_jeju)
                     );
-                }
-                else{
-                    state = 0;
+                } else {
+                    city = null;
+                    state = false;
                     jeju_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.loc_jeju)
@@ -178,15 +186,16 @@ public class localselectActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(jeonju_toggle.isChecked()){
-                    state = 1;
+                if (jeonju_toggle.isChecked()) {
+                    state = true;
+                    city = "전주";
                     jeonju_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.s_loc_jeonju)
                     );
-                }
-                else{
-                    state = 0;
+                } else {
+                    city = null;
+                    state = false;
                     jeonju_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.loc_jeonju)
@@ -199,15 +208,16 @@ public class localselectActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(seoul_toggle.isChecked()){
-                    state = 1;
+                if (seoul_toggle.isChecked()) {
+                    state = true;
+                    city = "서울";
                     seoul_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.s_loc_seoul)
                     );
-                }
-                else{
-                    state = 0;
+                } else {
+                    city = null;
+                    state = false;
                     seoul_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.loc_seoul)
@@ -220,15 +230,16 @@ public class localselectActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(sockcho_toggle.isChecked()){
-                    state = 1;
+                if (sockcho_toggle.isChecked()) {
+                    state = true;
+                    city = "속초";
                     sockcho_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.s_loc_sokcho)
                     );
-                }
-                else{
-                    state = 0;
+                } else {
+                    city = null;
+                    state = false;
                     sockcho_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.loc_sokcho)
@@ -241,15 +252,16 @@ public class localselectActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(yeosu_toggle.isChecked()){
-                    state = 1;
+                if (yeosu_toggle.isChecked()) {
+                    state = true;
+                    city = "여수";
                     yeosu_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.s_loc_yeosu)
                     );
-                }
-                else{
-                    state = 0;
+                } else {
+                    city = null;
+                    state = false;
                     yeosu_toggle.setBackgroundDrawable(
                             getResources().
                                     getDrawable(R.drawable.loc_yeosu)
