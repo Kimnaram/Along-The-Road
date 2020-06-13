@@ -2,12 +2,10 @@ package com.example.along_the_road;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 public class CheckListActivity extends AppCompatActivity {
 
