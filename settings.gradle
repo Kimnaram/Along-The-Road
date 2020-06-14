@@ -1,2 +1,2 @@
-include ':app', ':json-simple-1.1', ':AirCalendar', ':AirCalendar_app'
+include ':app', ':json-simple-1.1', ':AirCalendar'
 rootProject.name='Along-The-Road'

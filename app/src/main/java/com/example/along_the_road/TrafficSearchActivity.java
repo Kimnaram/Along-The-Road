@@ -17,9 +17,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -61,7 +58,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     private Drawable img = null;
 
     /****************************** Directions API 관련 변수 *******************************/
-    private static final String API_KEY = "AIzaSyDOKn6s7rULeFy1IteNOCcYwxwl5un_4zA";
+    private static final String API_KEY = "";
     //private RelativeLayout container;
     private LinearLayout container;
     private LinearLayout Route_Layout;

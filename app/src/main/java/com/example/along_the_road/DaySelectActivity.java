@@ -32,7 +32,7 @@ public class DaySelectActivity extends AppCompatActivity {
         yyyy += 1;
         intent.setMaxYear(yyyy);
         intent.setWeekStart(Calendar.SUNDAY);
-        intent.setActiveMonth(3);
+        intent.setActiveMonth(2);
         intent.setWeekDaysLanguage(AirCalendarIntent.Language.KO); //language for the weekdays
 
         startActivityForResult(intent, REQUEST_CODE);

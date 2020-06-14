@@ -22,77 +22,93 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize" />
 
-            <TableLayout
-                android:background="#00ff0000"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="10sp"
-                android:paddingRight="10sp" >
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5sp"
+                android:layout_marginRight="5sp">
 
-                <TableRow>
+                <com.example.along_the_road.ClearEditText
+                    android:id="@+id/depart_loc"
+                    android:layout_width="250sp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="출발지"
+                    android:textSize="18sp"
+                    android:backgroundTint="@color/basic_color_3A7AFF"
+                    android:textColor="@color/basic_color_3A7AFF"
+                    android:fontFamily="@font/nanumsquare"/>
 
-                    <EditText
-                        android:id="@+id/depart_loc"
-                        android:layout_width="250sp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:hint="출발지"
-                        android:textSize="15sp" />
+                <Spinner
+                    android:id="@+id/spinner_menu"
+                    android:layout_width="140dp"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/traffic"
+                    android:gravity="right"
+                    android:padding="7sp"
+                    android:layout_marginLeft="15sp"
+                    android:layout_alignRight="@+id/depart_loc"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/spinner_style"
+                    android:layout_centerHorizontal="true"
+                    android:spinnerMode="dropdown" />
 
-                    <Spinner
-                        android:id="@+id/spinner_menu"
-                        android:layout_width="140dp"
-                        android:layout_height="wrap_content"
-                        android:entries="@array/traffic"
-                        android:gravity="right"
-                        android:paddingTop="10sp"
-                        android:layout_marginLeft="15sp"
-                        android:spinnerMode="dropdown"/>
+                <TextView
+                    android:id="@+id/arrow"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingTop="7sp"
+                    android:text="↔"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/depart_loc"
+                    android:textSize="20sp"
+                    android:textColor="@color/basic_color_3A7AFF"
+                    android:fontFamily="@font/nanumsquare"/>
 
-                </TableRow>
+                <com.example.along_the_road.ClearEditText
+                    android:id="@+id/arrive_loc"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="도착지"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textSize="18sp"
+                    android:backgroundTint="@color/basic_color_3A7AFF"
+                    android:fontFamily="@font/nanumsquare"
+                    android:layout_below="@+id/depart_loc"
+                    android:layout_toRightOf="@id/arrow"/>
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/arrow"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="↔"
-                        android:textSize="23sp" />
-
-                    <EditText
-                        android:id="@+id/arrive_loc"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:gravity="center"
-                        android:hint="도착지"
-                        android:imeOptions="actionSearch"
-                        android:inputType="text"
-                        android:textSize="15sp" />
-
-                    <Button
-                        android:id="@+id/send"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:onClick="sendClick"
-                        android:text="검색" />
-
-                </TableRow>
+                <Button
+                    android:id="@+id/send"
+                    android:layout_width="100dp"
+                    android:layout_height="39dp"
+                    android:layout_gravity="right"
+                    android:onClick="sendClick"
+                    android:background="@drawable/common_btn_style"
+                    android:layout_marginBottom="17dp"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:textColor="#3A7AFF"
+                    android:textSize="20sp"
+                    android:text="검색"
+                    android:fontFamily="@font/nanumsquare"
+                    android:layout_below="@id/spinner_menu"
+                    android:layout_toRightOf="@+id/arrive_loc"/>
 
                 <fragment
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:id="@+id/map"
                     tools:context=".TrafficSearchActivity"
-                    android:name="com.google.android.gms.maps.SupportMapFragment" />
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_below="@+id/send"/>
 
-            </TableLayout>
+            </RelativeLayout>
+
+
 
 <!--            <RelativeLayout-->
 <!--                android:id="@+id/container"-->
