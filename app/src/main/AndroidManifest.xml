@@ -24,7 +24,12 @@
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".TrafficSearchActivity" />
         <activity android:name=".HotelSelectActivity" />
-        <activity android:name=".localselectActivity" />
+        <activity android:name=".localselectActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
         <activity android:name=".DaySelectActivity" />
         <activity android:name=".managebudgetActivity" />
         <activity android:name=".MainActivity" />

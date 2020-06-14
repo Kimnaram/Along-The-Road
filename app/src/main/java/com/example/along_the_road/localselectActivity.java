@@ -38,7 +38,7 @@ public class localselectActivity extends AppCompatActivity {
 
                     startActivity(local_to_day);
                 } else {
-                    Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT);
+                    Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -269,6 +269,13 @@ public class localselectActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent local_to_main = new Intent(getApplicationContext(), MainActivity.class);
+
+        startActivity(local_to_main);
     }
 }
 
