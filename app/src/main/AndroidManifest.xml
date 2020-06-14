@@ -20,6 +20,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".CheckListActivity" />
+        <activity android:name="com.yongbeom.aircalendar.AirCalendarDatePickerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".TrafficSearchActivity" />
         <activity android:name=".HotelSelectActivity" />
         <activity android:name=".localselectActivity" />
@@ -29,10 +31,10 @@
 
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value= />
+            android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value= />
+            android:value="API KEY" />
     </application>
 
 </manifest>

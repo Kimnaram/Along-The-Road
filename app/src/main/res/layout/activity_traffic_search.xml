@@ -28,55 +28,50 @@
                 android:layout_marginLeft="5sp"
                 android:layout_marginRight="5sp">
 
+                <TextView
+                    android:id="@+id/arrow"
+                    android:layout_width="35dp"
+                    android:layout_height="30dp"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/up_down_arrow_48"
+                    android:layout_marginTop="28dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"/>
+
                 <com.example.along_the_road.ClearEditText
                     android:id="@+id/depart_loc"
                     android:layout_width="250sp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:gravity="center"
                     android:hint="출발지"
                     android:textSize="18sp"
-                    android:backgroundTint="@color/basic_color_3A7AFF"
+                    android:background="@color/basic_color_FFFFFF"
                     android:textColor="@color/basic_color_3A7AFF"
-                    android:fontFamily="@font/nanumsquare"/>
+                    android:fontFamily="@font/nanumsquare"
+                    android:layout_toRightOf="@+id/arrow" />
 
                 <Spinner
                     android:id="@+id/spinner_menu"
-                    android:layout_width="140dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="110dp"
+                    android:layout_height="40dp"
                     android:entries="@array/traffic"
-                    android:gravity="right"
-                    android:padding="7sp"
-                    android:layout_marginLeft="15sp"
-                    android:layout_alignRight="@+id/depart_loc"
-                    android:layout_alignParentRight="true"
-                    android:background="@drawable/spinner_style"
+                    android:layout_marginLeft="10sp"
+                    android:layout_toRightOf="@+id/depart_loc"
                     android:layout_centerHorizontal="true"
+                    android:background="@null"
                     android:spinnerMode="dropdown" />
-
-                <TextView
-                    android:id="@+id/arrow"
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:paddingTop="7sp"
-                    android:text="↔"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/depart_loc"
-                    android:textSize="20sp"
-                    android:textColor="@color/basic_color_3A7AFF"
-                    android:fontFamily="@font/nanumsquare"/>
 
                 <com.example.along_the_road.ClearEditText
                     android:id="@+id/arrive_loc"
                     android:layout_width="250dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:gravity="center"
                     android:hint="도착지"
-                    android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:textSize="18sp"
-                    android:backgroundTint="@color/basic_color_3A7AFF"
+                    android:layout_marginTop="7dp"
+                    android:background="@color/basic_color_FFFFFF"
+                    android:textColor="@color/basic_color_3A7AFF"
                     android:fontFamily="@font/nanumsquare"
                     android:layout_below="@+id/depart_loc"
                     android:layout_toRightOf="@id/arrow"/>
@@ -90,7 +85,8 @@
                     android:background="@drawable/common_btn_style"
                     android:layout_marginBottom="17dp"
                     android:gravity="center"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="15dp"
                     android:textColor="#3A7AFF"
                     android:textSize="20sp"
                     android:text="검색"
@@ -107,8 +103,6 @@
                     android:layout_below="@+id/send"/>
 
             </RelativeLayout>
-
-
 
 <!--            <RelativeLayout-->
 <!--                android:id="@+id/container"-->

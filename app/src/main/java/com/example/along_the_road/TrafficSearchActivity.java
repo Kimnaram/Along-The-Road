@@ -17,13 +17,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -46,8 +50,12 @@ import java.util.concurrent.ExecutionException;
 public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
-    private Spinner spinner;
-    private static final String[] traffic = new String[]{"최소 환승", "최소 도보"};
+    private Spinner spinner = null;
+    private String[] spinnerArr = null;
+    private String selected_spinner = null;
+    private EditText dep_loc = null;
+    private EditText arr_loc = null;
+    private Button send = null;
 
     private GoogleMap mMap; // 구글 지도
     private Marker start_m; // 시작 마커
@@ -65,7 +73,6 @@ public class TrafficSearchActivity extends AppCompatActivity
     private LinearLayout Addition_Layout;
     private String str_url = null; // URL
     private String option = null;
-    private String travel_mode = "transit";
     private String step = null;
     private String entire_step = null;
     private String departure_lat = null;
@@ -102,22 +109,32 @@ public class TrafficSearchActivity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_40);
 
-        spinner = findViewById(R.id.spinner_menu);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        initView();
+
+        dep_loc = findViewById(R.id.depart_loc);
+        dep_loc.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(parent.getItemAtPosition(position).toString().equals("최소 환승")) {
-                    option = "&transit_routing_preference=fewer_transfers";
-                } else if (parent.getItemAtPosition(position).toString().equals("최소 도보")) {
-                    option = "&transit_routing_preference=less_walking";
-                } else {
-                    option = "";
+            public boolean onKey(View v, int KeyCode, KeyEvent event) {
+                if((event.getAction() == KeyEvent.ACTION_DOWN) && KeyCode == KeyEvent.KEYCODE_ENTER) {
+                    EditText enter_action = findViewById(R.id.arrive_loc);
+
+                    enter_action.requestFocus();
+                    return true;
                 }
+                return false;
             }
+        });
 
+        arr_loc = findViewById(R.id.arrive_loc);
+        send = findViewById(R.id.send);
+        arr_loc.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+            public boolean onKey(View v, int KeyCode, KeyEvent event) {
+                if((event.getAction() == KeyEvent.ACTION_DOWN) && KeyCode == KeyEvent.KEYCODE_ENTER) {
+                    send.performClick();
+                    return true;
+                }
+                return false;
             }
         });
 
@@ -151,55 +168,107 @@ public class TrafficSearchActivity extends AppCompatActivity
 //        return super.onOptionsItemSelected(item);
 //    }
 
+    private void initView() {
+        spinner = findViewById(R.id.spinner_menu);
+        spinnerArr = getResources().getStringArray(R.array.traffic);
+        selected_spinner = spinnerArr[0];
+        final ArrayAdapter<CharSequence> spinnerLargerAdapter =
+                ArrayAdapter.createFromResource(this, R.array.traffic, R.layout.spinner_item);
+        spinner.setAdapter(spinnerLargerAdapter);
+        spinner.setSelection(0);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        option = "";
+                        selected_spinner = spinnerArr[0];
+                        break;
+                    case 1:
+                        option = "&transit_routing_preference=fewer_transfers";
+                        selected_spinner = spinnerArr[1];
+                        break;
+                    case 2:
+                        option = "&transit_routing_preference=less_walking";
+                        selected_spinner = spinnerArr[2];
+                        break;
+                    default:
+                        option = "";
+                }
+//                if(parent.getItemAtPosition(position).toString().equals("최소 환승")) {
+//                    option = "&transit_routing_preference=fewer_transfers";
+//                } else if (parent.getItemAtPosition(position).toString().equals("최소 도보")) {
+//                    option = "&transit_routing_preference=less_walking";
+//                } else {
+//                    option = "";
+//                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
     public void sendClick(View view) { // 검색 버튼을 클릭하면
 
         mMap.clear(); // 맵을 clear
-        // BR_num = 0;
 
         r_list_len = 0;
         list_len = null;
 
         container = findViewById(R.id.container);
-        EditText dep_loc = findViewById(R.id.depart_loc);
-        EditText arr_loc = findViewById(R.id.arrive_loc);
+
+        dep_loc = findViewById(R.id.depart_loc);
+        arr_loc = findViewById(R.id.arrive_loc);
 
         String depart = dep_loc.getText().toString();
         String arrival = arr_loc.getText().toString();
 
-        directions(depart, arrival);
+        if(!depart.equals("") && !arrival.equals("")) {
 
-        if (getOverview != null) {
-            ArrayList<LatLng> entire_path = decodePolyPoints(getOverview);
+            directions(depart, arrival);
 
-            for (int i = 0; i < entire_path.size(); i++) {
-                if (i == 0) {
-                    mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("출발"));
-                } else if (i >= entire_path.size() - 1) {
-                    mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("도착"));
+            if (getOverview != null) {
+                ArrayList<LatLng> entire_path = decodePolyPoints(getOverview);
+
+                for (int i = 0; i < entire_path.size(); i++) {
+                    if (i == 0) {
+                        mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("출발"));
+                    } else if (i >= entire_path.size() - 1) {
+                        mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("도착"));
+                    }
+                }
+
+                Polyline line = null;
+
+                if (line == null) {
+                    line = mMap.addPolyline(new PolylineOptions()
+                            .color(Color.rgb(58, 122, 255))
+                            .geodesic(true)
+                            .addAll(entire_path));
+                } else {
+                    line.remove();
+                    line = mMap.addPolyline(new PolylineOptions()
+                            .color(Color.rgb(58, 122, 255))
+                            .geodesic(true)
+                            .addAll(entire_path));
                 }
             }
 
-            Polyline line = null;
+            onMapReady(mMap);
 
-            if (line == null) {
-                line = mMap.addPolyline(new PolylineOptions()
-                        .color(Color.rgb(0, 153, 255))
-                        .geodesic(true)
-                        .addAll(entire_path));
-            } else {
-                line.remove();
-                line = mMap.addPolyline(new PolylineOptions()
-                        .color(Color.rgb(0, 153, 255))
-                        .geodesic(true)
-                        .addAll(entire_path));
+            if (End_location != null) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(End_location));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
             }
-        }
-
-        onMapReady(mMap);
-
-        if(End_location != null) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(End_location));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+        } else {
+            if(!depart.equals("") && arrival.equals(""))
+                Toast.makeText(getApplicationContext(), "도착지를 작성해주세요.", Toast.LENGTH_SHORT);
+            else if(depart.equals("") && !arrival.equals(""))
+                Toast.makeText(getApplicationContext(), "출발지를 작성해주세요.", Toast.LENGTH_SHORT);
+            else Toast.makeText(getApplicationContext(), "출발지와 도착지를 작성해주세요.", Toast.LENGTH_SHORT);
         }
 
     }
@@ -536,13 +605,13 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                     if (line == null) {
                         line = mMap.addPolyline(new PolylineOptions()
-                                .color(Color.rgb(0, 153, 255))
+                                .color(Color.rgb(58, 122, 255))
                                 .geodesic(true)
                                 .addAll(path_points));
                     } else {
                         line.remove();
                         line = mMap.addPolyline(new PolylineOptions()
-                                .color(Color.rgb(0, 153, 255))
+                                .color(Color.rgb(58, 122, 255))
                                 .geodesic(true)
                                 .addAll(path_points));
                     }
