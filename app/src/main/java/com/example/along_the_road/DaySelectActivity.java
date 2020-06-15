@@ -31,8 +31,8 @@ public class DaySelectActivity extends AppCompatActivity {
         // 현재 연도 계산
         yyyy += 1;
         intent.setMaxYear(yyyy);
-        intent.setWeekStart(Calendar.SUNDAY);
         intent.setActiveMonth(2);
+        intent.setWeekStart(Calendar.SUNDAY);
         intent.setWeekDaysLanguage(AirCalendarIntent.Language.KO); //language for the weekdays
 
         startActivityForResult(intent, REQUEST_CODE);

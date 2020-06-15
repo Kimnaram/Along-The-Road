@@ -1,5 +1,6 @@
 package com.example.along_the_road;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
@@ -24,7 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,14 +68,14 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     /****************************** Directions API 관련 변수 *******************************/
     private static final String API_KEY = "";
-    //private RelativeLayout container;
-    private LinearLayout container;
-    private LinearLayout Route_Layout;
-    private LinearLayout Addition_Layout;
+    private RelativeLayout container;
+    private RelativeLayout Another_Route_Layout;
     private String str_url = null; // URL
     private String option = null;
     private String step = null;
-    private String entire_step = null;
+    private String[] full_time;
+    private String[] hours;
+    private String[] min;
     private String departure_lat = null;
     private String departure_lng = null;
     private String[][] goingS_lat;
@@ -92,10 +93,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     private int C_text_count = 0;
     private int R_text_count = 0;
-    private int count = 0;
-    // private int M_num = 0;
-    private int Max_num = 0;
-    // private int BR_num = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,30 +141,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        MenuInflater inflater = getMenuInflater();
-//
-//        inflater.inflate(R.menu.traffic_menu, menu);
-//
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//
-//        switch (item.getItemId()) {
-//            case R.id.less_walk:
-//                option = "&transit_routing_preference=less_walking";
-//                break;
-//            case R.id.fewer_transfers:
-//                option = "&transit_routing_preference=fewer_transfers";
-//                break;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-
     private void initView() {
         spinner = findViewById(R.id.spinner_menu);
         spinnerArr = getResources().getStringArray(R.array.traffic);
@@ -195,13 +168,6 @@ public class TrafficSearchActivity extends AppCompatActivity
                     default:
                         option = "";
                 }
-//                if(parent.getItemAtPosition(position).toString().equals("최소 환승")) {
-//                    option = "&transit_routing_preference=fewer_transfers";
-//                } else if (parent.getItemAtPosition(position).toString().equals("최소 도보")) {
-//                    option = "&transit_routing_preference=less_walking";
-//                } else {
-//                    option = "";
-//                }
             }
 
             @Override
@@ -219,6 +185,7 @@ public class TrafficSearchActivity extends AppCompatActivity
         list_len = null;
 
         container = findViewById(R.id.container);
+        container.setVisibility(container.VISIBLE);
 
         dep_loc = findViewById(R.id.depart_loc);
         arr_loc = findViewById(R.id.arrive_loc);
@@ -229,6 +196,9 @@ public class TrafficSearchActivity extends AppCompatActivity
         if(!depart.equals("") && !arrival.equals("")) {
 
             directions(depart, arrival);
+
+            TextView time = findViewById(R.id.during_time);
+            time.setText(full_time[0]);
 
             if (getOverview != null) {
                 ArrayList<LatLng> entire_path = decodePolyPoints(getOverview);
@@ -265,10 +235,10 @@ public class TrafficSearchActivity extends AppCompatActivity
             }
         } else {
             if(!depart.equals("") && arrival.equals(""))
-                Toast.makeText(getApplicationContext(), "도착지를 작성해주세요.", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(), "도착지를 작성해주세요.", Toast.LENGTH_SHORT).show();
             else if(depart.equals("") && !arrival.equals(""))
-                Toast.makeText(getApplicationContext(), "출발지를 작성해주세요.", Toast.LENGTH_SHORT);
-            else Toast.makeText(getApplicationContext(), "출발지와 도착지를 작성해주세요.", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(), "출발지를 작성해주세요.", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(getApplicationContext(), "출발지와 도착지를 작성해주세요.", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -290,7 +260,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                 C_text_count = 0;
             } // 재검색 시, 이전의 TextView 삭제
             if (R_text_count > 0) {
-                Route_Layout.removeAllViews();
+                Another_Route_Layout.removeAllViews();
                 R_text_count = 0;
             }
 
@@ -302,9 +272,11 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             r_list_len = routesArray.length();
 
-            System.out.println("r_list_len : " + r_list_len);
-
             list_len = new int[r_list_len]; // route의 개수만큼 배열 동적 생성
+
+            full_time = new String[r_list_len];
+            hours = new String[r_list_len];
+            min = new String[r_list_len];
 
             JSONObject preferredObject = routesArray.getJSONObject(0);
             String singleRoute = preferredObject.getString("overview_polyline");
@@ -324,7 +296,6 @@ public class TrafficSearchActivity extends AppCompatActivity
                 JSONArray stepsArray = new JSONArray(steps);
 
                 list_len[j] = stepsArray.length(); // j번째 route에 step이 몇개인지 저장
-                System.out.println("list_len[j] : " + list_len[j]);
 
                 goingS_lat = new String[r_list_len][20]; // route의 개수만큼 그리고 그 안에 자잘한 route들을 최대 20으로 배열을 생성
                 goingS_lng = new String[r_list_len][20];
@@ -349,26 +320,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             for (int j = 0; j < routesArray.length(); j++) {
 
-                if (count == 0) {
-                    recommend_view("추천 경로");
-                    C_text_count += 1;
-                } else if (count == 1) {
-                    recommend_view("다른 경로 더 보기");
-                    C_text_count += 1;
-                }
-
-                Route_Layout = new LinearLayout(TrafficSearchActivity.this);
-                Route_Layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
-                Route_Layout.setOrientation(LinearLayout.HORIZONTAL);
-                container.addView(Route_Layout);
-
-                Addition_Layout = new LinearLayout(TrafficSearchActivity.this);
-                Addition_Layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
-                Addition_Layout.setOrientation(LinearLayout.HORIZONTAL);
-                container.addView(Addition_Layout);
-
                 JSONObject subJsonObject = routesArray.getJSONObject(j);
 
                 String legs = subJsonObject.getString("legs");
@@ -378,6 +329,22 @@ public class TrafficSearchActivity extends AppCompatActivity
                 String leg_duration = legJsonObject.getString("duration");
                 JSONObject legdurObject = new JSONObject(leg_duration);
                 String amountDuration = legdurObject.getString("text");
+                String[] set_time = amountDuration.split(" ").clone();
+                for(int k = 0; k < set_time.length; k++) {
+                    if(set_time[k].equals("hours")) {
+                        hours[j] = set_time[k-1] + "시간";
+                    } else if(set_time[k].equals("min")) {
+                        min[j] = set_time[k-1] + "분";
+                    }
+                }
+
+                if((hours[j] != null && !hours[j].equals(""))
+                        && (min[j] != null && !min[j].equals(""))) {
+                    full_time[j] = hours[j] + " " + min[j];
+                } else if((hours == null && hours[j].equals(""))
+                        && (min[j] != null && !min[j].equals(""))) {
+                    full_time[j] = min[j];
+                }
 
                 String steps = legJsonObject.getString("steps");
                 JSONArray stepsArray = new JSONArray(steps);
@@ -385,11 +352,9 @@ public class TrafficSearchActivity extends AppCompatActivity
                 String[] getTravelMode = new String[list_len[j]]; // j번째 route의 step 수만큼 배열 동적 생성
                 String[] getInstructions = new String[list_len[j]]; // 기차인지 판별하는 변수
                 String isTrain = null;
-                //String[] getDistance = new String[list_len[j]];
                 String[] getDuration = new String[list_len[j]];
                 String[] arrival_name = new String[list_len[j]];
                 String[] depart_name = new String[list_len[j]];
-                //String[] getHeadsign = new String[list_len[j]];
                 String[] getTransit = new String[list_len[j]];
 
                 for (int i = 0; i < list_len[j]; i++) {
@@ -434,10 +399,6 @@ public class TrafficSearchActivity extends AppCompatActivity
                     String tempDuration = durJsonObject.getString("text");
                     getDuration[i] = tempDuration.split(" ")[0];
 
-                    //String distance = stepsObject.getString("distance");
-                    //JSONObject disJsonObject = new JSONObject(distance);
-                    //getDistance[i] = disJsonObject.getString("text");
-
                     if (getTravelMode[i].equals("TRANSIT")) {
 
                         String transit_details = stepsObject.getString("transit_details");
@@ -450,7 +411,6 @@ public class TrafficSearchActivity extends AppCompatActivity
                         String depart_stop = transitObject.getString("departure_stop");
                         JSONObject departObject = new JSONObject(depart_stop);
                         depart_name[i] = departObject.getString("name");
-                        // getHeadsign[i] = transitObject.getString("headsign");
 
                         String line = transitObject.getString("line");
                         JSONObject lineObject = new JSONObject(line);
@@ -501,8 +461,6 @@ public class TrafficSearchActivity extends AppCompatActivity
                     R_text_count += 1;
                 }
 
-                Max_num = 0;
-                count += 1;
             }
 
         } catch (InterruptedException e) {
@@ -514,8 +472,6 @@ public class TrafficSearchActivity extends AppCompatActivity
         } catch (ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
         }
-
-        count = 0;
 
     }
 
@@ -553,32 +509,42 @@ public class TrafficSearchActivity extends AppCompatActivity
         return path;
     }
 
-    public void method_view(String a, Drawable img, int j, int i) {
+    public void method_view(String a, Drawable img, int j, @Nullable int i) {
 
-        // String t_method = a.split("\\(")[0];
+        TextView Method = null;
 
-        // System.out.println(t_method + ": " + Max_num);
+        if(j == 0) {
+            Method = findViewById(R.id.show_view);
 
-        TextView Method = new TextView(this);
-
-        Method.setId(i);
-        Method.setText(a);
-        Method.setTextSize(16);
-        Method.setTextColor(Color.GRAY);
-
-        if(Max_num < 4) {
-            if(i >= list_len[j] - 1) {
-                Method.setPadding(0, 0, 0, 100);
-            } else {
-                Method.setPadding(0, 0, 0, 30);
-            }
-        } else {
-            Method.setPadding(0, 0, 0, 100);
+            Method.setText(a);
+            int h = 100;
+            int w = 100;
+            img.setBounds(0, 0, w, h);
+            Method.setCompoundDrawables(img, null, null, null);
+            Method.setVisibility(TextView.VISIBLE);
         }
-        int h = 70;
-        int w = 70;
-        img.setBounds(0, 0, w, h);
-        Method.setCompoundDrawables(img, null, null, null);
+        else if(j > 0) {
+            Method = new TextView(this);
+            if(i >= 0) {
+                Method.setId(i);
+            }
+            Method.setText(a);
+            Method.setTextSize(22);
+            Method.setTextColor(Color.parseColor("#6D6D6D"));
+            Method.setPadding(2,0, 0, 0);
+
+            int h = 100;
+            int w = 100;
+            img.setBounds(0, 0, w, h);
+            Method.setCompoundDrawables(img, null, null, null);
+
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            Method.setLayoutParams(lp);
+
+            Another_Route_Layout = findViewById(R.id.Another_Route_Layout);
+            Another_Route_Layout.addView(Method);
+        }
 
         final int t_num = j;
 
@@ -688,221 +654,12 @@ public class TrafficSearchActivity extends AppCompatActivity
                 onMapReady(mMap);
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(End));
-                //mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
             }
         });
 
-        if(Max_num < 4) {
 
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            Method.setLayoutParams(lp);
-
-            Route_Layout.addView(Method);
-
-            Max_num += 1;
-
-        } else if (Max_num >= 4) {
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            Method.setLayoutParams(lp);
-
-            Addition_Layout.addView(Method);
-
-//            if(list_len[j] - 1 <= list_num) {
-//                LinearLayout.LayoutParams params;
-//
-//                params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1);
-//
-//                View divider = new View(this);
-//                divider.setBackgroundColor(Color.rgb(0, 153, 255));
-//
-//                divider.setLayoutParams(params);
-//
-//                Addition_Layout.addView(divider);
-//            }
-
-            Max_num += 1;
-
-        }
     }
-
-    public void recommend_view(String a) {
-
-        TextView Route = new TextView(this);
-
-        Route = new TextView(this);
-        Route.setText(a);
-        Route.setTextSize(14);
-        Route.setTextColor(Color.rgb(133, 133, 133));
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        Route.setLayoutParams(lp);
-
-        container.addView(Route);
-    }
-
-//    public void method_view(String a, Drawable img) {
-//        Method = new TextView(this);
-//
-//        Method.setId(M_num);
-//        Method.setText(a);
-//        Method.setTextSize(16);
-//        Method.setTextColor(Color.GRAY);
-//        Method.setCompoundDrawables(img, null, null, null);
-//
-//        final int t_num = Method.getId();
-//
-//        if (M_num < r_list_len - 1) {
-//            M_num += 1;
-//        }
-//
-//        Method.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                mMap.clear();
-//                int j = t_num;
-//
-//                double dlatitude = Double.parseDouble(departure_lat);
-//                double dlngtitude = Double.parseDouble(departure_lng);
-//
-//                LatLng Start = new LatLng(dlatitude, dlngtitude);
-//
-//                start_m = mMap.addMarker(new MarkerOptions().position(Start).title("출발"));
-//
-//                for (int i = 0; i < list_len[j]; i++) {
-//
-//                    ArrayList<LatLng> path_points = decodePolyPoints(getPolyline[j][i]); // 폴리라인 포인트 디코드 후 ArrayList에 저장
-//                    System.out.println("polyline["+j+"]["+i+"] : " + getPolyline[j][i]);
-//
-//                    Polyline line = null;
-//
-//                    if (line == null) {
-//                        line = mMap.addPolyline(new PolylineOptions()
-//                                .color(Color.rgb(0, 153, 255))
-//                                .geodesic(true)
-//                                .addAll(path_points));
-//                    } else {
-//                        line.remove();
-//                        line = mMap.addPolyline(new PolylineOptions()
-//                                .color(Color.rgb(0, 153, 255))
-//                                .geodesic(true)
-//                                .addAll(path_points));
-//                    }
-//
-//                    if (goingE_lat[j][i] != null) {
-//
-//                        double gelatitude = Double.parseDouble(goingE_lat[j][i]);
-//                        double gelngtitude = Double.parseDouble(goingE_lng[j][i]);
-//                        String Transit_n = TransitName[j][i];
-//                        String next_Transit_n = null;
-//
-//                        if (i + 1 < list_len[j]) {
-//                            if (TransitName[j][i + 1] != null)
-//                                next_Transit_n = TransitName[j][i + 1];
-//                        }
-//
-//                        LatLng GoingE = new LatLng(gelatitude, gelngtitude);
-//
-//                        if (Transit_n == null) {
-//                            Transit_n = "도보";
-//                            if (next_Transit_n != null) {
-//                                marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 후, " + next_Transit_n + " 승차"));
-//                            } else {
-//                                if (i == list_len[j] - 1) {
-//                                    marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 후, 도착"));
-//                                }
-//                                marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n));
-//                            }
-//                        } else {
-//                            if (i == list_len[j] - 1) {
-//                                marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차 후, 도착"));
-//                            }
-//                            marker_arr[1][i] = mMap.addMarker(new MarkerOptions().position(GoingE).title(Transit_n + " 하차"));
-//                        }
-//
-//                        onMapReady(mMap);
-//                    }
-//
-//                    if (goingS_lat[j][i] != null) {
-//
-//                        double gslatitude = Double.parseDouble(goingS_lat[j][i]);
-//                        double gslngtitude = Double.parseDouble(goingS_lng[j][i]);
-//                        String Transit_n = TransitName[j][i];
-//                        String prev_Transit_n = null;
-//                        if (i != 0) {
-//                            prev_Transit_n = TransitName[j][i - 1];
-//                        }
-//
-//                        LatLng GoingS = new LatLng(gslatitude, gslngtitude);
-//
-//                        if (Transit_n == null) {
-//                            Transit_n = "도보";
-//                            // 도보 전 지하철 하차, 버스 하차 등을 표시할 수 있도록
-//                            if (prev_Transit_n != null) {
-//                                marker_arr[0][i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(prev_Transit_n + "하차 후, " + Transit_n));
-//                            } else {
-//                                marker_arr[0][i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n));
-//                            }
-//                        } else {
-//                            marker_arr[0][i] = mMap.addMarker(new MarkerOptions().position(GoingS).title(Transit_n + " 승차"));
-//                        }
-//
-//                        onMapReady(mMap);
-//                    }
-//                }
-//
-//                double alatitude = Double.parseDouble(arrival_lat);
-//                double alngtitude = Double.parseDouble(arrival_lng);
-//
-//                LatLng End = new LatLng(alatitude, alngtitude);
-//
-//                end_m = mMap.addMarker(new MarkerOptions().position(End).title("도착"));
-//
-//                onMapReady(mMap);
-//
-//                mMap.moveCamera(CameraUpdateFactory.newLatLng(End));
-//                //mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-//
-//            }
-//        });
-//
-//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT);
-//        Method.setLayoutParams(lp);
-//
-//        if(BR_num > 0) {
-//            lp.addRule(RelativeLayout.BELOW, BestRoute.getId());
-//        }
-//        if(t_num > 0) { //
-//            lp.addRule(RelativeLayout.RIGHT_OF, Method.getId());
-//        }
-//
-//        container.addView(Method);
-//
-//    }
-//
-//    public void recommend_view(String a) {
-//        ++BR_num;
-//
-//        BestRoute = new TextView(this);
-//        BestRoute.setId(BR_num);
-//        BestRoute.setText(a);
-//        BestRoute.setTextSize(13);
-//        BestRoute.setTextColor(Color.rgb(133, 133, 133));
-//
-//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT);
-//        BestRoute.setLayoutParams(lp);
-//
-//        lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-//
-//        container.addView(BestRoute);
-//    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
