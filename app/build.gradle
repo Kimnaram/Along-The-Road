@@ -36,4 +36,6 @@ dependencies {
     // implementation 'org.json:json:20190722'
     implementation project(path: ':AirCalendar')
     implementation 'org.apmem.tools:layouts:1.10'
+    compile project(path: ':AirCalendar')
+    implementation project(path: ':AirCalendar')
 }
