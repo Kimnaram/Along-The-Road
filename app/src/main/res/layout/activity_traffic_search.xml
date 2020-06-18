@@ -101,14 +101,14 @@
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_below="@+id/send"/>
 
-                <RelativeLayout
+                <LinearLayout
                     android:id="@+id/container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_below="@id/map"
                     android:layout_marginTop="20dp"
-                    android:visibility="gone" >
+                    android:visibility="gone">
 
                     <TextView
                         android:id="@+id/recommend_route"
@@ -125,7 +125,8 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/recommend_route"
                         android:layout_marginBottom="50dp"
-                        android:background="@color/basic_color_FFFFFF" >
+                        android:background="@color/basic_color_FFFFFF"
+                        android:visibility="gone" >
 
                         <TextView
                             android:id="@+id/show_view"
@@ -136,26 +137,24 @@
                             android:textColor="@color/basic_color_6D6D6D"
                             android:textSize="22dp" />
 
+                        <TextView
+                            android:id="@+id/during_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nanumsquare"
+                            android:textSize="28dp"
+                            android:textColor="@color/basic_color_3A7AFF"
+                            android:gravity="right"
+                            android:layout_alignParentRight="true"/>
+
                         <View
                             android:id="@+id/line"
                             android:layout_width="2.5dp"
                             android:layout_height="32dp"
                             android:background="@color/basic_color_3A7AFF"
-                            android:layout_toRightOf="@+id/show_view"
-                            android:layout_marginLeft="100dp"
+                            android:layout_toLeftOf="@+id/during_time"
+                            android:layout_marginLeft="20dp"
                             android:layout_marginRight="10dp"/>
-
-
-                        <TextView
-                            android:id="@+id/during_time"
-                            android:layout_width="30dp"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/nanumsquare"
-                            android:textSize="24dp"
-                            android:textColor="@color/basic_color_3A7AFF"
-                            android:gravity="center_horizontal"
-                            android:layout_toRightOf="@+id/line"
-                            android:layout_alignParentRight="true"/>
 
                     </RelativeLayout>
 
@@ -166,20 +165,9 @@
                         android:text="다른 경로 더 보기"
                         android:fontFamily="@font/nanumsquare"
                         android:textSize="16dp"
-                        android:layout_marginBottom="10dp"
-                        android:layout_below="@+id/Route_Layout"/>
+                        android:layout_below="@+id/Route_Layout" />
 
-                    <RelativeLayout
-                        android:id="@+id/Another_Route_Layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/another_route"
-                        android:layout_marginBottom="50dp"
-                        android:background="@color/basic_color_FFFFFF" >
-
-                    </RelativeLayout>
-
-                </RelativeLayout>
+                </LinearLayout>
 
             </RelativeLayout>
 
