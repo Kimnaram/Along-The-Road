@@ -1,6 +1,8 @@
 package com.example.along_the_road;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CalendarView;
@@ -8,6 +10,7 @@ import android.widget.CalendarView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 
 public class CalendarActivity extends AppCompatActivity {
@@ -18,8 +21,14 @@ public class CalendarActivity extends AppCompatActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.calendar_layout);
+
+        //상단 툴바 설정
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setDisplayShowTitleEnabled(false); //xml에서 titleview 설정
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //툴바 뒤로가기 생성
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
         mCalendarView = (CalendarView) findViewById(R.id.calendarView);
 

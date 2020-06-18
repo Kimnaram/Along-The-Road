@@ -11,6 +11,22 @@
         android:layout_height="wrap_content"
         android:orientation = "vertical">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="준비물체크"
+                android:textSize="25dp"
+                android:textColor="#ffffff"
+                android:fontFamily="@font/handon600">
+            </TextView>
+        </androidx.appcompat.widget.Toolbar>
+
         <!--전자기기 체크리스트-->
         <TextView
             android:id="@+id/checklist_part_1"
