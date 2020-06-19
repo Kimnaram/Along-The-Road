@@ -1,25 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_traffic"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/layout_traffic"
+    android:orientation="vertical"
     tools:context=".TrafficSearchActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/handon600"
+            android:text="교통편 검색"
+            android:textColor="#ffffff"
+            android:textSize="25dp"></TextView>
+    </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical" >
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="?attr/actionBarSize" />
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -31,148 +41,162 @@
                     android:id="@+id/arrow"
                     android:layout_width="35dp"
                     android:layout_height="30dp"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/up_down_arrow_48"
-                    android:layout_marginTop="28dp"
                     android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"/>
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="28dp"
+                    android:background="@drawable/up_down_arrow_48"
+                    android:gravity="center_vertical" />
 
                 <com.example.along_the_road.ClearEditText
                     android:id="@+id/depart_loc"
                     android:layout_width="250sp"
                     android:layout_height="40dp"
+                    android:layout_toRightOf="@+id/arrow"
+                    android:background="@color/basic_color_FFFFFF"
+                    android:fontFamily="@font/nanumsquare"
                     android:gravity="center"
                     android:hint="출발지"
-                    android:textSize="18sp"
-                    android:background="@color/basic_color_FFFFFF"
                     android:textColor="@color/basic_color_3A7AFF"
-                    android:fontFamily="@font/nanumsquare"
-                    android:layout_toRightOf="@+id/arrow" />
+                    android:textSize="18sp" />
 
                 <Spinner
                     android:id="@+id/spinner_menu"
                     android:layout_width="110dp"
                     android:layout_height="40dp"
-                    android:entries="@array/traffic"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginLeft="10sp"
                     android:layout_toRightOf="@+id/depart_loc"
-                    android:layout_centerHorizontal="true"
                     android:background="@null"
+                    android:entries="@array/traffic"
                     android:spinnerMode="dropdown" />
 
                 <com.example.along_the_road.ClearEditText
                     android:id="@+id/arrive_loc"
                     android:layout_width="250dp"
                     android:layout_height="40dp"
+                    android:layout_below="@+id/depart_loc"
+                    android:layout_marginTop="7dp"
+                    android:layout_toRightOf="@id/arrow"
+                    android:background="@color/basic_color_FFFFFF"
+                    android:fontFamily="@font/nanumsquare"
                     android:gravity="center"
                     android:hint="도착지"
                     android:inputType="text"
-                    android:textSize="18sp"
-                    android:layout_marginTop="7dp"
-                    android:background="@color/basic_color_FFFFFF"
                     android:textColor="@color/basic_color_3A7AFF"
-                    android:fontFamily="@font/nanumsquare"
-                    android:layout_below="@+id/depart_loc"
-                    android:layout_toRightOf="@id/arrow"/>
+                    android:textSize="18sp" />
 
                 <Button
                     android:id="@+id/send"
                     android:layout_width="100dp"
                     android:layout_height="39dp"
-                    android:layout_gravity="right"
-                    android:onClick="sendClick"
-                    android:background="@drawable/common_btn_style"
-                    android:layout_marginBottom="17dp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginLeft="15dp"
-                    android:textColor="#3A7AFF"
-                    android:textSize="20sp"
-                    android:text="검색"
-                    android:fontFamily="@font/nanumsquare"
                     android:layout_below="@id/spinner_menu"
-                    android:layout_toRightOf="@+id/arrive_loc"/>
+                    android:layout_gravity="right"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="17dp"
+                    android:layout_toRightOf="@+id/arrive_loc"
+                    android:background="@drawable/common_btn_style"
+                    android:fontFamily="@font/nanumsquare"
+                    android:gravity="center"
+                    android:onClick="sendClick"
+                    android:text="검색"
+                    android:textColor="#3A7AFF"
+                    android:textSize="20sp" />
 
                 <fragment
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
-                    android:id="@+id/map"
-                    tools:context=".TrafficSearchActivity"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
-                    android:layout_below="@+id/send"/>
+                    android:layout_below="@+id/send"
+                    tools:context=".TrafficSearchActivity" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_below="@id/map"
                     android:layout_marginTop="20dp"
+                    android:orientation="vertical"
                     android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/recommend_route"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="추천 경로"
-                        android:fontFamily="@font/nanumsquare"
-                        android:textSize="16dp"
-                        android:layout_marginBottom="10dp"/>
 
                     <RelativeLayout
                         android:id="@+id/Route_Layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/recommend_route"
                         android:layout_marginBottom="50dp"
-                        android:background="@color/basic_color_FFFFFF"
-                        android:visibility="gone" >
+                        android:visibility="gone">
 
                         <TextView
-                            android:id="@+id/show_view"
-                            android:layout_width="200dp"
+                            android:id="@+id/recommend_route"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp"
                             android:fontFamily="@font/nanumsquare"
-                            android:textColor="@color/basic_color_6D6D6D"
-                            android:textSize="22dp" />
+                            android:text="추천 경로"
+                            android:textSize="16dp" />
 
                         <TextView
                             android:id="@+id/during_time"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/nanumsquare"
-                            android:textSize="28dp"
-                            android:textColor="@color/basic_color_3A7AFF"
-                            android:gravity="right"
-                            android:layout_alignParentRight="true"/>
-
-                        <View
-                            android:id="@+id/line"
-                            android:layout_width="2.5dp"
-                            android:layout_height="32dp"
+                            android:layout_alignParentRight="true"
                             android:background="@color/basic_color_3A7AFF"
-                            android:layout_toLeftOf="@+id/during_time"
-                            android:layout_marginLeft="20dp"
-                            android:layout_marginRight="10dp"/>
+                            android:fontFamily="@font/nanumsquare"
+                            android:gravity="right"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:textColor="@color/basic_color_FFFFFF"
+                            android:textSize="28dp" />
+
+                        <!--                        <View-->
+                        <!--                            android:id="@+id/line"-->
+                        <!--                            android:layout_width="80dp"-->
+                        <!--                            android:layout_height="2.5dp"-->
+                        <!--                            android:background="@color/basic_color_3A7AFF"-->
+                        <!--                            android:layout_below="@id/during_time"-->
+                        <!--                            android:layout_alignParentRight="true"/>-->
+
+                        <org.apmem.tools.layouts.FlowLayout
+                            android:id="@+id/Route_fl"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/during_time"
+                            android:background="@color/basic_color_FFFFFF">
+
+                        </org.apmem.tools.layouts.FlowLayout>
 
                     </RelativeLayout>
 
-                    <TextView
-                        android:id="@+id/another_route"
+                    <RelativeLayout
+                        android:id="@+id/Another_Route_Layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="다른 경로 더 보기"
-                        android:fontFamily="@font/nanumsquare"
-                        android:textSize="16dp"
-                        android:layout_below="@+id/Route_Layout" />
+                        android:layout_below="@+id/Route_Layout"
+                        android:visibility="gone">
 
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/another_route"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nanumsquare"
+                            android:text="다른 경로 더 보기"
+                            android:textSize="16dp" />
+
+                        <LinearLayout
+                            android:id="@+id/flow_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"></LinearLayout>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
 
             </RelativeLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </ScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

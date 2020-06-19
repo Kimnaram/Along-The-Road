@@ -7,6 +7,7 @@ import androidx.core.content.res.ResourcesCompat;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,8 +18,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,9 +55,12 @@ import java.util.concurrent.ExecutionException;
 public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
-    private LinearLayout container;
+    private RelativeLayout container;
+    private RelativeLayout Another_Route_Layout;
     private RelativeLayout Route_Layout;
-    private FlowLayout fl;
+    private LinearLayout flow_container;
+    private FlowLayout Route_fl;
+    private FlowLayout Another_fl;
 
     private Spinner spinner = null;
     private String[] spinnerArr = null;
@@ -98,6 +102,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     private int r_list_len = 0;
     private int[] list_len = null;
     private int fl_count = 0;
+    private int R_fl_count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,11 +110,12 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_traffic_search);
 
+        //상단 툴바 설정
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        getSupportActionBar().setTitle("길따라");
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_40);
+        getSupportActionBar().setDisplayShowTitleEnabled(false); //xml에서 titleview 설정
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //툴바 뒤로가기 생성
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
         initView();
 
@@ -141,6 +147,9 @@ public class TrafficSearchActivity extends AppCompatActivity
         });
 
         container = findViewById(R.id.container);
+        Route_Layout = findViewById(R.id.Route_Layout);
+        Another_Route_Layout = findViewById(R.id.Another_Route_Layout);
+        flow_container = findViewById(R.id.flow_container);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -258,8 +267,12 @@ public class TrafficSearchActivity extends AppCompatActivity
         try {
 
             if(fl_count >= 1) {
-                fl.removeAllViews();
+                flow_container.removeAllViews();
                 fl_count = 0;
+            }
+            if(R_fl_count >= 1) {
+                Route_fl.removeAllViews();
+                R_fl_count = 0;
             }
 
             resultText = new Task().execute().get(); // URL에 있는 내용을 받아옴
@@ -320,14 +333,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             for (int j = 0; j < routesArray.length(); j++) {
 
-                fl = new FlowLayout(TrafficSearchActivity.this);
-                fl.setLayoutParams(new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
-                fl.setOrientation(FlowLayout.HORIZONTAL);
-                fl.setPadding(0, 0, 0, 50);
-                fl.setBackgroundColor(Color.WHITE);
-                container.addView(fl);
-
                 JSONObject subJsonObject = routesArray.getJSONObject(j);
 
                 String legs = subJsonObject.getString("legs");
@@ -351,6 +356,36 @@ public class TrafficSearchActivity extends AppCompatActivity
                 } else {
                     full_time[j] = hours[j] + " " + min[j];
                 }
+
+                if(j > 0) {
+                    TextView time = new TextView(this);
+                    time.setText(full_time[j]);
+
+                    time.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)time.getLayoutParams();
+                    params.gravity = Gravity.RIGHT;
+                    time.setLayoutParams(params);
+                    time.setTextSize(28);
+
+                    Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
+                    time.setTypeface(typeface);
+
+                    time.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                    time.setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                    time.setPadding(5, 0, 5, 0);
+
+                    flow_container.addView(time);
+                }
+
+                Another_fl = new FlowLayout(TrafficSearchActivity.this);
+                FlowLayout.LayoutParams param = new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                // param.bottomMargin = 50;
+                Another_fl.setLayoutParams(param);
+
+                Another_fl.setOrientation(FlowLayout.HORIZONTAL);
+                Another_fl.setBackgroundColor(Color.WHITE);
+                flow_container.addView(Another_fl);
 
                 String steps = legJsonObject.getString("steps");
                 JSONArray stepsArray = new JSONArray(steps);
@@ -461,8 +496,9 @@ public class TrafficSearchActivity extends AppCompatActivity
                             img = ResourcesCompat.getDrawable(res, R.drawable.walk_96, null);
                     }
 
-                    method_view(step, img, j, i);
+                    method_view(step, full_time[j], img, j, i);
                 }
+
             }
 
         } catch (InterruptedException e) {
@@ -511,26 +547,39 @@ public class TrafficSearchActivity extends AppCompatActivity
         return path;
     }
 
-    public void method_view(String a, Drawable img, int j, int i) {
+    public void method_view(String a, String t, Drawable img, int j, int i) {
 
         TextView ith_route = null;
 
         if (j == 0) { // j가 0이라면 추천 경로이므로
-            // 수정 필요
-            ith_route = findViewById(R.id.show_view);
 
+            Route_fl = findViewById(R.id.Route_fl);
+
+            ith_route = new TextView(this);
             ith_route.setText(a);
+            ith_route.setTextSize(22);
+            ith_route.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+
+            Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
+            ith_route.setTypeface(typeface);
+
+            ith_route.setTextColor(Color.parseColor("#6D6D6D"));
+
             int h = 90;
             int w = 90;
             img.setBounds(0, 0, w, h);
             ith_route.setCompoundDrawables(img, null, null, null);
 
-            TextView time = findViewById(R.id.during_time);
-            time.setText(full_time[0]);
-            System.out.println("시간 : " + full_time[0]);
+            ith_route.setGravity(Gravity.CENTER_VERTICAL);
+            ith_route.setPadding(0, 0, 0, 13);
 
-            Route_Layout = findViewById(R.id.Route_Layout);
+            TextView time = findViewById(R.id.during_time);
+            time.setText(t);
+
+            R_fl_count += 1;
+            Route_fl.addView(ith_route);
             Route_Layout.setVisibility(View.VISIBLE);
+
         } else if (j > 0) { // j가 0보다 크다면 다른 경로이므로
 
             ith_route = new TextView(this);
@@ -540,17 +589,17 @@ public class TrafficSearchActivity extends AppCompatActivity
             Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
             ith_route.setTypeface(typeface);
 
-            ith_route.setTextColor(Color.parseColor("#6D6D6D"));
-
-            ith_route.setEllipsize(TextUtils.TruncateAt.END);
-
             int h = 90;
             int w = 90;
             img.setBounds(0, 0, w, h);
             ith_route.setCompoundDrawables(img, null, null, null);
 
+            ith_route.setGravity(Gravity.CENTER_VERTICAL);
+            ith_route.setPadding(0, 0, 0, 13);
+
             fl_count += 1;
-            fl.addView(ith_route);
+            Another_fl.addView(ith_route);
+            Another_Route_Layout.setVisibility(View.VISIBLE);
 
         }
 
