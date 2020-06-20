@@ -193,6 +193,26 @@ public class TrafficSearchActivity extends AppCompatActivity
         });
     }
 
+    public void Change_EditText(View view) {
+
+        if(!dep_loc.getText().equals("") && !arr_loc.getText().equals("")) {
+            dep_loc = findViewById(R.id.depart_loc);
+            arr_loc = findViewById(R.id.arrive_loc);
+            TextView temp = new TextView(this);
+
+            String d = dep_loc.getText().toString();
+            String a = arr_loc.getText().toString();
+
+            System.out.println("출발-도착 :" + d + "-" + "a");
+
+            temp.setText(d);
+            String t = temp.getText().toString();
+            dep_loc.setText(a);
+            arr_loc.setText(t);
+        }
+
+    }
+
     public void sendClick(View view) { // 검색 버튼을 클릭하면
 
         mMap.clear(); // 맵을 clear

@@ -35,9 +35,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5sp"
-                android:layout_marginRight="5sp">
+                android:layout_marginRight="5sp"
+                android:layout_marginTop="5sp">
 
-                <TextView
+                <ImageButton
                     android:id="@+id/arrow"
                     android:layout_width="35dp"
                     android:layout_height="30dp"
@@ -45,6 +46,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginTop="28dp"
                     android:background="@drawable/up_down_arrow_48"
+                    android:onClick="Change_EditText"
                     android:gravity="center_vertical" />
 
                 <com.example.along_the_road.ClearEditText
