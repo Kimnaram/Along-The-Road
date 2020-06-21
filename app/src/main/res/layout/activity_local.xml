@@ -23,7 +23,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="지역선택"
+                    android:text="지역 선택"
                     android:textSize="25dp"
                     android:textColor="#ffffff"
                     android:fontFamily="@font/handon600">

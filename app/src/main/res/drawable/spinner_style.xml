@@ -7,6 +7,8 @@
                 android:radius="10dp" />
             <solid
                 android:color="@color/basic_color_FFFFFF" />
+            <padding
+                android:left="15dp" />
         </shape>
     </item>
 

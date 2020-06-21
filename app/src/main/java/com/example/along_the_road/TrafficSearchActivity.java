@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.LatLng;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -98,6 +99,8 @@ public class TrafficSearchActivity extends AppCompatActivity
     private String[][] TransitName;
     private String[][] getPolyline;
     private String getOverview = null;
+    String REQUEST_DEP = null;
+    String REQUEST_ARR = null;
 
     private int r_list_len = 0;
     private int[] list_len = null;
@@ -120,6 +123,22 @@ public class TrafficSearchActivity extends AppCompatActivity
         initView();
 
         dep_loc = findViewById(R.id.depart_loc);
+        arr_loc = findViewById(R.id.arrive_loc);
+        send = findViewById(R.id.send);
+
+        if(savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+
+            if(extras != null) {
+                REQUEST_DEP = extras.getString("from");
+                REQUEST_ARR = extras.getString("to");
+
+                dep_loc.setText(REQUEST_DEP);
+                arr_loc.setText(REQUEST_ARR);
+//                send.performClick();
+            }
+        }
+
         dep_loc.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int KeyCode, KeyEvent event) {
@@ -133,8 +152,6 @@ public class TrafficSearchActivity extends AppCompatActivity
             }
         });
 
-        arr_loc = findViewById(R.id.arrive_loc);
-        send = findViewById(R.id.send);
         arr_loc.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int KeyCode, KeyEvent event) {
@@ -299,6 +316,11 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             JSONObject jsonObject = new JSONObject(resultText);
             String routes = jsonObject.getString("routes");
+            if(routes.isEmpty()) { // 경로가 존재하지 않는다면
+
+                Toast.makeText(getApplicationContext(), "경로가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+
+            }
             JSONArray routesArray = new JSONArray(routes);
 
             r_list_len = routesArray.length();
@@ -780,6 +802,17 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             return receiveMsg;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ //툴바 뒤로가기 동작
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

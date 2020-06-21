@@ -14,13 +14,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +48,8 @@ public class CourseRecoActivity extends AppCompatActivity {
     private String area_Course = null; // URL
     private String detail_Course = null;
     private String what_url = null;
-    private String selected_thing = null;
+    private String selected_city_txt = null;
+    private String selected_course_txt = null;
 
     //    private int areaCode = 1; // 테스트를 위함
     private int areaCode = Code;
@@ -55,6 +62,9 @@ public class CourseRecoActivity extends AppCompatActivity {
     private String[] Title;
     private String[] subname;
     private String[] subdetailimg;
+
+    private String from = null;
+    private String to = null;
 
     private static final String Family_C = "C0112";
     private static final String Solo_C = "C0113";
@@ -78,17 +88,26 @@ public class CourseRecoActivity extends AppCompatActivity {
     private int d_list_len = 0;
     private int C_ll_count = 0;
 
+    private int[] state;
+
     private RelativeLayout rl_course;
-    private RelativeLayout brl;
+    private RelativeLayout rl_top;
     private RelativeLayout rl_info_popup;
     private RelativeLayout rl_popup_info_ok;
-    private LinearLayout ll_course_text;
+    private LinearLayout ll_course_list;
+    private LinearLayout[] ll_course_text_box;
+    private FlowLayout[] fl_course_text;
 
-    private Button local_reSelect;
-    private Button theme_reSelect;
-
-    private TextView Selected_Thing;
+    private TextView tv_selected_course;
+    private TextView tv_selected_city;
     private TextView tv_popup_msg;
+    private TextView ith_course;
+
+    private Drawable ea_img = null;
+    private Drawable c_img = null;
+    private Spinner spinner;
+    private String[] spinnerArr;
+    private String selected_spinner = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,20 +128,21 @@ public class CourseRecoActivity extends AppCompatActivity {
             startActivity(course_to_local);
         }
 
+        initView();
+
         if (C_ll_count > 0) {
-            ll_course_text.removeAllViews();
+            ll_course_list.removeAllViews();
             C_ll_count = 0;
         }
 
         rl_course = findViewById(R.id.rl_course);
-        brl = findViewById(R.id.bar);
+        rl_top = findViewById(R.id.rl_top);
         rl_info_popup = findViewById(R.id.rl_info_popup);
         rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
+        ll_course_list = findViewById(R.id.ll_course_list);
 
-        local_reSelect = findViewById(R.id.local_reSelect);
-        theme_reSelect = findViewById(R.id.theme_reSelect);
-
-        Selected_Thing = findViewById(R.id.Selected_Thing);
+        tv_selected_city = findViewById(R.id.tv_selected_city);
+        tv_selected_course = findViewById(R.id.tv_selected_course);
 
         final RadioGroup Course_Group = findViewById(R.id.Course_Group);
 
@@ -137,6 +157,7 @@ public class CourseRecoActivity extends AppCompatActivity {
                     case R.id.Solo_Course:
                         Theme = Solo_C;
                         Total_Theme = "&cat2=" + Theme;
+                        break;
                     case R.id.Healing_Course:
                         Theme = Healing_C;
                         Total_Theme = "&cat2=" + Theme;
@@ -241,10 +262,16 @@ public class CourseRecoActivity extends AppCompatActivity {
                         ContentID = new int[list_len];
                         CourseImg = new String[list_len];
                         Title = new String[list_len];
+                        state = new int[list_len];
+
+                        ll_course_text_box = new LinearLayout[list_len];
+                        fl_course_text = new FlowLayout[list_len];
 
                         if (ItemIsWhat.equals("[{")) {
 
                             for (int i = 0; i < list_len; i++) {
+
+                                state[i] = 0;
 
                                 JSONObject CourseObject = itemArray.getJSONObject(i);
 
@@ -253,13 +280,24 @@ public class CourseRecoActivity extends AppCompatActivity {
 //                                CourseImg[i] = CourseObject.getString("firstimage");
                                 Title[i] = CourseObject.getString("title");
 
-                                MakeTextView(Title[i], i);
+                                ll_course_text_box[i] = new LinearLayout(CourseRecoActivity.this);
+                                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                                param.bottomMargin = 10;
+                                param.topMargin = 10;
+                                ll_course_text_box[i].setLayoutParams(param);
+                                ll_course_text_box[i].setOrientation(LinearLayout.VERTICAL);
+                                ll_course_list.addView(ll_course_text_box[i]);
 
-                            }
+                                fl_course_text[i] = new FlowLayout(CourseRecoActivity.this);
+                                fl_course_text[i].setLayoutParams(new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                                fl_course_text[i].setOrientation(FlowLayout.HORIZONTAL);
+                                fl_course_text[i].setVisibility(View.GONE);
+                                fl_course_text[i].setBackground(getResources().getDrawable(R.drawable.rounded));
+                                fl_course_text[i].setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
 
-                            for (int i = 0; i < list_len; i++) {
-
-                                System.out.println(ContentID[i] + "의 " + Title[i]);
+                                MakeListTextView(Title[i], i);
 
                             }
 
@@ -270,7 +308,21 @@ public class CourseRecoActivity extends AppCompatActivity {
 //                            CourseImg[0] = itemObject.getString("firstimage");
                             Title[0] = itemObject.getString("title");
 
-                            MakeTextView(Title[0], 0);
+                            ll_course_text_box[0] = new LinearLayout(CourseRecoActivity.this);
+                            ll_course_text_box[0].setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT));
+                            ll_course_text_box[0].setOrientation(LinearLayout.VERTICAL);
+                            ll_course_list.addView(ll_course_text_box[0]);
+
+                            fl_course_text[0] = new FlowLayout(CourseRecoActivity.this);
+                            fl_course_text[0].setLayoutParams(new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT));
+                            fl_course_text[0].setOrientation(FlowLayout.HORIZONTAL);
+                            fl_course_text[0].setVisibility(View.GONE);
+                            fl_course_text[0].setBackground(getResources().getDrawable(R.drawable.rounded));
+                            fl_course_text[0].setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
+
+                            MakeListTextView(Title[0], 0);
 
                         }
                     }
@@ -330,6 +382,8 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                                 //subdetailimg[i] = CourseObject.getString("subdetailimg");
 
+                                MakeTextView(subname[i], i, k);
+
                             }
 
                             for (int i = 0; i < d_list_len; i++) {
@@ -350,12 +404,10 @@ public class CourseRecoActivity extends AppCompatActivity {
                     }
 
                     rl_course.setVisibility(View.GONE);
-
-                    brl.setVisibility(View.VISIBLE);
+                    rl_top.setVisibility(View.VISIBLE);
 
                     String city = null;
                     String course = null;
-                    Drawable c_img = null;
 
                     switch (areaCode) {
                         case Seoul:
@@ -416,78 +468,169 @@ public class CourseRecoActivity extends AppCompatActivity {
                             c_img = ResourcesCompat.getDrawable(res, R.drawable.taste_40, null);
                     }
 
-                    selected_thing = city + "에서 " + course;
+                    selected_city_txt = city;
+                    selected_course_txt = "에서 " + course;
 
-                    Selected_Thing.setText(selected_thing);
+                    tv_selected_city.setText(selected_city_txt);
+                    tv_selected_course.setText(selected_course_txt);
 
-                    int h = 80;
-                    int w = 80;
+                    int h = 90;
+                    int w = 90;
                     c_img.setBounds(0, 0, h, w);
-                    Selected_Thing.setCompoundDrawables(null, null, c_img, null);
+                    tv_selected_course.setCompoundDrawables(null, null, c_img, null);
 
                 }
             }
 
-        });
-
-        local_reSelect.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                areaCode = 0;
-                Intent course_to_local = new Intent(getApplicationContext(), localselectActivity.class);
-                course_to_local.putExtra("REQUEST", AreaCodeIsNull);
-
-                startActivity(course_to_local);
-            }
-        });
-
-        theme_reSelect.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Total_Theme = "";
-                rl_course.setVisibility(View.VISIBLE);
-
-                brl.setVisibility(View.GONE);
-
-                if(C_ll_count > 0) {
-                    ll_course_text.removeAllViews();
-                    C_ll_count = 0;
-                }
-
-            }
         });
 
     }
 
-    public void MakeTextView(String t, int i) {
-        TextView ith_course = null;
+    private void initView() {
+        spinner = findViewById(R.id.sp_reselect);
+        spinnerArr = getResources().getStringArray(R.array.reselect);
+        selected_spinner = spinnerArr[0];
+        final ArrayAdapter<CharSequence> spinnerLargerAdapter =
+                ArrayAdapter.createFromResource(this, R.array.reselect, R.layout.spinner_item);
+        spinner.setAdapter(spinnerLargerAdapter);
+        spinner.setSelection(0);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        break;
+                    case 1:
+                        areaCode = 0;
+                        Intent course_to_local = new Intent(getApplicationContext(), localselectActivity.class);
+                        course_to_local.putExtra("REQUEST", AreaCodeIsNull);
 
-        ll_course_text = findViewById(R.id.ll_course_text);
+                        startActivity(course_to_local);
+                        selected_spinner = spinnerArr[0];
+                        break;
+                    case 2:
+                        Total_Theme = "";
+                        rl_course.setVisibility(View.VISIBLE);
+
+                        rl_top.setVisibility(View.GONE);
+
+                        if(C_ll_count > 0) {
+                            ll_course_list.removeAllViews();
+                            C_ll_count = 0;
+                        }
+                        selected_spinner = spinnerArr[1];
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    public void MakeListTextView(String t, int i) {
 
         ith_course = new TextView(this);
+        ith_course.setId(i);
         ith_course.setText("Course " + (i + 1) + ". " + t);
         ith_course.setTextSize(22);
-        ith_course.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+        ith_course.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
         ith_course.setPadding(16, 16, 16, 16);
         ith_course.setCompoundDrawablePadding(2);
 
         Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
         ith_course.setTypeface(typeface);
 
+        final Resources res = getResources();
+
+        ea_img = ResourcesCompat.getDrawable(res, R.drawable.expand_arrow_48, null);
+        ea_img.setBounds(0, 0, 40, 40);
+        ith_course.setCompoundDrawables(null, null, ea_img, null);
+        ith_course.setCompoundDrawablePadding(20);
+
         ith_course.setGravity(Gravity.CENTER_VERTICAL);
 
         C_ll_count += 1;
-        ll_course_text.addView(ith_course);
-        ll_course_text.setVisibility(View.VISIBLE);
+        ll_course_text_box[i].addView(ith_course);
+        ll_course_text_box[i].addView(fl_course_text[i]);
+
+        ll_course_list.setVisibility(View.VISIBLE);
+
+        final int no = i;
 
         ith_course.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 코스가 눌리면 상세 코스가 나오도록
+                if(state[no] == 0) {
+                    fl_course_text[no].setVisibility(View.VISIBLE);
+                    state[no] = 1;
+//                    Drawable ca_img = ResourcesCompat.getDrawable(res, R.drawable.collapse_arrow_48, null);
+//                    ca_img.setBounds(0, 0, 40, 40);
+//
+//                    ith_course.setCompoundDrawables(null, null, ca_img, null);
+                }
+                else if(state[no] == 1) {
+                    fl_course_text[no].setVisibility(View.GONE);
+                    state[no] = 0;
+//                    ea_img.setBounds(0, 0, 40, 40);
+//                    ith_course.setCompoundDrawables(null, null, ea_img, null);
+                }
             }
         });
 
+    }
+
+    public void MakeTextView(String t, int i, int k) {
+
+        TextView course_txt = null;
+
+        course_txt = new TextView(this);
+        if(i >= d_list_len - 1) {
+            course_txt.setText(t);
+        } else {
+            course_txt.setText(t + " >");
+        }
+        course_txt.setTextSize(18);
+        course_txt.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+        course_txt.setPadding(16, 16, 16, 16);
+        course_txt.setCompoundDrawablePadding(2);
+
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
+        course_txt.setTypeface(typeface);
+
+        course_txt.setGravity(Gravity.CENTER_VERTICAL);
+
+        fl_course_text[k].addView(course_txt);
+
+        final String loc = t;
+
+        course_txt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("from :" + from);
+                System.out.println("to : " + to);
+
+                if(from == null && to == null) {
+                    from = loc;
+                } else if(from != null && to == null) {
+                    to = loc;
+                    // 눌리면 교통검색 페이지로 이동?
+                    Intent course_to_traffic = new Intent(getApplicationContext(), TrafficSearchActivity.class);
+                    course_to_traffic.putExtra("from", from);
+                    course_to_traffic.putExtra("to", to);
+
+                    startActivity(course_to_traffic);
+                } else if(from != null && to != null) {
+                    from = loc;
+                    to = null;
+                }
+            }
+        });
     }
 
     public class Task extends AsyncTask<String, Void, String> {
@@ -523,6 +666,17 @@ public class CourseRecoActivity extends AppCompatActivity {
 
             return receiveMsg;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ //툴바 뒤로가기 동작
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
