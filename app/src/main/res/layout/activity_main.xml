@@ -11,6 +11,20 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!--상단 툴바-->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/logo_text">
+            </ImageView>
+        </androidx.appcompat.widget.Toolbar>
 
         <!--메인 하단 배경 무늬 디자인-->
         <ImageView
@@ -53,7 +67,7 @@
             android:src="@drawable/local_go" />
 
 
-        <!--교통편 확인 버튼-->
+        <!--교통편 확인 버튼 -> 코스 추천 버튼-->
         <ImageButton
             android:id="@+id/traffic_button"
             android:layout_width="160dp"
@@ -64,7 +78,7 @@
             android:layout_marginBottom="225dp"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
-            android:src="@drawable/check_traffic" />
+            android:src="@drawable/check_course" />
 
 
         <!--예산 관리 버튼-->
@@ -93,6 +107,21 @@
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/check_list" />
+
+
+        <!-- 준비물 체크 버튼 -> 행사 안내 버튼
+        <ImageButton
+            android:id="@+id/checklist_button"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="44dp"
+            android:layout_marginBottom="61dp"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/check_festival" />
+            -->
 
 
         <!--후기 구경 버튼-->

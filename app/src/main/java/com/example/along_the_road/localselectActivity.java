@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -17,6 +18,17 @@ public class localselectActivity extends AppCompatActivity {
     private boolean state = false;
     public static int Code = 0;
     public static int Detail_Code = 0;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ //툴바 뒤로가기 동작
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -314,6 +326,5 @@ public class localselectActivity extends AppCompatActivity {
 
         startActivity(local_to_main);
     }
-
 }
 
