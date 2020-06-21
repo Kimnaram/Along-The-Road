@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "525395892263",
+    "firebase_url": "https://along-the-road-deeac.firebaseio.com",
+    "project_id": "along-the-road-deeac",
+    "storage_bucket": "along-the-road-deeac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:525395892263:android:2c97d9ac4a1f63785e5602",
+        "android_client_info": {
+          "package_name": "com.example.along_the_road"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "525395892263-fkj8mvapoaif8gmtkmubcpgruvtcr9aq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.along_the_road",
+            "certificate_hash": "98aed5044e8d6f3d339ee1ad9a8ab96a60bb68ad"
+          }
+        },
+        {
+          "client_id": "525395892263-ol6hv2rf443i042shp5820gi1q2pkoq0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoprwVFeV1V7VPxQVhnqhYZQgd79BJft4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "525395892263-ol6hv2rf443i042shp5820gi1q2pkoq0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
