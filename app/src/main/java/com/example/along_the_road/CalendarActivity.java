@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.CalendarView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,17 @@ public class CalendarActivity extends AppCompatActivity {
 
     private static final String TAG = "CalendarActivity";
     private CalendarView mCalendarView;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ //툴바 뒤로가기 동작
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

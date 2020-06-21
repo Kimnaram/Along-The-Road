@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,6 +19,17 @@ public class CheckListActivity extends AppCompatActivity {
             part4_1, part4_2, part4_3, part4_4, part4_5, part4_6, part4_7, part4_8, part4_9, part4_10,
             part5_1, part5_2, part5_3, part5_4, part5_5, part5_6, part5_7, part5_8;
     Button clear_btn;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ //툴바 뒤로가기 동작
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
