@@ -19,7 +19,7 @@ public class localselectActivity extends AppCompatActivity {
     public static int Detail_Code = 0;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local);
 
@@ -30,21 +30,43 @@ public class localselectActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
-        final ImageButton local_btn = (ImageButton) findViewById(R.id.local_conf_btn); //다음페이지
+        ImageButton local_btn = findViewById(R.id.local_conf_btn);
 
         local_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if (state == true) {
-                    if(Code != 0) {
-                        Intent local_to_day = new Intent(getApplicationContext(), DaySelectActivity.class);
+                if(savedInstanceState == null) {
+                    Bundle extras = getIntent().getExtras();
 
-                        startActivity(local_to_day);
+                    if(extras == null) {
+                        if (state == true) {
+                            if (Code != 0) {
+                                Intent local_to_day = new Intent(getApplicationContext(), DaySelectActivity.class);
+
+                                startActivity(local_to_day);
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                } else {
-                    Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
+                     else if(extras != null) {
+
+                         int REQUEST_CODE = extras.getInt("REQUEST");
+
+                        if (state == true && REQUEST_CODE == 1001) {
+                            if (Code != 0) {
+                                Intent local_to_day = new Intent(getApplicationContext(), CourseRecoActivity.class);
+
+                                startActivity(local_to_day);
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
+
+
             }
         });
 
@@ -292,5 +314,6 @@ public class localselectActivity extends AppCompatActivity {
 
         startActivity(local_to_main);
     }
+
 }
 
