@@ -23,9 +23,9 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
-//        mTitle = findViewById(R.id.post_title_edit);
-//        mContents= findViewById(R.id.post_contents_edit);
-//        findViewById(R.id.post_save_button).setOnClickListener(this);
+      mTitle = findViewById(R.id.post_title_edit);
+       mContents= findViewById(R.id.post_contents_edit);
+       findViewById(R.id.post_save_button).setOnClickListener(this);
     }
 
     @Override
