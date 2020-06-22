@@ -190,13 +190,13 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                 if (detailCode != 0) {
                     area_Course = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?" +
-                            "ServiceKey=" + API_KEY + "&numOfRows=5&pageNo=1" +
+                            "ServiceKey=" + API_KEY + "&numOfRows=15&pageNo=1" +
                             "&areaCode=" + areaCode + "&code=" + detailCode + "&contentTypeId=25&cat1=C01" +
                             Total_Theme + "&MobileOS=ETC&MobileApp=AppTest&_type=json";
 
                 } else {
                     area_Course = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?" +
-                            "ServiceKey=" + API_KEY + "&numOfRows=5&pageNo=1" +
+                            "ServiceKey=" + API_KEY + "&numOfRows=15&pageNo=1" +
                             "&areaCode=" + areaCode + "&contentTypeId=25&cat1=C01" +
                             Total_Theme + "&MobileOS=ETC&MobileApp=AppTest&_type=json";
                 }
@@ -232,6 +232,8 @@ public class CourseRecoActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 rl_info_popup.setVisibility(View.GONE);
+                                rl_top.setVisibility(View.GONE);
+                                rl_course.setVisibility(View.VISIBLE);
                             }
                         });
 
@@ -445,27 +447,27 @@ public class CourseRecoActivity extends AppCompatActivity {
                     switch(Theme) {
                         case Family_C:
                             course = "가족 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.family_40, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.family_64, null);
                             break;
                         case Solo_C:
                             course = "나홀로 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.solo_40, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.solo_64, null);
                             break;
                         case Healing_C:
                             course = "힐링 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.healing_40, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.healing_64, null);
                             break;
                         case Walking_C:
                             course = "도보 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.walk_40, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.walk_64, null);
                             break;
                         case Camping_C:
                             course = "캠핑 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.camping_40, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.camping_64, null);
                             break;
                         case Taste_C:
                             course = "맛집 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.taste_40, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.taste_64, null);
                     }
 
                     selected_city_txt = city;
@@ -474,8 +476,8 @@ public class CourseRecoActivity extends AppCompatActivity {
                     tv_selected_city.setText(selected_city_txt);
                     tv_selected_course.setText(selected_course_txt);
 
-                    int h = 90;
-                    int w = 90;
+                    int h = 130;
+                    int w = 130;
                     c_img.setBounds(0, 0, h, w);
                     tv_selected_course.setCompoundDrawables(null, null, c_img, null);
 
@@ -595,7 +597,7 @@ public class CourseRecoActivity extends AppCompatActivity {
         } else {
             course_txt.setText(t + " >");
         }
-        course_txt.setTextSize(18);
+        course_txt.setTextSize(20);
         course_txt.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
         course_txt.setPadding(16, 16, 16, 16);
         course_txt.setCompoundDrawablePadding(2);
@@ -607,13 +609,20 @@ public class CourseRecoActivity extends AppCompatActivity {
 
         fl_course_text[k].addView(course_txt);
 
-        final String loc = t;
+        final String loc_valid = t;
 
         course_txt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("from :" + from);
-                System.out.println("to : " + to);
+
+                String loc = null;
+
+                if(loc_valid.split("\\(")[0].equals("점심식사")) {
+                    loc = loc_valid.split("\\(")[1];
+                    loc = loc.split("\\)")[0];
+                } else {
+                    loc = loc_valid;
+                }
 
                 if(from == null && to == null) {
                     from = loc;
@@ -688,9 +697,7 @@ public class CourseRecoActivity extends AppCompatActivity {
         detail_Course = null;
         what_url = null;
 
-        Intent course_to_main = new Intent(getApplicationContext(), MainActivity.class);
-
-        startActivity(course_to_main);
+        finish();
     }
 
 }

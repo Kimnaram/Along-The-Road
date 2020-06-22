@@ -37,31 +37,26 @@
             android:layout_marginBottom="-70dp"
             android:src="@drawable/background_deco" />
 
-
         <!--어디로 떠날까요 텍스트-->
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="68dp"
-            android:layout_marginTop="115dp"
-            android:fontFamily="@font/fontstyle"
+            android:layout_marginTop="250dp"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="@font/nanumsquare"
             android:text="어디로 떠날까요?"
             android:textColor="#FFFFFF"
             android:textSize="38dp" />
-
 
         <!--지역 선택 버튼-->
         <ImageButton
             android:id="@+id/local_select"
             android:layout_width="317dp"
             android:layout_height="233dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="47dp"
-            android:layout_marginBottom="335dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="230dp"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/local_go" />
@@ -72,10 +67,8 @@
             android:id="@+id/traffic_button"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="44dp"
-            android:layout_marginBottom="225dp"
+            android:layout_marginLeft="45dp"
+            android:layout_marginTop="390dp"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/check_course" />
@@ -86,10 +79,8 @@
             android:id="@+id/budget_setting"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="210dp"
-            android:layout_marginBottom="225dp"
+            android:layout_marginTop="390dp"
+            android:layout_toRightOf="@+id/traffic_button"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/check_budget" />
@@ -97,42 +88,22 @@
 
         <!--준비물 체크 버튼-->
         <ImageButton
-            android:id="@+id/checklist_button"
+            android:id="@+id/festival_button"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="44dp"
-            android:layout_marginBottom="61dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check_list" />
-
-
-        <!-- 준비물 체크 버튼 -> 행사 안내 버튼
-        <ImageButton
-            android:id="@+id/checklist_button"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="44dp"
-            android:layout_marginBottom="61dp"
+            android:layout_marginLeft="45dp"
+            android:layout_below="@+id/traffic_button"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/check_festival" />
-            -->
-
 
         <!--후기 구경 버튼-->
         <ImageButton
             android:id="@+id/check_review"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="210dp"
-            android:layout_marginBottom="61dp"
+            android:layout_below="@+id/budget_setting"
+            android:layout_toRightOf="@+id/festival_button"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/check_review" />

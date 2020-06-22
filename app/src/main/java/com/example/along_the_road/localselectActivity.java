@@ -21,8 +21,8 @@ public class localselectActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:{ //툴바 뒤로가기 동작
+        switch (item.getItemId()) {
+            case android.R.id.home: { //툴바 뒤로가기 동작
                 finish();
                 return true;
             }
@@ -48,10 +48,10 @@ public class localselectActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(savedInstanceState == null) {
+                if (savedInstanceState == null) {
                     Bundle extras = getIntent().getExtras();
 
-                    if(extras == null) {
+                    if (extras == null) {
                         if (state == true) {
                             if (Code != 0) {
                                 Intent local_to_day = new Intent(getApplicationContext(), DaySelectActivity.class);
@@ -61,10 +61,9 @@ public class localselectActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                     else if(extras != null) {
+                    } else if (extras != null) {
 
-                         int REQUEST_CODE = extras.getInt("REQUEST");
+                        int REQUEST_CODE = extras.getInt("REQUEST");
 
                         if (state == true && REQUEST_CODE == 1001) {
                             if (Code != 0) {
@@ -77,8 +76,6 @@ public class localselectActivity extends AppCompatActivity {
                         }
                     }
                 }
-
-
             }
         });
 
@@ -322,9 +319,7 @@ public class localselectActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent local_to_main = new Intent(getApplicationContext(), MainActivity.class);
-
-        startActivity(local_to_main);
+        finish();
     }
 }
 

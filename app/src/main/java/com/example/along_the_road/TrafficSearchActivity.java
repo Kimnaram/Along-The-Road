@@ -135,7 +135,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                 dep_loc.setText(REQUEST_DEP);
                 arr_loc.setText(REQUEST_ARR);
-//                send.performClick();
+                send.performClick();
             }
         }
 
@@ -163,7 +163,74 @@ public class TrafficSearchActivity extends AppCompatActivity
             }
         });
 
-        container = findViewById(R.id.container);
+        send.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mMap.clear(); // 맵을 clear
+
+                r_list_len = 0;
+                list_len = null; // 다시 값 초기화
+
+                container.setVisibility(container.VISIBLE);
+
+                dep_loc = findViewById(R.id.depart_loc);
+                arr_loc = findViewById(R.id.arrive_loc);
+
+                String depart = dep_loc.getText().toString();
+                String arrival = arr_loc.getText().toString();
+
+                if (!depart.isEmpty() && !arrival.isEmpty()) {
+
+                    directions(depart, arrival);
+
+                    if (getOverview != null) {
+                        ArrayList<LatLng> entire_path = decodePolyPoints(getOverview);
+
+                        for (int i = 0; i < entire_path.size(); i++) {
+                            if (i == 0) {
+                                mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("출발"));
+                            } else if (i >= entire_path.size() - 1) {
+                                mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("도착"));
+                            }
+                        }
+
+                        Polyline line = null;
+
+                        if (line == null) {
+                            line = mMap.addPolyline(new PolylineOptions()
+                                    .color(Color.rgb(58, 122, 255))
+                                    .geodesic(true)
+                                    .addAll(entire_path));
+                        } else {
+                            line.remove();
+                            line = mMap.addPolyline(new PolylineOptions()
+                                    .color(Color.rgb(58, 122, 255))
+                                    .geodesic(true)
+                                    .addAll(entire_path));
+                        }
+                    }
+
+                    onMapReady(mMap);
+
+                    if (End_location != null) {
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(End_location));
+                        mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+                    }
+                } else {
+                    if (!depart.isEmpty() && arrival.isEmpty())
+                        Toast.makeText(getApplicationContext(), "도착지를 작성해주세요.", Toast.LENGTH_SHORT).show();
+                    else if (depart.isEmpty() && !arrival.isEmpty())
+                        Toast.makeText(getApplicationContext(), "출발지를 작성해주세요.", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(getApplicationContext(), "출발지와 도착지를 작성해주세요.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+
+                container = findViewById(R.id.container);
         Route_Layout = findViewById(R.id.Route_Layout);
         Another_Route_Layout = findViewById(R.id.Another_Route_Layout);
         flow_container = findViewById(R.id.flow_container);
@@ -230,69 +297,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     }
 
-    public void sendClick(View view) { // 검색 버튼을 클릭하면
-
-        mMap.clear(); // 맵을 clear
-
-        r_list_len = 0;
-        list_len = null; // 다시 값 초기화
-
-        container.setVisibility(container.VISIBLE);
-
-        dep_loc = findViewById(R.id.depart_loc);
-        arr_loc = findViewById(R.id.arrive_loc);
-
-        String depart = dep_loc.getText().toString();
-        String arrival = arr_loc.getText().toString();
-
-        if (!depart.isEmpty() && !arrival.isEmpty()) {
-
-            directions(depart, arrival);
-
-            if (getOverview != null) {
-                ArrayList<LatLng> entire_path = decodePolyPoints(getOverview);
-
-                for (int i = 0; i < entire_path.size(); i++) {
-                    if (i == 0) {
-                        mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("출발"));
-                    } else if (i >= entire_path.size() - 1) {
-                        mMap.addMarker(new MarkerOptions().position(entire_path.get(i)).title("도착"));
-                    }
-                }
-
-                Polyline line = null;
-
-                if (line == null) {
-                    line = mMap.addPolyline(new PolylineOptions()
-                            .color(Color.rgb(58, 122, 255))
-                            .geodesic(true)
-                            .addAll(entire_path));
-                } else {
-                    line.remove();
-                    line = mMap.addPolyline(new PolylineOptions()
-                            .color(Color.rgb(58, 122, 255))
-                            .geodesic(true)
-                            .addAll(entire_path));
-                }
-            }
-
-            onMapReady(mMap);
-
-            if (End_location != null) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(End_location));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
-            }
-        } else {
-            if (!depart.isEmpty() && arrival.isEmpty())
-                Toast.makeText(getApplicationContext(), "도착지를 작성해주세요.", Toast.LENGTH_SHORT).show();
-            else if (depart.isEmpty() && !arrival.isEmpty())
-                Toast.makeText(getApplicationContext(), "출발지를 작성해주세요.", Toast.LENGTH_SHORT).show();
-            else
-                Toast.makeText(getApplicationContext(), "출발지와 도착지를 작성해주세요.", Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
     public void directions(String depart, String arrival) {
 
         str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
@@ -319,6 +323,7 @@ public class TrafficSearchActivity extends AppCompatActivity
             if(routes.isEmpty()) { // 경로가 존재하지 않는다면
 
                 Toast.makeText(getApplicationContext(), "경로가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+                System.out.println("경로 x");
 
             }
             JSONArray routesArray = new JSONArray(routes);
@@ -600,20 +605,19 @@ public class TrafficSearchActivity extends AppCompatActivity
             ith_route = new TextView(this);
             ith_route.setText(a);
             ith_route.setTextSize(22);
-            ith_route.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
 
             Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
             ith_route.setTypeface(typeface);
 
             ith_route.setTextColor(Color.parseColor("#6D6D6D"));
 
-            int h = 90;
-            int w = 90;
+            int h = 130;
+            int w = 130;
             img.setBounds(0, 0, w, h);
             ith_route.setCompoundDrawables(img, null, null, null);
 
             ith_route.setGravity(Gravity.CENTER_VERTICAL);
-            ith_route.setPadding(0, 0, 0, 13);
+            ith_route.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
 
             TextView time = findViewById(R.id.during_time);
             time.setText(t);
@@ -621,28 +625,29 @@ public class TrafficSearchActivity extends AppCompatActivity
             R_fl_count += 1;
             Route_fl.addView(ith_route);
             Route_Layout.setVisibility(View.VISIBLE);
+            Route_Layout.setPadding(15, 20, 15, 20);
 
         } else if (j > 0) { // j가 0보다 크다면 다른 경로이므로
 
             ith_route = new TextView(this);
             ith_route.setText(a);
             ith_route.setTextSize(22);
+            ith_route.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
 
             Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
             ith_route.setTypeface(typeface);
 
-            int h = 90;
-            int w = 90;
+            int h = 130;
+            int w = 130;
             img.setBounds(0, 0, w, h);
             ith_route.setCompoundDrawables(img, null, null, null);
 
             ith_route.setGravity(Gravity.CENTER_VERTICAL);
-            ith_route.setPadding(0, 0, 0, 13);
 
             fl_count += 1;
             Another_fl.addView(ith_route);
             Another_Route_Layout.setVisibility(View.VISIBLE);
-
+            Another_Route_Layout.setPadding(15, 20, 15, 20);
         }
 
         final int t_num = j;

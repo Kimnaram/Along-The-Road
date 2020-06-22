@@ -51,7 +51,7 @@
 
                 <com.example.along_the_road.ClearEditText
                     android:id="@+id/depart_loc"
-                    android:layout_width="250sp"
+                    android:layout_width="220sp"
                     android:layout_height="40dp"
                     android:layout_toRightOf="@+id/arrow"
                     android:background="@color/basic_color_FFFFFF"
@@ -63,7 +63,7 @@
 
                 <Spinner
                     android:id="@+id/spinner_menu"
-                    android:layout_width="110dp"
+                    android:layout_width="130dp"
                     android:layout_height="40dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginLeft="10sp"
@@ -74,7 +74,7 @@
 
                 <com.example.along_the_road.ClearEditText
                     android:id="@+id/arrive_loc"
-                    android:layout_width="250dp"
+                    android:layout_width="240dp"
                     android:layout_height="40dp"
                     android:layout_below="@+id/depart_loc"
                     android:layout_marginTop="7dp"
@@ -100,7 +100,6 @@
                     android:background="@drawable/common_btn_style"
                     android:fontFamily="@font/nanumsquare"
                     android:gravity="center"
-                    android:onClick="sendClick"
                     android:text="검색"
                     android:textColor="#3A7AFF"
                     android:textSize="20sp" />
@@ -150,14 +149,6 @@
                             android:paddingRight="5dp"
                             android:textColor="@color/basic_color_FFFFFF"
                             android:textSize="28dp" />
-
-                        <!--                        <View-->
-                        <!--                            android:id="@+id/line"-->
-                        <!--                            android:layout_width="80dp"-->
-                        <!--                            android:layout_height="2.5dp"-->
-                        <!--                            android:background="@color/basic_color_3A7AFF"-->
-                        <!--                            android:layout_below="@id/during_time"-->
-                        <!--                            android:layout_alignParentRight="true"/>-->
 
                         <org.apmem.tools.layouts.FlowLayout
                             android:id="@+id/Route_fl"

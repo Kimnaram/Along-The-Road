@@ -51,7 +51,7 @@ public class ClearEditText extends AppCompatEditText
 
         Drawable tempDrawable = ContextCompat.getDrawable(getContext(), R.drawable.x_48);
         clearDrawable = DrawableCompat.wrap(tempDrawable);
-        clearDrawable.setBounds(0, 0, 50, 50);
+        clearDrawable.setBounds(0, 0, 70, 70);
 
         setClearIconVisible(false);
 

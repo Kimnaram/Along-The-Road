@@ -170,4 +170,9 @@ public class managebudgetActivity extends AppCompatActivity {
         String TABLE_NAME = "a_" + getToday_date();
         String querySelectAll = String.format( "SELECT * FROM %s", TABLE_NAME );
     }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
 }

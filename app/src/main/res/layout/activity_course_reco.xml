@@ -109,7 +109,8 @@
                         android:id="@+id/rl_course"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginTop="50dp"
                         android:padding="8dp"
                         android:visibility="visible">
 
@@ -168,7 +169,7 @@
                                     android:padding="7dp"
                                     android:text="가족과 함께! 가족 코스"
                                     android:textColor="@color/basic_color_3A7AFF"
-                                    android:textSize="24dp" />
+                                    android:textSize="22dp" />
 
                                 <RadioButton
                                     android:id="@+id/Solo_Course"
@@ -179,9 +180,9 @@
                                     android:button="@drawable/theme_btn_style"
                                     android:fontFamily="@font/nanumsquare"
                                     android:padding="7dp"
-                                    android:text="나를 찾아, 나홀로 코스"
+                                    android:text="혼자만의 여행, 나홀로 코스"
                                     android:textColor="@color/basic_color_3A7AFF"
-                                    android:textSize="24dp" />
+                                    android:textSize="22dp" />
 
                                 <RadioButton
                                     android:id="@+id/Healing_Course"
@@ -192,9 +193,9 @@
                                     android:button="@drawable/theme_btn_style"
                                     android:fontFamily="@font/nanumsquare"
                                     android:padding="7dp"
-                                    android:text="나만의 힐링 코스"
+                                    android:text="일상을 벗어나, 힐링 코스"
                                     android:textColor="@color/basic_color_3A7AFF"
-                                    android:textSize="24dp" />
+                                    android:textSize="22dp" />
 
                                 <RadioButton
                                     android:id="@+id/Walking_Course"
@@ -207,7 +208,7 @@
                                     android:padding="7dp"
                                     android:text="걸어서 즐기는 도보 코스"
                                     android:textColor="@color/basic_color_3A7AFF"
-                                    android:textSize="24dp" />
+                                    android:textSize="22dp" />
 
                                 <RadioButton
                                     android:id="@+id/Camping_Course"
@@ -220,7 +221,7 @@
                                     android:padding="7dp"
                                     android:text="바베큐와 함께 캠핑 코스"
                                     android:textColor="@color/basic_color_3A7AFF"
-                                    android:textSize="24dp" />
+                                    android:textSize="22dp" />
 
                                 <RadioButton
                                     android:id="@+id/Taste_Course"
@@ -231,9 +232,9 @@
                                     android:button="@drawable/theme_btn_style"
                                     android:fontFamily="@font/nanumsquare"
                                     android:padding="7dp"
-                                    android:text="먹는게 좋아! 맛집 코스"
+                                    android:text="먹는게 제일 좋아~ 맛집 코스"
                                     android:textColor="@color/basic_color_3A7AFF"
-                                    android:textSize="24dp" />
+                                    android:textSize="22dp" />
 
                             </RadioGroup>
 
@@ -314,7 +315,7 @@
                     android:fontFamily="@font/nanumsquare"
                     android:gravity="center"
                     android:text="확인"
-                    android:textColor="@color/colorTest"
+                    android:textColor="@color/basic_color_3A7AFF"
                     android:textSize="15sp" />
 
             </RelativeLayout>
