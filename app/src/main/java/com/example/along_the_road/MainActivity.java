@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.example.along_the_road.models.Post;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -52,13 +54,24 @@ public class MainActivity extends AppCompatActivity {
         checklist_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent cntent = new Intent(getApplicationContext(), CheckListActivity.class);
+                Intent cntent = new Intent(getApplicationContext(), FestivalActivity.class);
 
                 startActivity(cntent);
             }
         });
 
-        ImageButton review_btn = findViewById(R.id.check_review);
+        ImageButton review_btn = findViewById(R.id.check_review); // 리뷰작성 버튼
+
+        review_btn.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), PostActivity.class);
+
+                startActivity(intent);
+            }
+        });
+
     }
 }
 
