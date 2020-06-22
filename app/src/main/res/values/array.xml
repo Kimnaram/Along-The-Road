@@ -9,4 +9,12 @@
 
     </string-array>
 
+    <string-array name = "reselect">
+
+        <item>재선택</item>
+        <item>지역 선택</item>
+        <item>코스 선택</item>
+
+    </string-array>
+
 </resources>

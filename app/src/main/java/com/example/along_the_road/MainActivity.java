@@ -36,12 +36,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageButton traffic_btn = (ImageButton) findViewById(R.id.traffic_button); // 페이지 전환 버튼 (교통 확인)
+        ImageButton course_btn = (ImageButton) findViewById(R.id.traffic_button); // 페이지 전환 버튼 (코스 추천) // 버튼 변경 필요
 
-        traffic_btn.setOnClickListener(new View.OnClickListener() {
+        course_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), TrafficSearchActivity.class);
+                Intent intent = new Intent(getApplicationContext(), CourseRecoActivity.class);
 
                 startActivity(intent);
             }
@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ImageButton review_btn = findViewById(R.id.check_review);
     }
 }
 

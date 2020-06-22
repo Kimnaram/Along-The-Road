@@ -1,8 +1,12 @@
 package com.example.along_the_road;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,9 +21,27 @@ public class CheckListActivity extends AppCompatActivity {
     Button clear_btn;
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ //툴바 뒤로가기 동작
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_list);
+
+        //상단 툴바 설정
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setDisplayShowTitleEnabled(false); //xml에서 titleview 설정
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //툴바 뒤로가기 생성
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
         part1_1 = (CheckBox) findViewById(R.id.checkBox1);
         part1_2 = (CheckBox) findViewById(R.id.checkBox2);

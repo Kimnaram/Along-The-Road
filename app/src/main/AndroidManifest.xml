@@ -13,26 +13,31 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".CourseRecoActivity"></activity>
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".CheckListActivity" />
-        <activity android:name="com.yongbeom.aircalendar.AirCalendarDatePickerActivity"
+        <activity
+            android:name="com.yongbeom.aircalendar.AirCalendarDatePickerActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".TrafficSearchActivity" />
         <activity android:name=".HotelSelectActivity" />
-        <activity android:name=".localselectActivity" >
+        <activity android:name=".localselectActivity">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity android:name=".DaySelectActivity" />
         <activity android:name=".managebudgetActivity" />
         <activity android:name=".MainActivity" />
+        <activity android:name=".CalendarActivity" />
 
         <meta-data
             android:name="com.google.android.gms.version"

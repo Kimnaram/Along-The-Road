@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/basic_color_FFFFFF"
+    tools:context=".CourseRecoActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:minHeight="?attr/actionBarSize">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/handon600"
+            android:text="코스 추천"
+            android:textColor="#ffffff"
+            android:textSize="25dp" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <RelativeLayout
+                        android:id="@+id/rl_top"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:padding="7dp"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:id="@+id/ll_selected_txt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tv_selected_city"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="4dp"
+                                android:background="@color/basic_color_3A7AFF"
+                                android:fontFamily="@font/nanumsquare"
+                                android:gravity="center_vertical"
+                                android:padding="3dp"
+                                android:textColor="@color/basic_color_FFFFFF"
+                                android:textSize="22dp" />
+
+                            <TextView
+                                android:id="@+id/tv_selected_course"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:fontFamily="@font/nanumsquare"
+                                android:gravity="center_vertical"
+                                android:textColor="@color/basic_color_3A7AFF"
+                                android:textSize="22dp" />
+
+                        </LinearLayout>
+
+                        <Spinner
+                            android:id="@+id/sp_reselect"
+                            android:layout_width="150dp"
+                            android:layout_height="40dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:entries="@array/reselect"
+                            android:gravity="center"
+                            android:spinnerMode="dialog" />
+
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_course_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_below="@+id/rl_top"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:visibility="gone">
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/rl_course"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:padding="8dp"
+                        android:visibility="visible">
+
+                        <RelativeLayout
+                            android:id="@+id/rl_show_course"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginRight="20dp"
+                            android:background="@drawable/course_view_style"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:id="@+id/title_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="10dp"
+                                android:background="@color/basic_color_3A7AFF"
+                                android:fontFamily="@font/nanumsquare"
+                                android:paddingLeft="15dp"
+                                android:paddingTop="5dp"
+                                android:paddingRight="15dp"
+                                android:paddingBottom="5dp"
+                                android:text="여행 코스 테마"
+                                android:textColor="@color/basic_color_FFFFFF"
+                                android:textSize="26dp" />
+
+                            <View
+                                android:id="@+id/line_view"
+                                android:layout_width="300dp"
+                                android:layout_height="2.5dp"
+                                android:layout_below="@+id/title_txt"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="10dp"
+                                android:background="@color/basic_color_3A7AFF" />
+
+                            <RadioGroup
+                                android:id="@+id/Course_Group"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/line_view"
+                                android:layout_centerHorizontal="true"
+                                android:orientation="vertical">
+
+                                <RadioButton
+                                    android:id="@+id/Family_Course"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/line_view"
+                                    android:layout_marginTop="20dp"
+                                    android:button="@drawable/theme_btn_style"
+                                    android:fontFamily="@font/nanumsquare"
+                                    android:padding="7dp"
+                                    android:text="가족과 함께! 가족 코스"
+                                    android:textColor="@color/basic_color_3A7AFF"
+                                    android:textSize="24dp" />
+
+                                <RadioButton
+                                    android:id="@+id/Solo_Course"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/Family_Course"
+                                    android:layout_marginTop="10dp"
+                                    android:button="@drawable/theme_btn_style"
+                                    android:fontFamily="@font/nanumsquare"
+                                    android:padding="7dp"
+                                    android:text="나를 찾아, 나홀로 코스"
+                                    android:textColor="@color/basic_color_3A7AFF"
+                                    android:textSize="24dp" />
+
+                                <RadioButton
+                                    android:id="@+id/Healing_Course"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/Solo_Course"
+                                    android:layout_marginTop="10dp"
+                                    android:button="@drawable/theme_btn_style"
+                                    android:fontFamily="@font/nanumsquare"
+                                    android:padding="7dp"
+                                    android:text="나만의 힐링 코스"
+                                    android:textColor="@color/basic_color_3A7AFF"
+                                    android:textSize="24dp" />
+
+                                <RadioButton
+                                    android:id="@+id/Walking_Course"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/Healing_Course"
+                                    android:layout_marginTop="10dp"
+                                    android:button="@drawable/theme_btn_style"
+                                    android:fontFamily="@font/nanumsquare"
+                                    android:padding="7dp"
+                                    android:text="걸어서 즐기는 도보 코스"
+                                    android:textColor="@color/basic_color_3A7AFF"
+                                    android:textSize="24dp" />
+
+                                <RadioButton
+                                    android:id="@+id/Camping_Course"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/Walking_Course"
+                                    android:layout_marginTop="10dp"
+                                    android:button="@drawable/theme_btn_style"
+                                    android:fontFamily="@font/nanumsquare"
+                                    android:padding="7dp"
+                                    android:text="바베큐와 함께 캠핑 코스"
+                                    android:textColor="@color/basic_color_3A7AFF"
+                                    android:textSize="24dp" />
+
+                                <RadioButton
+                                    android:id="@+id/Taste_Course"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/Camping_Course"
+                                    android:layout_marginTop="10dp"
+                                    android:button="@drawable/theme_btn_style"
+                                    android:fontFamily="@font/nanumsquare"
+                                    android:padding="7dp"
+                                    android:text="먹는게 좋아! 맛집 코스"
+                                    android:textColor="@color/basic_color_3A7AFF"
+                                    android:textSize="24dp" />
+
+                            </RadioGroup>
+
+                        </RelativeLayout>
+
+                        <Button
+                            android:id="@+id/course_select"
+                            android:layout_width="180dp"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/rl_show_course"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="85dp"
+                            android:background="@drawable/common_btn_style"
+                            android:fontFamily="@font/nanumsquare"
+                            android:text="검색하기"
+                            android:textColor="@color/basic_color_3A7AFF"
+                            android:textSize="25dp" />
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/rl_info_popup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#bf000000"
+        android:clickable="true"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_below="@+id/toolbar">
+
+        <RelativeLayout
+            android:layout_width="300dp"
+            android:layout_height="160dp"
+            android:background="@drawable/rounded">
+
+            <TextView
+                android:id="@+id/tv_popup_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:text="안내"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_popup_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_popup_title"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:textColor="#4a4a4a"
+                android:textSize="13sp" />
+
+            <RelativeLayout
+                android:id="@+id/rl_popup_info_ok"
+                android:layout_width="100dp"
+                android:layout_height="42dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/popup_btn_style"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/click_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/nanumsquare"
+                    android:gravity="center"
+                    android:text="확인"
+                    android:textColor="@color/colorTest"
+                    android:textSize="15sp" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

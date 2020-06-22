@@ -1,12 +1,13 @@
 package com.example.along_the_road;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,13 +19,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -35,6 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,11 +56,20 @@ import java.util.concurrent.ExecutionException;
 public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
+    private RelativeLayout container;
+    private RelativeLayout Another_Route_Layout;
+    private RelativeLayout Route_Layout;
+    private LinearLayout flow_container;
+    private FlowLayout Route_fl;
+    private FlowLayout Another_fl;
+
     private Spinner spinner = null;
     private String[] spinnerArr = null;
     private String selected_spinner = null;
+
     private EditText dep_loc = null;
     private EditText arr_loc = null;
+
     private Button send = null;
 
     private GoogleMap mMap; // 구글 지도
@@ -68,8 +82,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     /****************************** Directions API 관련 변수 *******************************/
     private static final String API_KEY = "";
-    private RelativeLayout container;
-    private RelativeLayout Another_Route_Layout;
     private String str_url = null; // URL
     private String option = null;
     private String step = null;
@@ -87,12 +99,13 @@ public class TrafficSearchActivity extends AppCompatActivity
     private String[][] TransitName;
     private String[][] getPolyline;
     private String getOverview = null;
+    String REQUEST_DEP = null;
+    String REQUEST_ARR = null;
 
     private int r_list_len = 0;
     private int[] list_len = null;
-
-    private int C_text_count = 0;
-    private int R_text_count = 0;
+    private int fl_count = 0;
+    private int R_fl_count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,19 +113,36 @@ public class TrafficSearchActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_traffic_search);
 
+        //상단 툴바 설정
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        getSupportActionBar().setTitle("길따라");
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu_40);
+        getSupportActionBar().setDisplayShowTitleEnabled(false); //xml에서 titleview 설정
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //툴바 뒤로가기 생성
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
         initView();
 
         dep_loc = findViewById(R.id.depart_loc);
+        arr_loc = findViewById(R.id.arrive_loc);
+        send = findViewById(R.id.send);
+
+        if(savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+
+            if(extras != null) {
+                REQUEST_DEP = extras.getString("from");
+                REQUEST_ARR = extras.getString("to");
+
+                dep_loc.setText(REQUEST_DEP);
+                arr_loc.setText(REQUEST_ARR);
+//                send.performClick();
+            }
+        }
+
         dep_loc.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int KeyCode, KeyEvent event) {
-                if((event.getAction() == KeyEvent.ACTION_DOWN) && KeyCode == KeyEvent.KEYCODE_ENTER) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && KeyCode == KeyEvent.KEYCODE_ENTER) {
                     EditText enter_action = findViewById(R.id.arrive_loc);
 
                     enter_action.requestFocus();
@@ -122,18 +152,21 @@ public class TrafficSearchActivity extends AppCompatActivity
             }
         });
 
-        arr_loc = findViewById(R.id.arrive_loc);
-        send = findViewById(R.id.send);
         arr_loc.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int KeyCode, KeyEvent event) {
-                if((event.getAction() == KeyEvent.ACTION_DOWN) && KeyCode == KeyEvent.KEYCODE_ENTER) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && KeyCode == KeyEvent.KEYCODE_ENTER) {
                     send.performClick();
                     return true;
                 }
                 return false;
             }
         });
+
+        container = findViewById(R.id.container);
+        Route_Layout = findViewById(R.id.Route_Layout);
+        Another_Route_Layout = findViewById(R.id.Another_Route_Layout);
+        flow_container = findViewById(R.id.flow_container);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -177,14 +210,33 @@ public class TrafficSearchActivity extends AppCompatActivity
         });
     }
 
+    public void Change_EditText(View view) {
+
+        if(!dep_loc.getText().equals("") && !arr_loc.getText().equals("")) {
+            dep_loc = findViewById(R.id.depart_loc);
+            arr_loc = findViewById(R.id.arrive_loc);
+            TextView temp = new TextView(this);
+
+            String d = dep_loc.getText().toString();
+            String a = arr_loc.getText().toString();
+
+            System.out.println("출발-도착 :" + d + "-" + "a");
+
+            temp.setText(d);
+            String t = temp.getText().toString();
+            dep_loc.setText(a);
+            arr_loc.setText(t);
+        }
+
+    }
+
     public void sendClick(View view) { // 검색 버튼을 클릭하면
 
         mMap.clear(); // 맵을 clear
 
         r_list_len = 0;
-        list_len = null;
+        list_len = null; // 다시 값 초기화
 
-        container = findViewById(R.id.container);
         container.setVisibility(container.VISIBLE);
 
         dep_loc = findViewById(R.id.depart_loc);
@@ -193,12 +245,9 @@ public class TrafficSearchActivity extends AppCompatActivity
         String depart = dep_loc.getText().toString();
         String arrival = arr_loc.getText().toString();
 
-        if(!depart.equals("") && !arrival.equals("")) {
+        if (!depart.isEmpty() && !arrival.isEmpty()) {
 
             directions(depart, arrival);
-
-            TextView time = findViewById(R.id.during_time);
-            time.setText(full_time[0]);
 
             if (getOverview != null) {
                 ArrayList<LatLng> entire_path = decodePolyPoints(getOverview);
@@ -234,11 +283,12 @@ public class TrafficSearchActivity extends AppCompatActivity
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
             }
         } else {
-            if(!depart.equals("") && arrival.equals(""))
+            if (!depart.isEmpty() && arrival.isEmpty())
                 Toast.makeText(getApplicationContext(), "도착지를 작성해주세요.", Toast.LENGTH_SHORT).show();
-            else if(depart.equals("") && !arrival.equals(""))
+            else if (depart.isEmpty() && !arrival.isEmpty())
                 Toast.makeText(getApplicationContext(), "출발지를 작성해주세요.", Toast.LENGTH_SHORT).show();
-            else Toast.makeText(getApplicationContext(), "출발지와 도착지를 작성해주세요.", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getApplicationContext(), "출발지와 도착지를 작성해주세요.", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -249,25 +299,28 @@ public class TrafficSearchActivity extends AppCompatActivity
                 "origin=" + depart + "&destination=" + arrival + "&mode=transit" + "&departure_time=now" +
                 option + "&alternatives=true&key=" + API_KEY;
 
-        System.out.println("str_url : " + str_url);
-
         String resultText = "값이 없음";
 
         try {
 
-            if (C_text_count > 0) {
-                container.removeAllViews();
-                C_text_count = 0;
-            } // 재검색 시, 이전의 TextView 삭제
-            if (R_text_count > 0) {
-                Another_Route_Layout.removeAllViews();
-                R_text_count = 0;
+            if(fl_count >= 1) {
+                flow_container.removeAllViews();
+                fl_count = 0;
+            }
+            if(R_fl_count >= 1) {
+                Route_fl.removeAllViews();
+                R_fl_count = 0;
             }
 
             resultText = new Task().execute().get(); // URL에 있는 내용을 받아옴
 
             JSONObject jsonObject = new JSONObject(resultText);
             String routes = jsonObject.getString("routes");
+            if(routes.isEmpty()) { // 경로가 존재하지 않는다면
+
+                Toast.makeText(getApplicationContext(), "경로가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+
+            }
             JSONArray routesArray = new JSONArray(routes);
 
             r_list_len = routesArray.length();
@@ -277,6 +330,15 @@ public class TrafficSearchActivity extends AppCompatActivity
             full_time = new String[r_list_len];
             hours = new String[r_list_len];
             min = new String[r_list_len];
+
+            goingS_lat = new String[r_list_len][20]; // route의 개수만큼 그리고 그 안에 자잘한 route들을 최대 20으로 배열을 생성
+            goingS_lng = new String[r_list_len][20];
+            goingE_lat = new String[r_list_len][20];
+            goingE_lng = new String[r_list_len][20];
+            getPolyline = new String[r_list_len][20];
+            TransitName = new String[r_list_len][20];
+
+            marker_arr = new Marker[2][20];
 
             JSONObject preferredObject = routesArray.getJSONObject(0);
             String singleRoute = preferredObject.getString("overview_polyline");
@@ -297,15 +359,8 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                 list_len[j] = stepsArray.length(); // j번째 route에 step이 몇개인지 저장
 
-                goingS_lat = new String[r_list_len][20]; // route의 개수만큼 그리고 그 안에 자잘한 route들을 최대 20으로 배열을 생성
-                goingS_lng = new String[r_list_len][20];
-                goingE_lat = new String[r_list_len][20];
-                goingE_lng = new String[r_list_len][20];
-                getPolyline = new String[r_list_len][20];
-                TransitName = new String[r_list_len][20];
-                marker_arr = new Marker[2][20];
+                for (int i = 0; i < list_len[j]; i++) {
 
-                for(int i = 0; i < list_len[j]; i++) {
                     goingS_lat[j][i] = null;
                     goingS_lng[j][i] = null;
                     goingE_lat[j][i] = null;
@@ -330,21 +385,49 @@ public class TrafficSearchActivity extends AppCompatActivity
                 JSONObject legdurObject = new JSONObject(leg_duration);
                 String amountDuration = legdurObject.getString("text");
                 String[] set_time = amountDuration.split(" ").clone();
-                for(int k = 0; k < set_time.length; k++) {
-                    if(set_time[k].equals("hours")) {
-                        hours[j] = set_time[k-1] + "시간";
-                    } else if(set_time[k].equals("min")) {
-                        min[j] = set_time[k-1] + "분";
+                for (int k = 0; k < set_time.length; k++) {
+                    if (set_time[k].equals("hour") || set_time[k].equals("hours")) {
+                        hours[j] = set_time[k - 1] + "시간";
+                    } else if (set_time[k].equals("mins") || set_time[k].equals("min")) {
+                        min[j] = set_time[k - 1] + "분";
                     }
                 }
 
-                if((hours[j] != null && !hours[j].equals(""))
-                        && (min[j] != null && !min[j].equals(""))) {
-                    full_time[j] = hours[j] + " " + min[j];
-                } else if((hours == null && hours[j].equals(""))
-                        && (min[j] != null && !min[j].equals(""))) {
+                if (hours[j] == null || hours[j].isEmpty()) {
                     full_time[j] = min[j];
+                } else {
+                    full_time[j] = hours[j] + " " + min[j];
                 }
+
+                if(j > 0) {
+                    TextView time = new TextView(this);
+                    time.setText(full_time[j]);
+
+                    time.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)time.getLayoutParams();
+                    params.gravity = Gravity.RIGHT;
+                    time.setLayoutParams(params);
+                    time.setTextSize(28);
+
+                    Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
+                    time.setTypeface(typeface);
+
+                    time.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                    time.setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                    time.setPadding(5, 0, 5, 0);
+
+                    flow_container.addView(time);
+                }
+
+                Another_fl = new FlowLayout(TrafficSearchActivity.this);
+                FlowLayout.LayoutParams param = new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                // param.bottomMargin = 50;
+                Another_fl.setLayoutParams(param);
+
+                Another_fl.setOrientation(FlowLayout.HORIZONTAL);
+                Another_fl.setBackgroundColor(Color.WHITE);
+                flow_container.addView(Another_fl);
 
                 String steps = legJsonObject.getString("steps");
                 JSONArray stepsArray = new JSONArray(steps);
@@ -377,7 +460,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                     } else {
                         goingE_lat[j][i] = endJsonObject.getString("lat");
                         goingE_lng[j][i] = endJsonObject.getString("lng");
-                    } // 오류 수정 필요
+                    }
 
                     String start_location = stepsObject.getString("start_location");
                     JSONObject startJsonObject = new JSONObject(start_location);
@@ -385,7 +468,6 @@ public class TrafficSearchActivity extends AppCompatActivity
                         departure_lat = startJsonObject.getString("lat");
                         departure_lng = startJsonObject.getString("lng");
                     } else {
-                        System.out.println("(j, i)" + j + i);
                         goingS_lat[j][i] = startJsonObject.getString("lat");
                         goingS_lng[j][i] = startJsonObject.getString("lng");
                     }
@@ -414,16 +496,15 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                         String line = transitObject.getString("line");
                         JSONObject lineObject = new JSONObject(line);
-                        if(isTrain.equals("Train")) {
+                        if (isTrain.equals("Train")) {
                             getTransit[i] = lineObject.getString("name");
-                        } else {
+                        } else if (isTrain.equals("Bus") || isTrain.equals("Subway")) {
                             getTransit[i] = lineObject.getString("short_name");
-                            if(isTrain.equals("Subway") && getTransit[i].equals("1")) {
+                            if (isTrain.equals("Subway") && getTransit[i].equals("1")) {
                                 getTransit[i] += "호선";
                             }
                         }
                         TransitName[j][i] = getTransit[i];
-                        System.out.println("방법 : " + getTransit[i]);
 
                     }
 
@@ -445,20 +526,19 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                     Resources res = getResources();
 
-                    switch(isTrain) {
-                        case "Train" :
-                        case "Subway" :
+                    switch (isTrain) {
+                        case "Train":
+                        case "Subway":
                             img = ResourcesCompat.getDrawable(res, R.drawable.subway_100, null);
                             break;
-                        case "Bus" :
+                        case "Bus":
                             img = ResourcesCompat.getDrawable(res, R.drawable.bus_96, null);
                             break;
-                        default :
+                        default:
                             img = ResourcesCompat.getDrawable(res, R.drawable.walk_96, null);
                     }
 
-                    method_view(step, img, j, i);
-                    R_text_count += 1;
+                    method_view(step, full_time[j], img, j, i);
                 }
 
             }
@@ -509,46 +589,65 @@ public class TrafficSearchActivity extends AppCompatActivity
         return path;
     }
 
-    public void method_view(String a, Drawable img, int j, @Nullable int i) {
+    public void method_view(String a, String t, Drawable img, int j, int i) {
 
-        TextView Method = null;
+        TextView ith_route = null;
 
-        if(j == 0) {
-            Method = findViewById(R.id.show_view);
+        if (j == 0) { // j가 0이라면 추천 경로이므로
 
-            Method.setText(a);
-            int h = 100;
-            int w = 100;
+            Route_fl = findViewById(R.id.Route_fl);
+
+            ith_route = new TextView(this);
+            ith_route.setText(a);
+            ith_route.setTextSize(22);
+            ith_route.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+
+            Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
+            ith_route.setTypeface(typeface);
+
+            ith_route.setTextColor(Color.parseColor("#6D6D6D"));
+
+            int h = 90;
+            int w = 90;
             img.setBounds(0, 0, w, h);
-            Method.setCompoundDrawables(img, null, null, null);
-            Method.setVisibility(TextView.VISIBLE);
-        }
-        else if(j > 0) {
-            Method = new TextView(this);
-            if(i >= 0) {
-                Method.setId(i);
-            }
-            Method.setText(a);
-            Method.setTextSize(22);
-            Method.setTextColor(Color.parseColor("#6D6D6D"));
-            Method.setPadding(2,0, 0, 0);
+            ith_route.setCompoundDrawables(img, null, null, null);
 
-            int h = 100;
-            int w = 100;
+            ith_route.setGravity(Gravity.CENTER_VERTICAL);
+            ith_route.setPadding(0, 0, 0, 13);
+
+            TextView time = findViewById(R.id.during_time);
+            time.setText(t);
+
+            R_fl_count += 1;
+            Route_fl.addView(ith_route);
+            Route_Layout.setVisibility(View.VISIBLE);
+
+        } else if (j > 0) { // j가 0보다 크다면 다른 경로이므로
+
+            ith_route = new TextView(this);
+            ith_route.setText(a);
+            ith_route.setTextSize(22);
+
+            Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
+            ith_route.setTypeface(typeface);
+
+            int h = 90;
+            int w = 90;
             img.setBounds(0, 0, w, h);
-            Method.setCompoundDrawables(img, null, null, null);
+            ith_route.setCompoundDrawables(img, null, null, null);
 
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            Method.setLayoutParams(lp);
+            ith_route.setGravity(Gravity.CENTER_VERTICAL);
+            ith_route.setPadding(0, 0, 0, 13);
 
-            Another_Route_Layout = findViewById(R.id.Another_Route_Layout);
-            Another_Route_Layout.addView(Method);
+            fl_count += 1;
+            Another_fl.addView(ith_route);
+            Another_Route_Layout.setVisibility(View.VISIBLE);
+
         }
 
         final int t_num = j;
 
-        Method.setOnClickListener(new View.OnClickListener() {
+        ith_route.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -658,7 +757,6 @@ public class TrafficSearchActivity extends AppCompatActivity
             }
         });
 
-
     }
 
     @Override
@@ -704,6 +802,17 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             return receiveMsg;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ //툴바 뒤로가기 동작
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
