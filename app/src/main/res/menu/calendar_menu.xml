@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <group>
-        <!--
         <item
             android:id="@+id/clear_selections"
             android:icon="@drawable/trash_40"
@@ -15,7 +14,6 @@
             android:icon="@drawable/information_40"
             android:title="show_selections"
             app:showAsAction="always" />
-         -->
     </group>
 
     </menu>

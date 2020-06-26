@@ -42,6 +42,8 @@ import java.util.concurrent.ExecutionException;
 import static com.example.along_the_road.localselectActivity.Code;
 import static com.example.along_the_road.localselectActivity.Detail_Code;
 
+
+
 public class CourseRecoActivity extends AppCompatActivity {
 
     private final String API_KEY = "";
@@ -444,6 +446,7 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                     Resources res = getResources();
 
+                    /*
                     switch(Theme) {
                         case Family_C:
                             course = "가족 코스";
@@ -469,6 +472,8 @@ public class CourseRecoActivity extends AppCompatActivity {
                             course = "맛집 코스";
                             c_img = ResourcesCompat.getDrawable(res, R.drawable.taste_64, null);
                     }
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.taste_40, null);
+                    } */
 
                     selected_city_txt = city;
                     selected_course_txt = "에서 " + course;
@@ -701,3 +706,5 @@ public class CourseRecoActivity extends AppCompatActivity {
     }
 
 }
+
+
