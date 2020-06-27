@@ -11,4 +11,9 @@
         android:fontWeight="800"
         android:font="@font/handon600" />
 
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="500"
+        android:font="@font/robotolight" />
+
 </font-family>

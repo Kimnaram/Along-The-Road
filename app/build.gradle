@@ -46,4 +46,9 @@ dependencies {
     // implementation 'org.json:json:20190722'
     implementation project(path:':AirCalendar')
     implementation 'com.android.support:multidex:1.0.3'
+
+    implementation('com.naver.maps:map-sdk:3.8.0') {
+        exclude group: 'com.android.support'
+        implementation 'com.android.support:appcompat-v7:27.0.0'
+    }
 }

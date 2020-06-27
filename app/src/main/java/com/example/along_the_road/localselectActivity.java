@@ -13,11 +13,18 @@ import android.widget.ToggleButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.yongbeom.aircalendar.AirCalendarDatePickerActivity;
+import com.yongbeom.aircalendar.core.AirCalendarIntent;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class localselectActivity extends AppCompatActivity {
 
     private boolean state = false;
     public static int Code = 0;
     public static int Detail_Code = 0;
+    public static final int REQUEST_CODE = 1001;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -54,9 +61,22 @@ public class localselectActivity extends AppCompatActivity {
                     if (extras == null) {
                         if (state == true) {
                             if (Code != 0) {
-                                Intent local_to_day = new Intent(getApplicationContext(), DaySelectActivity.class);
+                                AirCalendarIntent intent = new AirCalendarIntent(getApplicationContext());
+                                intent.isBooking(false);
+                                intent.isSelect(false);
 
-                                startActivity(local_to_day);
+                                Calendar cal = Calendar.getInstance();
+                                SimpleDateFormat Year = new SimpleDateFormat("yyyy");
+                                String Start_Year = Year.format(cal.getTime());
+                                int yyyy = Integer.parseInt(Start_Year);
+                                // 현재 연도 계산
+                                yyyy += 1;
+                                intent.setMaxYear(yyyy);
+                                intent.setActiveMonth(2);
+                                intent.setWeekStart(Calendar.SUNDAY);
+                                intent.setWeekDaysLanguage(AirCalendarIntent.Language.KO); //language for the weekdays
+
+                                startActivityForResult(intent, REQUEST_CODE);
                             }
                         } else {
                             Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
@@ -320,6 +340,21 @@ public class localselectActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            if(data != null){
+                Intent intent = new Intent(getApplicationContext(), HotelSelectActivity.class);
+//                intent.putExtra("Start_Date", data.getStringArrayExtra(AirCalendarDatePickerActivity.RESULT_SELECT_START_DATE));
+//                intent.putExtra("End_Date", data.getStringExtra(AirCalendarDatePickerActivity.RESULT_SELECT_END_DATE));
+
+                startActivity(intent);
+            }
+        }
     }
 }
 
