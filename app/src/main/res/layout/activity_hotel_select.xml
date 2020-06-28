@@ -29,53 +29,62 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp">
 
-            <RelativeLayout
-                android:id="@+id/rl_search_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+<!--            <RelativeLayout-->
+<!--                android:id="@+id/rl_search_bar"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content">-->
 
-                <com.example.along_the_road.ClearEditText
-                    android:id="@+id/et_search_keyword"
-                    android:layout_width="250dp"
-                    android:layout_height="50dp"
-                    android:layout_gravity="left"
-                    android:layout_margin="10dp"
-                    android:background="@color/basic_color_FFFFFF"
-                    android:hint="호텔 이름을 검색하세요."
-                    android:padding="5dp"
-                    android:textColor="@color/basic_color_3A7AFF"
-                    android:fontFamily="@font/robotolight"
-                    android:textSize="18dp" />
+<!--                <com.example.along_the_road.ClearEditText-->
+<!--                    android:id="@+id/et_search_keyword"-->
+<!--                    android:layout_width="250dp"-->
+<!--                    android:layout_height="50dp"-->
+<!--                    android:layout_gravity="left"-->
+<!--                    android:layout_margin="10dp"-->
+<!--                    android:background="@color/basic_color_FFFFFF"-->
+<!--                    android:hint="호텔 이름을 검색하세요."-->
+<!--                    android:padding="5dp"-->
+<!--                    android:textColor="@color/basic_color_3A7AFF"-->
+<!--                    android:fontFamily="@font/robotolight"-->
+<!--                    android:textSize="18dp" />-->
 
-                <Button
-                    android:id="@+id/search_hotel_btn"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/common_btn_style"
-                    android:fontFamily="@font/nanumsquare"
-                    android:text="검색"
-                    android:textColor="@color/basic_color_3A7AFF"
-                    android:textSize="16dp" />
+<!--                <Button-->
+<!--                    android:id="@+id/search_hotel_btn"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_alignParentRight="true"-->
+<!--                    android:layout_margin="10dp"-->
+<!--                    android:background="@drawable/common_btn_style"-->
+<!--                    android:fontFamily="@font/nanumsquare"-->
+<!--                    android:text="검색"-->
+<!--                    android:textColor="@color/basic_color_3A7AFF"-->
+<!--                    android:textSize="16dp" />-->
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2.5dp"
-                    android:layout_below="@+id/search_hotel_btn"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@color/basic_color_FFE77C" />
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="2.5dp"-->
+<!--                    android:layout_below="@+id/search_hotel_btn"-->
+<!--                    android:layout_marginLeft="10dp"-->
+<!--                    android:layout_marginRight="10dp"-->
+<!--                    android:background="@color/basic_color_FFE77C" />-->
 
-            </RelativeLayout>
+<!--            </RelativeLayout>-->
+            <Spinner
+                android:id="@+id/sp_reselect"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:entries="@array/reselect_hotel"
+                android:gravity="center"
+                android:spinnerMode="dialog" />
 
             <LinearLayout
                 android:id="@+id/ll_hotel_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/rl_search_bar"
+                android:layout_below="@+id/sp_reselect"
                 android:layout_margin="10dp"
                 android:orientation="vertical">
 

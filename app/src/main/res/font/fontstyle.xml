@@ -16,4 +16,9 @@
         android:fontWeight="500"
         android:font="@font/robotolight" />
 
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="500"
+        android:font="@font/robotobold" />
+
 </font-family>

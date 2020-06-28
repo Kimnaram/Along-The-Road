@@ -24,7 +24,10 @@ public class localselectActivity extends AppCompatActivity {
     private boolean state = false;
     public static int Code = 0;
     public static int Detail_Code = 0;
-    public static final int REQUEST_CODE = 1001;
+
+    public static final int CALENDAR_REQUEST_CODE = 1001;
+    public static final int COURSE_REQUEST_CODE = 1001;
+    public static final int HOTEL_REQUEST_CODE = 1002;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -76,7 +79,7 @@ public class localselectActivity extends AppCompatActivity {
                                 intent.setWeekStart(Calendar.SUNDAY);
                                 intent.setWeekDaysLanguage(AirCalendarIntent.Language.KO); //language for the weekdays
 
-                                startActivityForResult(intent, REQUEST_CODE);
+                                startActivityForResult(intent, CALENDAR_REQUEST_CODE);
                             }
                         } else {
                             Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
@@ -87,12 +90,20 @@ public class localselectActivity extends AppCompatActivity {
 
                         if (state == true && REQUEST_CODE == 1001) {
                             if (Code != 0) {
-                                Intent local_to_day = new Intent(getApplicationContext(), CourseRecoActivity.class);
+                                Intent local_to_course = new Intent(getApplicationContext(), CourseRecoActivity.class);
 
-                                startActivity(local_to_day);
+                                startActivity(local_to_course);
+                            } else {
+                                Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
+                        } else if(state == true && REQUEST_CODE == 1002) {
+                            if (Code != 0) {
+                                Intent local_to_hotel = new Intent(getApplicationContext(), HotelSelectActivity.class);
+
+                                startActivity(local_to_hotel);
+                            } else {
+                                Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 }
@@ -346,7 +357,7 @@ public class localselectActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+        if (resultCode == RESULT_OK && requestCode == CALENDAR_REQUEST_CODE) {
             if(data != null){
                 Intent intent = new Intent(getApplicationContext(), HotelSelectActivity.class);
 //                intent.putExtra("Start_Date", data.getStringArrayExtra(AirCalendarDatePickerActivity.RESULT_SELECT_START_DATE));

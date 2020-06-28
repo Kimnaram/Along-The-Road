@@ -80,7 +80,7 @@
                     android:layout_height="40dp"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:entries="@array/reselect"
+                    android:entries="@array/reselect_course"
                     android:gravity="center"
                     android:spinnerMode="dialog" />
 
@@ -112,7 +112,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="10dp"
-            android:layout_marginBottom="20dp"
             android:visibility="visible">
 
             <RelativeLayout
@@ -123,6 +122,7 @@
                 android:layout_marginTop="80dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/course_view_style"
                 android:padding="20dp">
 

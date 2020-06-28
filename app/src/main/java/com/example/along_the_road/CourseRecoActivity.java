@@ -492,10 +492,10 @@ public class CourseRecoActivity extends AppCompatActivity {
 
     private void initView() {
         spinner = findViewById(R.id.sp_reselect);
-        spinnerArr = getResources().getStringArray(R.array.reselect);
+        spinnerArr = getResources().getStringArray(R.array.reselect_course);
         selected_spinner = spinnerArr[0];
         final ArrayAdapter<CharSequence> spinnerLargerAdapter =
-                ArrayAdapter.createFromResource(this, R.array.reselect, R.layout.spinner_item);
+                ArrayAdapter.createFromResource(this, R.array.reselect_course, R.layout.spinner_item);
         spinner.setAdapter(spinnerLargerAdapter);
         spinner.setSelection(0);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
