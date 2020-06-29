@@ -49,7 +49,7 @@ public class CourseRecoActivity extends AppCompatActivity {
     private final String API_KEY = "";
     private String area_Course = null; // URL
     private String detail_Course = null;
-    private String what_url = null;
+    private String search_url = null;
     private String selected_city_txt = null;
     private String selected_course_txt = null;
 
@@ -193,8 +193,10 @@ public class CourseRecoActivity extends AppCompatActivity {
                 if (detailCode != 0) {
                     area_Course = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?" +
                             "ServiceKey=" + API_KEY + "&numOfRows=15&pageNo=1" +
-                            "&areaCode=" + areaCode + "&code=" + detailCode + "&contentTypeId=25&cat1=C01" +
+                            "&areaCode=" + areaCode + "&sigunguCode=" + detailCode + "&contentTypeId=25&cat1=C01" +
                             Total_Theme + "&MobileOS=ETC&MobileApp=AppTest&_type=json";
+
+                    detailCode = 0;
 
                 } else {
                     area_Course = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?" +
@@ -208,10 +210,10 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                 try {
 
-                    what_url = area_Course;
+                    search_url = area_Course;
                     resultText = new Task().execute().get(); // URL에 있는 내용을 받아옴
 
-                    what_url = null;
+                    search_url = null;
 
                     JSONObject Object = new JSONObject(resultText);
 
@@ -228,13 +230,13 @@ public class CourseRecoActivity extends AppCompatActivity {
                         String popup_msg = "코스가 존재하지 않습니다.";
                         tv_popup_msg = findViewById(R.id.tv_popup_msg);
                         tv_popup_msg.setText(popup_msg);
+                        rl_top.setVisibility(View.GONE);
                         rl_info_popup.setVisibility(View.VISIBLE); // 팝업을 띄움
 
                         rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 rl_info_popup.setVisibility(View.GONE);
-                                rl_top.setVisibility(View.GONE);
                                 rl_course.setVisibility(View.VISIBLE);
                             }
                         });
@@ -355,10 +357,10 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                         try {
 
-                            what_url = detail_Course;
+                            search_url = detail_Course;
                             resultText2 = new Task().execute().get(); // URL에 있는 내용을 받아옴
 
-                            what_url = null;
+                            search_url = null;
 
                             JSONObject Object = new JSONObject(resultText2);
 
@@ -495,10 +497,10 @@ public class CourseRecoActivity extends AppCompatActivity {
 
     private void initView() {
         spinner = findViewById(R.id.sp_reselect);
-        spinnerArr = getResources().getStringArray(R.array.reselect);
+        spinnerArr = getResources().getStringArray(R.array.reselect_course);
         selected_spinner = spinnerArr[0];
         final ArrayAdapter<CharSequence> spinnerLargerAdapter =
-                ArrayAdapter.createFromResource(this, R.array.reselect, R.layout.spinner_item);
+                ArrayAdapter.createFromResource(this, R.array.reselect_course, R.layout.spinner_item);
         spinner.setAdapter(spinnerLargerAdapter);
         spinner.setSelection(0);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -655,7 +657,7 @@ public class CourseRecoActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             URL url = null;
             try {
-                url = new URL(what_url);
+                url = new URL(search_url);
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -700,7 +702,7 @@ public class CourseRecoActivity extends AppCompatActivity {
         detailCode = 0;
         area_Course = null; // URL
         detail_Course = null;
-        what_url = null;
+        search_url = null;
 
         finish();
     }

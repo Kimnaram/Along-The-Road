@@ -1,48 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".HotelSelectActivity">
 
-    <RelativeLayout
+    <!--상단 툴바-->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize">
 
-        <com.example.along_the_road.ClearEditText
-            android:id="@+id/et_search_keyword"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:layout_gravity="left"
-            android:layout_margin="10dp"
-            android:background="@color/basic_color_FFFFFF"
-            android:textColor="@color/basic_color_3A7AFF"
-            android:textSize="18dp"
-            android:padding="5dp"
-            android:hint="호텔 이름을 검색하세요." />
-
-        <Button
-            android:id="@+id/search_hotel_btn"
-            android:layout_width="100dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/common_btn_style"
-            android:layout_alignParentRight="true"
-            android:textColor="@color/basic_color_3A7AFF"
-            android:fontFamily="@font/nanumsquare"
-            android:textSize="16dp"
-            android:text="검색" />
+            android:fontFamily="@font/handon600"
+            android:text="호텔 검색"
+            android:textColor="#ffffff"
+            android:textSize="25dp"></TextView>
+    </androidx.appcompat.widget.Toolbar>
 
-        <View
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="2.5dp"
-            android:layout_below="@+id/search_hotel_btn"
-            android:background="@color/basic_color_FFE77C"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"/>
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp">
+
+<!--            <RelativeLayout-->
+<!--                android:id="@+id/rl_search_bar"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content">-->
+
+<!--                <com.example.along_the_road.ClearEditText-->
+<!--                    android:id="@+id/et_search_keyword"-->
+<!--                    android:layout_width="250dp"-->
+<!--                    android:layout_height="50dp"-->
+<!--                    android:layout_gravity="left"-->
+<!--                    android:layout_margin="10dp"-->
+<!--                    android:background="@color/basic_color_FFFFFF"-->
+<!--                    android:hint="호텔 이름을 검색하세요."-->
+<!--                    android:padding="5dp"-->
+<!--                    android:textColor="@color/basic_color_3A7AFF"-->
+<!--                    android:fontFamily="@font/robotolight"-->
+<!--                    android:textSize="18dp" />-->
+
+<!--                <Button-->
+<!--                    android:id="@+id/search_hotel_btn"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_alignParentRight="true"-->
+<!--                    android:layout_margin="10dp"-->
+<!--                    android:background="@drawable/common_btn_style"-->
+<!--                    android:fontFamily="@font/nanumsquare"-->
+<!--                    android:text="검색"-->
+<!--                    android:textColor="@color/basic_color_3A7AFF"-->
+<!--                    android:textSize="16dp" />-->
+
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="2.5dp"-->
+<!--                    android:layout_below="@+id/search_hotel_btn"-->
+<!--                    android:layout_marginLeft="10dp"-->
+<!--                    android:layout_marginRight="10dp"-->
+<!--                    android:background="@color/basic_color_FFE77C" />-->
+
+<!--            </RelativeLayout>-->
+            <Spinner
+                android:id="@+id/sp_reselect"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:entries="@array/reselect_hotel"
+                android:gravity="center"
+                android:spinnerMode="dialog" />
+
+            <LinearLayout
+                android:id="@+id/ll_hotel_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/sp_reselect"
+                android:layout_margin="10dp"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/rl_map_container"
+        android:layout_height="250dp"
+        android:layout_width="250dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone">
+
+<!--        <fragment-->
+<!--            android:id="@+id/fr_hotel_map"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:name="com.naver.maps.map.MapFragment" />-->
+
+        <fragment
+            android:id="@+id/fr_hotel_map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".HotelSelectActivity" />
 
     </RelativeLayout>
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/rl_info_popup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar"
+        android:background="#bf000000"
+        android:clickable="true"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="300dp"
+            android:layout_height="160dp"
+            android:background="@drawable/rounded">
+
+            <TextView
+                android:id="@+id/tv_popup_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/robotolight"
+                android:gravity="center"
+                android:text="안내"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_popup_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_popup_title"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/robotolight"
+                android:gravity="center"
+                android:textColor="#4a4a4a"
+                android:textSize="13sp" />
+
+            <RelativeLayout
+                android:id="@+id/rl_popup_info_ok"
+                android:layout_width="100dp"
+                android:layout_height="42dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/popup_btn_style"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/click_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/robotolight"
+                    android:gravity="center"
+                    android:text="확인"
+                    android:textColor="@color/basic_color_3A7AFF"
+                    android:textSize="15sp" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

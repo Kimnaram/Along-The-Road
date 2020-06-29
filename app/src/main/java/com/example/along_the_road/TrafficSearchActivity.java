@@ -230,7 +230,7 @@ public class TrafficSearchActivity extends AppCompatActivity
         });
 
 
-                container = findViewById(R.id.container);
+        container = findViewById(R.id.container);
         Route_Layout = findViewById(R.id.Route_Layout);
         Another_Route_Layout = findViewById(R.id.Another_Route_Layout);
         flow_container = findViewById(R.id.flow_container);
