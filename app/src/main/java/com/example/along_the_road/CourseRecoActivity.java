@@ -123,11 +123,24 @@ public class CourseRecoActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
-        if (areaCode == 0) {
-            Intent course_to_local = new Intent(getApplicationContext(), localselectActivity.class);
-            course_to_local.putExtra("REQUEST", AreaCodeIsNull);
+        rl_info_popup = findViewById(R.id.rl_info_popup);
+        rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
 
-            startActivity(course_to_local);
+        if (areaCode == 0) {
+            String popup_msg = "지역을 선택해야 합니다.";
+            tv_popup_msg = findViewById(R.id.tv_popup_msg);
+            tv_popup_msg.setText(popup_msg);
+            rl_info_popup.setVisibility(View.VISIBLE);
+            rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    rl_info_popup.setVisibility(View.GONE);
+                    Intent course_to_local = new Intent(getApplicationContext(), localselectActivity.class);
+                    course_to_local.putExtra("REQUEST", AreaCodeIsNull);
+
+                    startActivity(course_to_local);
+                }
+            });
         }
 
         initView();
@@ -139,8 +152,6 @@ public class CourseRecoActivity extends AppCompatActivity {
 
         rl_course = findViewById(R.id.rl_course);
         rl_top = findViewById(R.id.rl_top);
-        rl_info_popup = findViewById(R.id.rl_info_popup);
-        rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
         ll_course_list = findViewById(R.id.ll_course_list);
 
         tv_selected_city = findViewById(R.id.tv_selected_city);
@@ -448,7 +459,6 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                     Resources res = getResources();
 
-                    /*
                     switch(Theme) {
                         case Family_C:
                             course = "가족 코스";
@@ -474,8 +484,6 @@ public class CourseRecoActivity extends AppCompatActivity {
                             course = "맛집 코스";
                             c_img = ResourcesCompat.getDrawable(res, R.drawable.taste_64, null);
                     }
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.taste_40, null);
-                    } */
 
                     selected_city_txt = city;
                     selected_course_txt = "에서 " + course;
@@ -483,9 +491,7 @@ public class CourseRecoActivity extends AppCompatActivity {
                     tv_selected_city.setText(selected_city_txt);
                     tv_selected_course.setText(selected_course_txt);
 
-                    int h = 130;
-                    int w = 130;
-                    c_img.setBounds(0, 0, h, w);
+                    c_img.setBounds(0, 0, 130, 130);
                     tv_selected_course.setCompoundDrawables(null, null, c_img, null);
 
                 }
