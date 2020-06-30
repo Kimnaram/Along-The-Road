@@ -9,12 +9,44 @@
 
     </string-array>
 
-    <string-array name = "reselect">
+    <string-array name = "reselect_course">
 
         <item>재선택</item>
         <item>지역 선택</item>
         <item>코스 선택</item>
 
     </string-array>
+
+    <string-array name = "reselect_local_from_hotel">
+
+        <item>지역 선택</item>
+        <item>-----------------</item>
+        <item>서울</item>
+        <item>속초</item>
+        <item>강릉</item>
+        <item>대구</item>
+        <item>경주</item>
+        <item>부산</item>
+        <item>전주</item>
+        <item>여수</item>
+        <item>제주</item>
+
+    </string-array>
+
+<!--    <string-array name = "reselect_form_from_hotel">-->
+
+<!--        <item>호텔 유형 선택</item>-->
+<!--        <item>&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</item>-->
+<!--        <item>가족 호텔</item>-->
+<!--        <item>관광 호텔</item>-->
+<!--        <item>전통 호텔</item>-->
+<!--        <item></item>-->
+<!--        <item>경주</item>-->
+<!--        <item>부산</item>-->
+<!--        <item>전주</item>-->
+<!--        <item>여수</item>-->
+<!--        <item>제주</item>-->
+
+<!--    </string-array>-->
 
 </resources>

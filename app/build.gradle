@@ -45,7 +45,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'org.apmem.tools:layouts:1.10'
     // implementation 'org.json:json:20190722'
-    implementation project(path:':AirCalendar')
+    implementation project(path: ':AirCalendar')
     implementation 'com.android.support:multidex:1.0.3'
 
     implementation('com.naver.maps:map-sdk:3.8.0') {

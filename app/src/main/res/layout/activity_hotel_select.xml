@@ -76,9 +76,9 @@
                 android:layout_width="150dp"
                 android:layout_height="40dp"
                 android:layout_alignParentRight="true"
-                android:entries="@array/reselect_hotel"
+                android:entries="@array/reselect_local_from_hotel"
                 android:gravity="center"
-                android:spinnerMode="dialog" />
+                android:spinnerMode="dropdown" />
 
             <LinearLayout
                 android:id="@+id/ll_hotel_list"
@@ -110,12 +110,14 @@
 <!--            android:layout_height="match_parent"-->
 <!--            android:name="com.naver.maps.map.MapFragment" />-->
 
-        <fragment
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
             android:id="@+id/fr_hotel_map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".HotelSelectActivity" />
+            tools:context="com.example.along_the_road.HotelSelectActivity"
+            map:liteMode="true" />
 
     </RelativeLayout>
 
