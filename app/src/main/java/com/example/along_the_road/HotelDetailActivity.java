@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -18,10 +19,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
@@ -44,6 +48,9 @@ public class HotelDetailActivity extends AppCompatActivity {
 
     private int ContentID;
     private String HotelName;
+    private String Start_Date;
+    private String End_Date;
+    private String Member;
 
     private int list_len = 0;
 
@@ -88,6 +95,8 @@ public class HotelDetailActivity extends AppCompatActivity {
 
     private ImageView RoomImage1;
 
+    private Button btn_reservation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +121,9 @@ public class HotelDetailActivity extends AppCompatActivity {
             System.out.println(strID);
             ContentID = Integer.parseInt(strID);
             HotelName = intent.getStringExtra("Name");
+            Start_Date = intent.getStringExtra("Start_Date");
+            End_Date = intent.getStringExtra("End_Date");
+//            Member = intent.getStringExtra("Member");
 
             tv_hotel_name = findViewById(R.id.tv_hotel_name);
             tv_hotel_name.setText(HotelName);
@@ -335,6 +347,28 @@ public class HotelDetailActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        btn_reservation = findViewById(R.id.btn_reservation);
+        btn_reservation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println(Start_Date);
+                System.out.println(End_Date);
+                String reservation_url = "https://www.hotelscombined.co.kr/hotels/" +
+                Start_Date + "/" + End_Date + "/1adults/1rooms?&placeName=hotel:" + HotelName;
+
+                Intent detail_to_url = new Intent(Intent.ACTION_WEB_SEARCH);
+                detail_to_url.putExtra(SearchManager.QUERY, reservation_url);
+                // 구글로 검색
+
+                if(detail_to_url.resolveActivity(getPackageManager()) != null) {
+                    startActivity(detail_to_url);
+                } else {
+                    String msg = "웹페이지로 이동할 수 없습니다.";
+                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public void MakeRoomType(String t, int i) {
