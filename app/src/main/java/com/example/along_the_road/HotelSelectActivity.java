@@ -1,12 +1,9 @@
 package com.example.along_the_road;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -28,32 +25,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import org.apmem.tools.layouts.FlowLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.naver.maps.geometry.LatLng;
-import com.naver.maps.map.CameraPosition;
-import com.naver.maps.map.CameraUpdate;
-import com.naver.maps.map.MapFragment;
-import com.naver.maps.map.NaverMap;
-import com.naver.maps.map.NaverMapOptions;
-import com.naver.maps.map.NaverMapSdk;
-import com.naver.maps.map.OnMapReadyCallback;
-import com.naver.maps.map.overlay.Marker;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-//import com.google.android.gms.maps.CameraUpdateFactory;
-//import com.google.android.gms.maps.GoogleMap;
-//import com.google.android.gms.maps.OnMapReadyCallback;
-//import com.google.android.gms.maps.SupportMapFragment;
-//import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-//import com.google.android.gms.maps.model.LatLng;
-//import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,19 +86,19 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     private String search_url = null;
 
     private int list_len = 0;
-    private int now_i = 0;
 
     private int ll_hl_count = 0;
 
     private int[] ContentID;
     private String[] HotelName;
     private String[] HotelImage;
-    private String checkintime;
-    private String checkouttime;
-    private String parkinglodging;
-    private String roomtype;
-    private String reservationurl;
-    private String subfacility;
+    private String[] checkintime;
+    private String[] checkouttime;
+    private String[] parkinglodging;
+    private String[] roomtype;
+    private String[] foodplace;
+    private String[] reservationurl;
+    private String[] subfacility;
 
     private int[] state;
 
@@ -142,14 +128,10 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     private Bitmap bitmap;
     Handler handler = new Handler();
 
-    /************* Naver Map API 관련 변수 *************/
-    private NaverMap nMap;
-    private LatLng[] HotelLocation;
-
     /************* Google Map API 관련 변수 *************/
-//    private GoogleMap mMap;
-//    private LatLng[] HotelLocation;
-//    private MarkerOptions markerOptions;
+    private GoogleMap mMap;
+    private LatLng[] HotelLocation;
+    private MarkerOptions markerOptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,24 +146,11 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
             End_Date = intent.getStringExtra("End_Date");
         }
 
-        NaverMapSdk.getInstance(this).setClient(
-                new NaverMapSdk.NaverCloudPlatformClient(""));
-
-        // 네이버 지도 객체 받아오기
-        FragmentManager fm = getSupportFragmentManager();
-        MapFragment mapFragment = (MapFragment)fm.findFragmentById(R.id.fr_hotel_map);
-        if (mapFragment == null) {
-            mapFragment = MapFragment.newInstance();
-            fm.beginTransaction().add(R.id.fr_hotel_map, mapFragment).commit();
-        }
-
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fr_hotel_map);
         mapFragment.getMapAsync(this);
 
         rl_map_container = findViewById(R.id.rl_map_container);
-
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.fr_hotel_map);
-//        mapFragment.getMapAsync(this);
 
         //상단 툴바 설정
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -200,35 +169,13 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     }
 
-    @UiThread
+
     @Override
-    public void onMapReady(@NonNull final NaverMap naverMap) {
+    public void onMapReady(GoogleMap googleMap) {
 
-        nMap = naverMap;
-
-        NaverMapOptions options = new NaverMapOptions()
-                .camera(new CameraPosition(new LatLng(35.1798159, 129.0750222), 8))
-                .mapType(NaverMap.MapType.Basic);
-        naverMap.setIndoorEnabled(true);
-
-        MapFragment mapFragment = MapFragment.newInstance(options);
-
-        ll_hotel_list_view[now_i].setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CameraPosition cameraPosition = new CameraPosition(HotelLocation[now_i], 16);
-                naverMap.moveCamera(CameraUpdate.toCameraPosition(cameraPosition));
-            }
-        });
+        mMap = googleMap;
 
     }
-//
-//    @Override
-//    public void onMapReady(GoogleMap googleMap) {
-//
-//        mMap = googleMap;
-//
-//    }
 
     private void initView() {
         spinner = findViewById(R.id.sp_reselect);
@@ -388,6 +335,14 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 fl_hotel_text = new FlowLayout[list_len];
                 state = new int[list_len];
 
+                checkintime = new String[list_len];
+                checkouttime = new String[list_len];
+                parkinglodging = new String[list_len];
+                roomtype = new String[list_len];
+                foodplace = new String[list_len];
+                reservationurl = new String[list_len];
+                subfacility = new String[list_len];
+
                 if (ItemIsWhat.equals("[{")) {
 
                     for (int i = 0; i < list_len; i++) {
@@ -412,6 +367,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                         fl_hotel_text[i].setLayoutParams(new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT));
                         fl_hotel_text[i].setOrientation(FlowLayout.HORIZONTAL);
+                        fl_hotel_text[i].setPadding(10, 20, 10, 20);
                         fl_hotel_text[i].setVisibility(View.GONE);
                         fl_hotel_text[i].setBackground(getResources().getDrawable(R.drawable.rounded));
                         fl_hotel_text[i].setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
@@ -484,41 +440,27 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                             public void onClick(View v) {
                                 if (state[no] == 0) {
                                     fl_hotel_text[no].setVisibility(View.VISIBLE);
-                                    // 해당 호텔의 주소를 네이버 지도에 표시
-//                                    CameraPosition cameraPosition = new CameraPosition(HotelLocation[no].toLatLng(), 16);
-//                                    CameraUpdate cameraUpdate = CameraUpdate.toCameraPosition(cameraPosition);
-//                                    nMap.moveCamera(cameraUpdate);
-//
-//                                    Marker marker = new Marker();
-//                                    marker.setPosition(HotelLocation[no]);
-//
-//                                    marker.setMap(nMap);
-
-                                    now_i = no;
-                                    onMapReady(nMap);
-
                                     rl_map_container.setVisibility(View.VISIBLE);
                                     state[no] = 1;
 
-//                                    markerOptions = new MarkerOptions();
-//                                    markerOptions.position(HotelLocation[no]);
-//
-//                                    BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_64);
-//                                    Bitmap b = bitmapdraw.getBitmap();
-//                                    Bitmap smallMarker = Bitmap.createScaledBitmap(b, 120, 120, false);
-//                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-//                                    markerOptions.title(HotelName[no]);
-//
-//                                    mMap.addMarker(markerOptions);
-//                                    mMap.moveCamera(CameraUpdateFactory.newLatLng(HotelLocation[no]));
-//                                    mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-//
-//                                    onMapReady(mMap);
+                                    markerOptions = new MarkerOptions();
+                                    markerOptions.position(HotelLocation[no]);
+
+                                    BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_64);
+                                    Bitmap b = bitmapdraw.getBitmap();
+                                    Bitmap smallMarker = Bitmap.createScaledBitmap(b, 120, 120, false);
+                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+                                    markerOptions.title(HotelName[no]);
+
+                                    mMap.addMarker(markerOptions);
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLng(HotelLocation[no]));
+                                    mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+
+                                    onMapReady(mMap);
 
 
                                 } else if (state[no] == 1) {
                                     fl_hotel_text[no].setVisibility(View.GONE);
-//                                    mMap.clear();
                                     rl_map_container.setVisibility(View.GONE);
 
                                     state[no] = 0;
@@ -614,33 +556,12 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                 rl_map_container.setVisibility(View.VISIBLE);
                                 state[no] = 1;
 
-//                                markerOptions = new MarkerOptions();
-//                                markerOptions.position(HotelLocation[no]);
-//
-//                                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_64);
-//                                Bitmap b = bitmapdraw.getBitmap();
-//                                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 120, 120, false);
-//                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-//                                markerOptions.title(HotelName[no]);
-//
-//                                mMap.addMarker(markerOptions);
-//                                mMap.moveCamera(CameraUpdateFactory.newLatLng(HotelLocation[no]));
-//                                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-//
-//                                onMapReady(mMap);
-
-//                    Drawable ca_img = ResourcesCompat.getDrawable(res, R.drawable.collapse_arrow_48, null);
-//                    ca_img.setBounds(0, 0, 40, 40);
-//
-//                    ith_course.setCompoundDrawables(null, null, ca_img, null);
                             } else if (state[no] == 1) {
                                 fl_hotel_text[no].setVisibility(View.GONE);
                                 //mMap.clear();
                                 rl_map_container.setVisibility(View.GONE);
 
                                 state[no] = 0;
-//                    ea_img.setBounds(0, 0, 40, 40);
-//                    ith_course.setCompoundDrawables(null, null, ea_img, null);
                             }
                         }
                     });
@@ -705,21 +626,24 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 String item = itemsObject.getString("item");
                 JSONObject itemObject = new JSONObject(item);
 
-                checkintime = itemObject.getString("checkintime");
-                checkouttime = itemObject.getString("checkouttime");
-                parkinglodging = itemObject.getString("parkinglodging");
-                roomtype = itemObject.getString("roomtype");
+                checkintime[k] = itemObject.getString("checkintime");
+                checkouttime[k] = itemObject.getString("checkouttime");
+                parkinglodging[k] = itemObject.getString("parkinglodging");
+                roomtype[k] = itemObject.getString("roomtype");
+                foodplace[k] = itemObject.getString("foodplace");
                 boolean urlcheck = itemObject.isNull("reservationurl");
                 if(urlcheck == false) {
-                    reservationurl = itemObject.getString("reservationurl");
+                    reservationurl[k] = itemObject.getString("reservationurl");
                 }
-                subfacility = itemObject.getString("subfacility");
+                subfacility[k] = itemObject.getString("subfacility");
 
                 //subdetailimg[i] = CourseObject.getString("subdetailimg");
 
-                String Text = "체크인 시간 " + checkintime + ", 체크아웃 시간 " + checkouttime +
-                        "\n"+ parkinglodging +
-                        "\n사용 가능 시설 : " + subfacility;
+                String Text = "체크인 시간 " + checkintime[k] + ", 체크아웃 시간 " + checkouttime[k] +
+                        "\n주차 가능 여부 : "+ parkinglodging[k] +
+                        "\n\n클릭하면 객실 리스트로 넘어갑니다.";
+//                        "\n음식점 : " + foodplace[k] +
+//                        "\n사용 가능 시설 : " + subfacility[k];
                         // "\n룸 타입 : " + roomtype +
                         // "\n예약 URL : " + reservationurl;
 
@@ -743,10 +667,10 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
         ith_hotel.setText(t);
         ith_hotel.setTextSize(18);
         ith_hotel.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
-        ith_hotel.setPadding(16, 16, 16, 16);
+        ith_hotel.setPadding(25, 25, 25, 25);
         ith_hotel.setCompoundDrawablePadding(2);
 
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "font/robotobold.ttf");
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
         ith_hotel.setTypeface(typeface);
 
         final Resources res = getResources();
@@ -776,12 +700,12 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
         hotel_txt = new TextView(this);
         hotel_txt.setText(t);
-        hotel_txt.setTextSize(16);
+        hotel_txt.setTextSize(17);
         hotel_txt.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
-        hotel_txt.setPadding(16, 16, 16, 16);
+        hotel_txt.setPadding(20, 20, 20, 20);
         hotel_txt.setCompoundDrawablePadding(2);
 
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "font/robotobold.ttf");
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquareregular.ttf");
         hotel_txt.setTypeface(typeface);
 
         hotel_txt.setGravity(Gravity.CENTER_VERTICAL);
@@ -800,6 +724,9 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 hotel_to_detail.putExtra("Name", HotelName[no]);
                 hotel_to_detail.putExtra("Start_Date", Start_Date);
                 hotel_to_detail.putExtra("End_Date", End_Date);
+                hotel_to_detail.putExtra("URL", reservationurl[no]);
+                hotel_to_detail.putExtra("CheckIn", checkintime[no]);
+                hotel_to_detail.putExtra("CheckOut", checkouttime[no]);
 
                 startActivity(hotel_to_detail);
             }

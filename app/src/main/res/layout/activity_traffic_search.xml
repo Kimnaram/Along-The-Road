@@ -113,7 +113,7 @@
                     tools:context=".TrafficSearchActivity" />
 
                 <RelativeLayout
-                    android:id="@+id/container"
+                    android:id="@+id/rl_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/map"
@@ -122,7 +122,7 @@
                     android:visibility="gone">
 
                     <RelativeLayout
-                        android:id="@+id/Route_Layout"
+                        android:id="@+id/rl_route_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="50dp"
@@ -151,7 +151,7 @@
                             android:textSize="28dp" />
 
                         <org.apmem.tools.layouts.FlowLayout
-                            android:id="@+id/Route_fl"
+                            android:id="@+id/fl_route"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/during_time"
@@ -162,10 +162,10 @@
                     </RelativeLayout>
 
                     <RelativeLayout
-                        android:id="@+id/Another_Route_Layout"
+                        android:id="@+id/rl_another_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/Route_Layout"
+                        android:layout_below="@+id/rl_route_view"
                         android:visibility="gone">
 
                         <TextView
@@ -177,7 +177,7 @@
                             android:textSize="16dp" />
 
                         <LinearLayout
-                            android:id="@+id/flow_container"
+                            android:id="@+id/ll_flow_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"></LinearLayout>

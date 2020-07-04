@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/handon600"
-            android:text="룸 리스트"
+            android:text="객실 리스트"
             android:textColor="#ffffff"
             android:textSize="25dp"></TextView>
     </androidx.appcompat.widget.Toolbar>
@@ -26,7 +25,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/basic_color_FFFFFF">
+        android:layout_below="@id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,12 +51,87 @@
                 android:layout_marginBottom="30dp"
                 android:background="@color/basic_color_3A7AFF" />
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp" >
+
+                <TextView
+                    android:id="@+id/tv_checkin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/nanumsquare"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="체크인"
+                    android:background="@color/basic_color_FFCD49"
+                    android:textColor="@color/basic_color_FFFFFF"
+                    android:layout_toLeftOf="@+id/v_tv_division_line"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:layout_marginRight="10dp"/>
+
+                <TextView
+                    android:id="@+id/tv_checkin_time"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/robotolight"
+                    android:text="12 : 00"
+                    android:layout_toLeftOf="@+id/v_time_division_line"
+                    android:layout_below="@+id/tv_checkin"
+                    android:gravity="center"
+                    android:textSize="23sp"/>
+
+                <View
+                    android:id="@+id/v_time_division_line"
+                    android:layout_width="2dp"
+                    android:layout_height="24sp"
+                    android:background="@color/basic_color_3A7AFF"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/v_tv_division_line"/>
+
+                <View
+                    android:id="@+id/v_tv_division_line"
+                    android:layout_width="2dp"
+                    android:layout_height="28sp"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:id="@+id/tv_checkout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="체크아웃"
+                    android:fontFamily="@font/nanumsquare"
+                    android:textColor="@color/basic_color_FFFFFF"
+                    android:background="@color/basic_color_FFCD49"
+                    android:layout_above="@+id/tv_checkout_time"
+                    android:layout_toRightOf="@+id/v_tv_division_line"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tv_checkout_time"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/robotolight"
+                    android:layout_toRightOf="@+id/v_time_division_line"
+                    android:layout_below="@+id/tv_checkin"
+                    android:gravity="center"
+                    android:textSize="23sp" />
+
+            </RelativeLayout>
+
             <LinearLayout
                 android:id="@+id/ll_room_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:orientation="vertical">
+                android:layout_marginRight="10dp"
+                android:orientation="vertical"
+                android:layout_gravity="center">
 
             </LinearLayout>
 
