@@ -73,11 +73,13 @@
 <!--            </RelativeLayout>-->
             <Spinner
                 android:id="@+id/sp_reselect"
-                android:layout_width="150dp"
+                android:layout_width="120dp"
                 android:layout_height="40dp"
                 android:layout_alignParentRight="true"
                 android:entries="@array/reselect_local_from_hotel"
                 android:gravity="center"
+                android:layout_marginRight="10dp"
+                android:background="@null"
                 android:spinnerMode="dropdown" />
 
             <LinearLayout

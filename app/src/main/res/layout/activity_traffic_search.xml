@@ -51,7 +51,7 @@
 
                 <com.example.along_the_road.ClearEditText
                     android:id="@+id/depart_loc"
-                    android:layout_width="220sp"
+                    android:layout_width="230sp"
                     android:layout_height="40dp"
                     android:layout_toRightOf="@+id/arrow"
                     android:background="@color/basic_color_FFFFFF"
@@ -63,7 +63,7 @@
 
                 <Spinner
                     android:id="@+id/spinner_menu"
-                    android:layout_width="130dp"
+                    android:layout_width="120dp"
                     android:layout_height="40dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginLeft="10sp"
@@ -74,7 +74,7 @@
 
                 <com.example.along_the_road.ClearEditText
                     android:id="@+id/arrive_loc"
-                    android:layout_width="240dp"
+                    android:layout_width="230dp"
                     android:layout_height="40dp"
                     android:layout_below="@+id/depart_loc"
                     android:layout_marginTop="7dp"
@@ -93,7 +93,7 @@
                     android:layout_height="39dp"
                     android:layout_below="@id/spinner_menu"
                     android:layout_gravity="right"
-                    android:layout_marginLeft="15dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="17dp"
                     android:layout_toRightOf="@+id/arrive_loc"

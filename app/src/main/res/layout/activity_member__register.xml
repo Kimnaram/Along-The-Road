@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MEMBER_RegisterActivity"
+    android:background="@color/basic_color_3A7AFF">
+
+    <ImageView
+        android:id="@+id/logo_img"
+        android:layout_width="250dp"
+        android:layout_height="150dp"
+        android:src="@drawable/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="100dp"
+        android:layout_above="@+id/rl_login_field"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_register_field"
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="10dp">
+
+            <EditText
+                android:id="@+id/ed_username_field"
+                android:layout_width="300dp"
+                android:layout_height="40dp"
+                android:layout_centerHorizontal="true"
+                android:backgroundTint="@color/basic_color_FFFFFF"
+                android:textColor="@color/basic_color_FFFFFF"
+                android:textColorHint="@color/basic_color_FFFFFF"
+                android:fontFamily="@font/nanumsquare"
+                android:hint="User Name" />
+
+            <EditText
+                android:id="@+id/ed_email_field"
+                android:layout_width="300dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/ed_username_field"
+                android:layout_centerHorizontal="true"
+                android:backgroundTint="@color/basic_color_FFFFFF"
+                android:textColor="@color/basic_color_FFFFFF"
+                android:textColorHint="@color/basic_color_FFFFFF"
+                android:fontFamily="@font/nanumsquare"
+                android:hint="Email" />
+
+            <EditText
+                android:id="@+id/ed_pw_field"
+                android:layout_width="300dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/ed_email_field"
+                android:layout_centerHorizontal="true"
+                android:backgroundTint="@color/basic_color_FFFFFF"
+                android:textColor="@color/basic_color_FFFFFF"
+                android:textColorHint="@color/basic_color_FFFFFF"
+                android:fontFamily="@font/nanumsquare"
+                android:hint="Password" />
+
+            <EditText
+                android:id="@+id/ed_pwcheck_field"
+                android:layout_width="300dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/ed_pw_field"
+                android:layout_centerHorizontal="true"
+                android:backgroundTint="@color/basic_color_FFFFFF"
+                android:textColor="@color/basic_color_FFFFFF"
+                android:textColorHint="@color/basic_color_FFFFFF"
+                android:fontFamily="@font/nanumsquare"
+                android:hint="Password Check"
+                app:passwordToggleEnabled="true" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btn_register_done"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rl_register_field"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/less_rounded"
+            android:backgroundTint="@color/basic_color_FFFFFF"
+            android:fontFamily="@font/nanumsquare"
+            android:text="SIGN UP"
+            android:textSize="20dp"
+            android:textColor="@color/basic_color_3A7AFF" />
+
+</RelativeLayout>

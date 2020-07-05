@@ -616,38 +616,46 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 String response = Object.getString("response");
                 JSONObject responseObject = new JSONObject(response);
 
-                String body = responseObject.getString("body");
-
-                JSONObject bodyObject = new JSONObject(body);
-
-                String items = bodyObject.getString("items");
-                JSONObject itemsObject = new JSONObject(items);
-
-                String item = itemsObject.getString("item");
-                JSONObject itemObject = new JSONObject(item);
-
-                checkintime[k] = itemObject.getString("checkintime");
-                checkouttime[k] = itemObject.getString("checkouttime");
-                parkinglodging[k] = itemObject.getString("parkinglodging");
-                roomtype[k] = itemObject.getString("roomtype");
-                foodplace[k] = itemObject.getString("foodplace");
-                boolean urlcheck = itemObject.isNull("reservationurl");
-                if(urlcheck == false) {
-                    reservationurl[k] = itemObject.getString("reservationurl");
+                boolean bodycheck = responseObject.isNull("body");
+                if(bodycheck == true) {
+                    String errmsg = "LIMITED NUMBER OF SERVICE REQUESTS EXCEEDS ERROR\n" +
+                            "다음날 다시 시도해주세요.";
+                    MakeTextView(errmsg, k, ContentID[k]);
                 }
-                subfacility[k] = itemObject.getString("subfacility");
+                else if(bodycheck == false) {
+                    String body = responseObject.getString("body");
 
-                //subdetailimg[i] = CourseObject.getString("subdetailimg");
+                    JSONObject bodyObject = new JSONObject(body);
 
-                String Text = "체크인 시간 " + checkintime[k] + ", 체크아웃 시간 " + checkouttime[k] +
-                        "\n주차 가능 여부 : "+ parkinglodging[k] +
-                        "\n\n클릭하면 객실 리스트로 넘어갑니다.";
+                    String items = bodyObject.getString("items");
+                    JSONObject itemsObject = new JSONObject(items);
+
+                    String item = itemsObject.getString("item");
+                    JSONObject itemObject = new JSONObject(item);
+
+                    checkintime[k] = itemObject.getString("checkintime");
+                    checkouttime[k] = itemObject.getString("checkouttime");
+                    parkinglodging[k] = itemObject.getString("parkinglodging");
+                    roomtype[k] = itemObject.getString("roomtype");
+                    foodplace[k] = itemObject.getString("foodplace");
+                    boolean urlcheck = itemObject.isNull("reservationurl");
+                    if (urlcheck == false) {
+                        reservationurl[k] = itemObject.getString("reservationurl");
+                    }
+                    subfacility[k] = itemObject.getString("subfacility");
+
+                    //subdetailimg[i] = CourseObject.getString("subdetailimg");
+
+                    String Text = "체크인 시간 " + checkintime[k] + ", 체크아웃 시간 " + checkouttime[k] +
+                            "\n주차 가능 여부 : " + parkinglodging[k] +
+                            "\n\n클릭하면 객실 리스트로 넘어갑니다.";
 //                        "\n음식점 : " + foodplace[k] +
 //                        "\n사용 가능 시설 : " + subfacility[k];
-                        // "\n룸 타입 : " + roomtype +
-                        // "\n예약 URL : " + reservationurl;
+                    // "\n룸 타입 : " + roomtype +
+                    // "\n예약 URL : " + reservationurl;
 
-                MakeTextView(Text, k, ContentID[k]);
+                    MakeTextView(Text, k, ContentID[k]);
+                }
 
             } catch (NullPointerException e) {
                 e.printStackTrace();

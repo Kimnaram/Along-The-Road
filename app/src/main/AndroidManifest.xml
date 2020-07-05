@@ -16,7 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".HotelDetailActivity"></activity>
+        <activity android:name=".MEMBER_LoginActivity"></activity>
+        <activity android:name=".MEMBER_RegisterActivity" />
+        <activity android:name=".HotelDetailActivity" />
         <activity android:name=".CourseRecoActivity" />
         <activity android:name=".FestivalActivity" />
         <activity android:name=".PostActivity" />

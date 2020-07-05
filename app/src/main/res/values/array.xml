@@ -20,7 +20,7 @@
     <string-array name = "reselect_local_from_hotel">
 
         <item>지역 선택</item>
-        <item>-----------------</item>
+        <item>─────</item>
         <item>서울</item>
         <item>속초</item>
         <item>강릉</item>

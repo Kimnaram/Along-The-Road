@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/basic_color_3A7AFF"
+    tools:context=".MEMBER_LoginActivity">
+
+    <ImageView
+        android:id="@+id/logo_img"
+        android:layout_width="250dp"
+        android:layout_height="150dp"
+        android:src="@drawable/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_above="@+id/rl_login_field"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_login_field"
+        android:layout_width="340dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true">
+
+        <EditText
+            android:id="@+id/ed_email_field"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="@color/basic_color_FFFFFF"
+            android:fontFamily="@font/nanumsquarebold"
+            android:hint="Email"
+            android:textColor="@color/basic_color_FFFFFF"
+            android:textColorHint="@color/basic_color_FFFFFF" />
+
+        <EditText
+            android:id="@+id/ed_pw_field"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="@color/basic_color_FFFFFF"
+            android:fontFamily="@font/nanumsquarebold"
+            android:hint="Password"
+            android:textColor="@color/basic_color_FFFFFF"
+            android:textColorHint="@color/basic_color_FFFFFF"
+            android:layout_marginBottom="10dp"
+            android:layout_below="@+id/ed_email_field" />
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/less_rounded"
+            android:backgroundTint="@color/basic_color_FFFFFF"
+            android:textColor="@color/basic_color_3A7AFF"
+            android:text="LOGIN"
+            android:fontFamily="@font/nanumsquare"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/ed_pw_field"
+            android:textSize="20dp" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_non_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rl_login_field"
+        android:layout_centerHorizontal="true"
+        android:text="계정이 없으신가요?"
+        android:fontFamily="@font/nanumsquarebold"
+        android:layout_marginTop="15dp"
+        android:textColor="@color/basic_color_FFFFFF"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tv_go_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_non_account"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="2dp"
+        android:text="SIGN UP"
+        android:fontFamily="@font/nanumsquare"
+        android:textSize="20dp"
+        android:textColor="@color/basic_color_FFE77C"/>
+    
+</RelativeLayout>

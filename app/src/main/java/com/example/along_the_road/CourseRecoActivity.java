@@ -42,16 +42,16 @@ import java.util.concurrent.ExecutionException;
 import static com.example.along_the_road.localselectActivity.Code;
 import static com.example.along_the_road.localselectActivity.Detail_Code;
 
-
-
 public class CourseRecoActivity extends AppCompatActivity {
 
     private final String API_KEY = "";
     private String area_Course = null; // URL
     private String detail_Course = null;
+    private String time_and_distance = null;
     private String search_url = null;
     private String selected_city_txt = null;
     private String selected_course_txt = null;
+    private String d_and_t = null;
 
     //    private int areaCode = 1; // 테스트를 위함
     private int areaCode = Code;
@@ -110,6 +110,8 @@ public class CourseRecoActivity extends AppCompatActivity {
     private Spinner spinner;
     private String[] spinnerArr;
     private String selected_spinner = null;
+
+    private boolean bodycheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -295,15 +297,61 @@ public class CourseRecoActivity extends AppCompatActivity {
                                 String contentId = CourseObject.getString("contentid");
                                 ContentID[i] = Integer.parseInt(contentId);
 //                                CourseImg[i] = CourseObject.getString("firstimage");
+
+                                time_and_distance = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailIntro?" +
+                                        "ServiceKey=" + API_KEY + "&contentId=" + ContentID[i] + "&contentTypeId=25" +
+                                        "&MobileOS=ETC&MobileApp=AppTest&_type=json";
+
+                                System.out.println(time_and_distance);
+
+                                String resultText3 = "값이 없음";
+
+                                try {
+
+                                    resultText3 = new TADTask().execute().get(); // URL에 있는 내용을 받아옴
+
+                                    JSONObject Object2 = new JSONObject(resultText3);
+
+                                    String response2 = Object2.getString("response");
+                                    JSONObject responseObject2 = new JSONObject(response2);
+
+                                    boolean bodycheck = responseObject2.isNull("body");
+                                    if(bodycheck == false) {
+                                        String body2 = responseObject2.getString("body");
+                                        JSONObject bodyObject2 = new JSONObject(body2);
+
+                                        String items2 = bodyObject2.getString("items");
+                                        JSONObject itemsObject2 = new JSONObject(items2);
+
+                                        String item2 = itemsObject2.getString("item");
+                                        JSONObject itemObject2 = new JSONObject(item2);
+
+                                        String distance = itemObject2.getString("distance");
+
+                                        String taketime = itemObject2.getString("taketime");
+
+                                        d_and_t = "코스 총 거리 : " + distance + ", 소요 시간 : " + taketime;
+                                    }
+                                } catch (NullPointerException e) {
+                                    e.printStackTrace();
+                                } catch (ExecutionException e) {
+                                    e.printStackTrace();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
                                 Title[i] = CourseObject.getString("title");
 
                                 ll_course_text_box[i] = new LinearLayout(CourseRecoActivity.this);
                                 LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                         ViewGroup.LayoutParams.WRAP_CONTENT);
-                                param.bottomMargin = 10;
+                                param.bottomMargin = 70;
                                 param.topMargin = 10;
                                 ll_course_text_box[i].setLayoutParams(param);
                                 ll_course_text_box[i].setOrientation(LinearLayout.VERTICAL);
+                                ll_course_text_box[i].setBackgroundColor(getResources().getColor(R.color.basic_color_FFFFFF));
                                 ll_course_list.addView(ll_course_text_box[i]);
 
                                 fl_course_text[i] = new FlowLayout(CourseRecoActivity.this);
@@ -314,6 +362,9 @@ public class CourseRecoActivity extends AppCompatActivity {
                                 fl_course_text[i].setBackground(getResources().getDrawable(R.drawable.rounded));
                                 fl_course_text[i].setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
 
+                                if(bodycheck == false) {
+                                    MakeDANDT(d_and_t, i);
+                                }
                                 MakeListTextView(Title[i], i);
 
                             }
@@ -322,7 +373,47 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                             String contentId = itemObject.getString("contentid");
                             ContentID[0] = Integer.parseInt(contentId);
-//                            CourseImg[0] = itemObject.getString("firstimage");
+
+                            time_and_distance = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailIntro?" +
+                                    "ServiceKey=" + API_KEY + "&contentId=" + ContentID[0] + "&contentTypeId=25" +
+                                    "&MobileOS=ETC&MobileApp=AppTest&_type=json";
+
+                            String resultText3 = "값이 없음";
+
+                            try {
+
+                                search_url = time_and_distance;
+                                resultText3 = new Task().execute().get(); // URL에 있는 내용을 받아옴
+
+                                JSONObject Object2 = new JSONObject(resultText3);
+
+                                String response2 = Object2.getString("response");
+                                JSONObject responseObject2 = new JSONObject(response2);
+
+                                String body2 = responseObject2.getString("body");
+                                JSONObject bodyObject2 = new JSONObject(body2);
+
+                                String items2 = bodyObject2.getString("items");
+                                JSONObject itemsObject2 = new JSONObject(items2);
+
+                                String item2 = itemsObject2.getString("item");
+                                JSONObject itemObject2 = new JSONObject(item2);
+
+                                String distance = itemObject2.getString("distance");
+
+                                String taketime = itemObject2.getString("taketime");
+
+                                d_and_t = "코스 총 거리 : " + distance + ", 소요 시간 : " + taketime;
+                            } catch (NullPointerException e) {
+                                e.printStackTrace();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
                             Title[0] = itemObject.getString("title");
 
                             ll_course_text_box[0] = new LinearLayout(CourseRecoActivity.this);
@@ -339,6 +430,7 @@ public class CourseRecoActivity extends AppCompatActivity {
                             fl_course_text[0].setBackground(getResources().getDrawable(R.drawable.rounded));
                             fl_course_text[0].setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
 
+                            MakeDANDT(d_and_t, 0);
                             MakeListTextView(Title[0], 0);
 
                         }
@@ -357,6 +449,7 @@ public class CourseRecoActivity extends AppCompatActivity {
                 if (ContentID != null) {
 
                     for (int k = 0; k < ContentID.length; k++) {
+
                         detail_Course = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailInfo?" +
                                 "ServiceKey=" + API_KEY + "&contentId=" + ContentID[k] + "&contentTypeId=25" +
                                 "&MobileOS=ETC&MobileApp=AppTest&_type=json";
@@ -399,7 +492,7 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                                 //subdetailimg[i] = CourseObject.getString("subdetailimg");
 
-                                MakeTextView(subname[i], i, k);
+                                MakeCourseDetail(subname[i], i, k);
 
                             }
 
@@ -600,7 +693,24 @@ public class CourseRecoActivity extends AppCompatActivity {
 
     }
 
-    public void MakeTextView(String t, int i, int k) {
+    public void MakeDANDT(String t, int i) {
+
+        TextView time_dist = new TextView(this);
+        time_dist.setId(i);
+        time_dist.setText(t);
+        time_dist.setTextSize(18);
+        time_dist.setPadding(16, 16, 16, 16);
+        time_dist.setGravity(Gravity.RIGHT);
+        time_dist.setCompoundDrawablePadding(2);
+
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
+        time_dist.setTypeface(typeface);
+
+        ll_course_text_box[i].addView(time_dist);
+
+    }
+
+    public void MakeCourseDetail(String t, int i, int k) {
 
         TextView course_txt = null;
 
@@ -664,6 +774,41 @@ public class CourseRecoActivity extends AppCompatActivity {
             URL url = null;
             try {
                 url = new URL(search_url);
+
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                if (conn.getResponseCode() == conn.HTTP_OK) {
+                    InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                    BufferedReader reader = new BufferedReader(tmp);
+                    StringBuffer buffer = new StringBuffer();
+                    while ((str = reader.readLine()) != null) {
+                        buffer.append(str);
+                    }
+                    receiveMsg = buffer.toString();
+
+                    reader.close();
+                } else {
+                    Log.i("통신 결과", conn.getResponseCode() + "에러");
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return receiveMsg;
+        }
+    }
+
+    public class TADTask extends AsyncTask<String, Void, String> {
+
+        private String str, receiveMsg;
+
+        @Override
+        protected String doInBackground(String... params) {
+            URL url = null;
+            try {
+                url = new URL(time_and_distance);
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
