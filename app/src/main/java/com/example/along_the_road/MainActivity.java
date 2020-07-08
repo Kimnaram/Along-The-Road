@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageButton course_btn = (ImageButton) findViewById(R.id.traffic_button); // 페이지 전환 버튼 (코스 추천) // 버튼 변경 필요
+        ImageButton course_btn = (ImageButton) findViewById(R.id.course_button); // 페이지 전환 버튼 (코스 추천) // 버튼 변경 필요
 
         course_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         alBuilder.setPositiveButton("예", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                finish(); // 현재 액티비티를 종료한다.
+                finishAffinity();
             }
         });
         // "아니오" 버튼을 누르면 실행되는 리스너

@@ -103,8 +103,8 @@ public class TrafficSearchActivity extends AppCompatActivity
     private String[][] TransitName;
     private String[][] getPolyline;
     private String getOverview = null;
-    String REQUEST_DEP = null;
-    String REQUEST_ARR = null;
+    private String REQUEST_DEP = null;
+    private String REQUEST_ARR = null;
 
     private int r_list_len = 0;
     private int[] list_len = null;
@@ -129,6 +129,11 @@ public class TrafficSearchActivity extends AppCompatActivity
         dep_loc = findViewById(R.id.depart_loc);
         arr_loc = findViewById(R.id.arrive_loc);
         send = findViewById(R.id.send);
+        rl_container = findViewById(R.id.rl_container);
+        fl_route = findViewById(R.id.fl_route);
+        rl_route_view = findViewById(R.id.rl_route_view);
+        rl_another_view = findViewById(R.id.rl_another_view);
+        ll_flow_container = findViewById(R.id.ll_flow_container);
 
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
@@ -139,7 +144,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                 dep_loc.setText(REQUEST_DEP);
                 arr_loc.setText(REQUEST_ARR);
-                send.performClick();
             }
         }
 
@@ -176,7 +180,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                 r_list_len = 0;
                 list_len = null; // 다시 값 초기화
 
-                rl_container.setVisibility(rl_container.VISIBLE);
+                rl_container.setVisibility(View.VISIBLE);
 
                 dep_loc = findViewById(R.id.depart_loc);
                 arr_loc = findViewById(R.id.arrive_loc);
@@ -231,13 +235,6 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             }
         });
-
-
-        rl_container = findViewById(R.id.rl_container);
-        fl_route = findViewById(R.id.fl_route);
-        rl_route_view = findViewById(R.id.rl_route_view);
-        rl_another_view = findViewById(R.id.rl_another_view);
-        ll_flow_container = findViewById(R.id.ll_flow_container);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);

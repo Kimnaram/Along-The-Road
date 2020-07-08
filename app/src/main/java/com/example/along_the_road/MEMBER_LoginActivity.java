@@ -3,6 +3,7 @@ package com.example.along_the_road;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +22,7 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
     private Button btn_login;
 
     private TextView tv_go_register;
+    private TextView tv_notification_wrong;
 
     private EditText ed_email_field;
     private EditText ed_pw_field;
@@ -36,6 +38,9 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
 
         //버튼 등록하기
         tv_go_register = findViewById(R.id.tv_go_register);
+
+        tv_notification_wrong = findViewById(R.id.tv_notification_wrong);
+
         btn_login = findViewById(R.id.btn_login);
         ed_email_field = findViewById(R.id.ed_email_field);
         ed_pw_field = findViewById(R.id.ed_pw_field);
@@ -45,7 +50,7 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                //intent함수를 통해 register액티비티 함수를 호출한다.
+
                 startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
 
             }
@@ -56,20 +61,31 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                String email = ed_email_field.getText().toString().trim();
-                String pwd = ed_pw_field.getText().toString().trim();
+                final ProgressDialog mDialog = new ProgressDialog(MEMBER_LoginActivity.this);
+                mDialog.setMessage("로그인 중입니다.");
+                mDialog.show();
+
+                final String email = ed_email_field.getText().toString();
+                final String pwd = ed_pw_field.getText().toString();
 
                 firebaseAuth.signInWithEmailAndPassword(email, pwd)
                         .addOnCompleteListener(MEMBER_LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                if(task.isSuccessful()){
+                                    mDialog.dismiss();
+
+                                    Intent intent = new Intent(MEMBER_LoginActivity.this, MainActivity.class);
                                     startActivity(intent);
 
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "로그인 오류", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                }else{
+                                    mDialog.dismiss();
+                                    tv_notification_wrong.setVisibility(View.VISIBLE);
+                                    Toast.makeText(getApplicationContext(), "로그인에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+
+
+                                    // 파이어베이스 연동이 안 되어서 임시 조치
+                                    Intent intent = new Intent(MEMBER_LoginActivity.this, MainActivity.class);
                                     startActivity(intent);
                                 }
                             }

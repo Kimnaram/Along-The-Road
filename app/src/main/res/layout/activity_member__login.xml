@@ -23,11 +23,23 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true">
 
+        <TextView
+            android:id="@+id/tv_notification_wrong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="아이디 또는 비밀번호가 잘못되었습니다."
+            android:fontFamily="@font/nanumsquarebold"
+            android:textColor="@color/basic_color_FFCD49"
+            android:textSize="15dp"
+            android:visibility="invisible"/>
+
         <EditText
             android:id="@+id/ed_email_field"
             android:layout_width="300dp"
             android:layout_height="40dp"
             android:layout_centerHorizontal="true"
+            android:layout_below="@+id/tv_notification_wrong"
             android:backgroundTint="@color/basic_color_FFFFFF"
             android:fontFamily="@font/nanumsquarebold"
             android:hint="Email"
@@ -71,7 +83,7 @@
         android:text="계정이 없으신가요?"
         android:fontFamily="@font/nanumsquarebold"
         android:layout_marginTop="15dp"
-        android:textColor="@color/basic_color_FFFFFF"
+        android:textColor="#E9F6FF"
         android:textSize="15dp" />
 
     <TextView
@@ -84,6 +96,6 @@
         android:text="SIGN UP"
         android:fontFamily="@font/nanumsquare"
         android:textSize="20dp"
-        android:textColor="@color/basic_color_FFE77C"/>
+        android:textColor="@color/basic_color_FFFFFF"/>
     
 </RelativeLayout>

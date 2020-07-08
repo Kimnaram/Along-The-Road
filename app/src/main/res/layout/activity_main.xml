@@ -64,7 +64,7 @@
 
         <!--교통편 확인 버튼 -> 코스 추천 버튼-->
         <ImageButton
-            android:id="@+id/traffic_button"
+            android:id="@+id/course_button"
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_marginLeft="45dp"
@@ -80,7 +80,7 @@
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_marginTop="390dp"
-            android:layout_toRightOf="@+id/traffic_button"
+            android:layout_toRightOf="@+id/course_button"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/check_budget" />
@@ -92,7 +92,7 @@
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_marginLeft="45dp"
-            android:layout_below="@+id/traffic_button"
+            android:layout_below="@+id/course_button"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/check_festival" />
