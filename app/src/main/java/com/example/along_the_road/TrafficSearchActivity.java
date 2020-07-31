@@ -85,7 +85,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     private Drawable img = null;
 
     /****************************** Directions API 관련 변수 *******************************/
-    private static final String API_KEY = "AIzaSyDDT9kjela1jKi11KUbnib1okqYBrlWM24";
+    private static final String API_KEY = "API KEY";
     private String str_url = null; // URL
     private String option = null;
     private String step = null;
