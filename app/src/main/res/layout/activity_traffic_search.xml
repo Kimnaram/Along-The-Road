@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_traffic"
     android:layout_width="match_parent"
@@ -24,7 +24,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -192,4 +193,19 @@
 
     </ScrollView>
 
-</LinearLayout>
+    <Button
+        android:id="@+id/btn_reservation"
+        android:layout_width="170dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="15dp"
+        android:background="@drawable/common_btn_style"
+        android:fontFamily="@font/nanumsquare"
+        android:text="기차 예약하기"
+        android:textColor="@color/basic_color_3A7AFF"
+        android:textSize="25sp"
+        android:visibility="gone"/>
+
+</RelativeLayout>

@@ -4,11 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.app.SearchManager;
+import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -18,7 +18,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.util.Log;
@@ -74,7 +73,8 @@ public class TrafficSearchActivity extends AppCompatActivity
     private EditText dep_loc = null;
     private EditText arr_loc = null;
 
-    private Button send = null;
+    private Button send;
+    private Button btn_reservation;
 
     private GoogleMap mMap; // 구글 지도
     private Marker start_m; // 시작 마커
@@ -85,7 +85,7 @@ public class TrafficSearchActivity extends AppCompatActivity
     private Drawable img = null;
 
     /****************************** Directions API 관련 변수 *******************************/
-    private static final String API_KEY = "AIzaSyABJVWBXaHJb5Gp69M0nKq3kDEwLDGpQkk";
+    private static final String API_KEY = "AIzaSyDDT9kjela1jKi11KUbnib1okqYBrlWM24";
     private String str_url = null; // URL
     private String option = null;
     private String step = null;
@@ -129,6 +129,7 @@ public class TrafficSearchActivity extends AppCompatActivity
         dep_loc = findViewById(R.id.depart_loc);
         arr_loc = findViewById(R.id.arrive_loc);
         send = findViewById(R.id.send);
+        btn_reservation = findViewById(R.id.btn_reservation);
         rl_container = findViewById(R.id.rl_container);
         fl_route = findViewById(R.id.fl_route);
         rl_route_view = findViewById(R.id.rl_route_view);
@@ -614,6 +615,27 @@ public class TrafficSearchActivity extends AppCompatActivity
     public void method_view(String a, String t, Drawable img, int j, int i) {
 
         TextView ith_route = null;
+        String t_str = a.split(" ")[0];
+        if(t_str.equals("KTX경부선") || t_str.equals("KTX호남선")
+            || t_str.equals("SRT경부선") || t_str.equals("SRT호남선")) {
+            btn_reservation.setVisibility(View.VISIBLE);
+            final String reservation_url = "http://www.letskorail.com/";
+            btn_reservation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent detail_to_url = new Intent(Intent.ACTION_WEB_SEARCH);
+                    detail_to_url.putExtra(SearchManager.QUERY, reservation_url);
+                    // 구글로 검색
+
+                    if (detail_to_url.resolveActivity(getPackageManager()) != null) {
+                        startActivity(detail_to_url);
+                    } else {
+                        String msg = "웹페이지로 이동할 수 없습니다.";
+                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
 
         if (j == 0) { // j가 0이라면 추천 경로이므로
 
@@ -683,15 +705,6 @@ public class TrafficSearchActivity extends AppCompatActivity
                 LatLng Start = new LatLng(dlatitude, dlngtitude);
 
                 start_m = mMap.addMarker(new MarkerOptions().position(Start).title("출발"));
-//                MarkerOptions start_markeroptions = new MarkerOptions();
-//                start_markeroptions.position(Start);
-//
-//                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_64);
-//                Bitmap b = bitmapdraw.getBitmap();
-//                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 150, 150, false);
-//                start_markeroptions.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-//                start_markeroptions.title("출발");
-//                mMap.addMarker(start_markeroptions);
 
                 for (int i = 0; i < list_len[j]; i++) {
 
@@ -780,20 +793,11 @@ public class TrafficSearchActivity extends AppCompatActivity
                 LatLng End = new LatLng(alatitude, alngtitude);
 
                 end_m = mMap.addMarker(new MarkerOptions().position(End).title("도착"));
-//                MarkerOptions end_markeroptions = new MarkerOptions();
-//                end_markeroptions.position(End);
-//
-//                BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_64);
-//                Bitmap b2 = bitmapdraw2.getBitmap();
-//                Bitmap smallMarker2 = Bitmap.createScaledBitmap(b2, 150, 150, false);
-//                end_markeroptions.icon(BitmapDescriptorFactory.fromBitmap(smallMarker2));
-//                end_markeroptions.title("도착");
-//                mMap.addMarker(end_markeroptions);
 
                 onMapReady(mMap);
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(End));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
             }
         });
