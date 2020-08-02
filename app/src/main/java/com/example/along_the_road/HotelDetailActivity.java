@@ -75,10 +75,16 @@ public class HotelDetailActivity extends AppCompatActivity {
     private String[] roomimg3;
     private String[] roomimg4;
     private String[] roomimg5;
+    private String[] roomintro;
     private String[] roomtype;
+    private String[] roombasecount;
+    private String[] roommaxcount;
 
     private boolean offseasonfeecheck;
     private boolean peakseasonfeecheck;
+    private boolean basecountcheck;
+    private boolean maxcountcheck;
+    private boolean introcheck;
     private boolean airconditioncheck;
     private boolean bathfacilitycheck;
     private boolean toiletriescheck;
@@ -220,13 +226,16 @@ public class HotelDetailActivity extends AppCompatActivity {
                     roomtable = new String[list_len];
                     roomcable = new String[list_len];
                     roomtype = new String[list_len];
+                    roomintro = new String[list_len];
                     roomimg1 = new String[list_len];
+                    roombasecount = new String[list_len];
+                    roommaxcount = new String[list_len];
 
                     if (ItemIsWhat.equals("[{")) {
 
                         for (int i = 0; i < list_len; i++) {
 
-                            if(fl_count > 0) {
+                            if (fl_count > 0) {
 //                                ll_room_option[i]
                             }
 
@@ -250,57 +259,76 @@ public class HotelDetailActivity extends AppCompatActivity {
                             roomtype[i] = HotelObject.getString("roomtitle");
 
                             offseasonfeecheck = HotelObject.isNull("roomoffseasonminfee1");
-                            if(offseasonfeecheck == false) {
+                            if (offseasonfeecheck == false) {
                                 roomoffseasonminfee1[i] = HotelObject.getInt("roomoffseasonminfee1");
                             }
+
                             peakseasonfeecheck = HotelObject.isNull("roompeakseasonminfee1");
-                            if(peakseasonfeecheck == false) {
+                            if (peakseasonfeecheck == false) {
                                 roompeakseasonminfee1[i] = HotelObject.getInt("roompeakseasonminfee1");
                             }
 
+                            basecountcheck = HotelObject.isNull("roombasecount");
+                            if (basecountcheck == false) {
+                                int basecount = HotelObject.getInt("roombasecount");
+                                roombasecount[i] = Integer.toString(basecount);
+
+                            }
+
+                            maxcountcheck = HotelObject.isNull("roommaxcount");
+                            if (maxcountcheck == false) {
+                                int maxcount = HotelObject.getInt("roommaxcount");
+                                roommaxcount[i] = Integer.toString(maxcount);
+                            }
+
+                            introcheck = HotelObject.isNull("roomintro");
+                            if(introcheck == false) {
+                                roomintro[i] = HotelObject.getString("roomintro");
+                            }
+
                             airconditioncheck = HotelObject.isNull("roomaircondition");
-                            if(airconditioncheck == false) {
+                            if (airconditioncheck == false) {
                                 roomaircondition[i] = HotelObject.getString("roomaircondition");
                             }
 
                             bathfacilitycheck = HotelObject.isNull("roombathfacility");
-                            if(bathfacilitycheck == false) {
+                            if (bathfacilitycheck == false) {
                                 roombathfacility[i] = HotelObject.getString("roombathfacility");
                             }
 
                             toiletriescheck = HotelObject.isNull("roomtoiletries");
-                            if(toiletriescheck == false) {
+                            if (toiletriescheck == false) {
                                 roomtoiletries[i] = HotelObject.getString("roomtoiletries");
                             }
 
                             tablecheck = HotelObject.isNull("roomtable");
-                            if(tablecheck == false) {
+                            if (tablecheck == false) {
                                 roomtable[i] = HotelObject.getString("roomtable");
                             }
 
                             cablecheck = HotelObject.isNull("roomcable");
-                            if(cablecheck == false) {
+                            if (cablecheck == false) {
                                 roomcable[i] = HotelObject.getString("roomcable");
                             }
 
                             refrigeratorcheck = HotelObject.isNull("roomrefrigerator");
-                            if(refrigeratorcheck == false) {
+                            if (refrigeratorcheck == false) {
                                 roomrefrigerator[i] = HotelObject.getString("roomrefrigerator");
                             }
 
                             internetcheck = HotelObject.isNull("roominternet");
-                            if(internetcheck == false) {
+                            if (internetcheck == false) {
                                 roominternet[i] = HotelObject.getString("roominternet");
                             }
 
-                            tvcheck = HotelObject.isNull("roomtv");
-                            if(tvcheck == false) {
-                                roomtv[i] = HotelObject.getString("roomtv");
+                            hairdryercheck = HotelObject.isNull("roomhairdryer");
+                            if (hairdryercheck == false) {
+                                roomhairdryer[i] = HotelObject.getString("roomhairdryer");
                             }
 
-                            hairdryercheck = HotelObject.isNull("roomhairdryer");
-                            if(hairdryercheck == false) {
-                                roomhairdryer[i] = HotelObject.getString("roomhairdryer");
+                            tvcheck = HotelObject.isNull("roomtv");
+                            if (tvcheck == false) {
+                                roomtv[i] = HotelObject.getString("roomtv");
                             }
 
                             MakeRoomType(roomtype[i], i);
@@ -359,72 +387,104 @@ public class HotelDetailActivity extends AppCompatActivity {
 
                             }
 
-                            if(offseasonfeecheck == false || peakseasonfeecheck == false) {
-                                String standard = "(1인 1객실 기준)";
-                                MakeTextView(standard, i, null, 14, 2, 20, 0);
-                            }
-                            if(offseasonfeecheck == false && roomoffseasonminfee1[i] != 0) {
-                                String minfee = Integer.toString(roomoffseasonminfee1[i]);
-                                String offminfee = "비성수기 최소 가격 : " + minfee + " \\";
-                                MakeTextView(offminfee, i, "BLUE", 19, 0, 20, 20);
+                            String count = null;
+
+                            if(basecountcheck == false || maxcountcheck == false) {
+                                if ((basecountcheck == false && Integer.parseInt(roombasecount[i]) != 0)
+                                        && (maxcountcheck == false && Integer.parseInt(roommaxcount[i]) != 0)) {
+                                    count = roombasecount[i] + "인 기준   |   최대 " + roommaxcount[i] + "인";
+                                } else if ((basecountcheck == false && Integer.parseInt(roombasecount[i]) != 0)
+                                        && (maxcountcheck == true || Integer.parseInt(roommaxcount[i]) == 0)) {
+                                    count = roombasecount[i] + "인 기준";
+                                } else if ((basecountcheck == true || Integer.parseInt(roombasecount[i]) == 0)
+                                        && (maxcountcheck == false && Integer.parseInt(roommaxcount[i]) != 0)) {
+                                    count = "최대 " + roommaxcount[i] + "인";
+                                }
+
+                                MakeTextView(count, i, "WHITE", 18, 1, 10, 10, "BLUE");
                             }
 
-                            if(peakseasonfeecheck == false && roompeakseasonminfee1[i] != 0) {
-                                String minfee = Integer.toString(roompeakseasonminfee1[i]);
-                                String peakminfee = "성수기 최소 가격 : " + minfee + " \\";
-                                MakeTextView(peakminfee, i, "BLUE", 19, 0, 20, 20);
+                            if (offseasonfeecheck == false || peakseasonfeecheck == false) {
+                                String standard = "(1인 1객실 기준 가격)";
+                                MakeTextView(standard, i, null, 14, 2, 20, 10, null);
                             }
+
+                            String minfee = null;
+
+                            if ((offseasonfeecheck == false && roomoffseasonminfee1[i] != 0)
+                                    && (peakseasonfeecheck == false && roompeakseasonminfee1[i] != 0)) {
+                                String offminfee = Integer.toString(roomoffseasonminfee1[i]);
+                                String peakminfee = Integer.toString(roompeakseasonminfee1[i]);
+                                minfee = "비성수기 최소 " + offminfee + "\\ / 성수기 최소 " + peakminfee + "\\";
+                            } else if ((offseasonfeecheck == false && roomoffseasonminfee1[i] != 0)
+                                    && (peakseasonfeecheck == true || roompeakseasonminfee1[i] == 0)) {
+                                String offminfee = Integer.toString(roomoffseasonminfee1[i]);
+                                minfee = "비성수기 최소 " + offminfee + "\\";
+                            } else if ((offseasonfeecheck == true || roomoffseasonminfee1[i] == 0)
+                                    && (peakseasonfeecheck == false && roompeakseasonminfee1[i] != 0)) {
+                                String peakminfee = Integer.toString(roompeakseasonminfee1[i]);
+                                minfee = "성수기 최소 " + peakminfee + "\\";
+                            } else if ((offseasonfeecheck == true || roomoffseasonminfee1[i] == 0)
+                                && (peakseasonfeecheck == true || roompeakseasonminfee1[i] == 0)) {
+                                minfee = "※ 가격 정보가 없습니다.";
+                            }
+
+                            MakeTextView(minfee, i, null, 19, 1, 5, 5, null);
 
                             String text = "객실 내 시설";
-                            MakeTextView(text, i, null, 18, 0, 20, 20);
+                            MakeTextView(text, i, "WHITE", 18, 1, 25, 10, "BLUE");
 
                             ll_room_option[i].addView(fl_option_list[i]);
 
                             Resources res = getResources();
-                            if(roomaircondition != null || roomaircondition.equals("Y")) {
+                            if (roomaircondition != null || roomaircondition.equals("Y")) {
                                 String ac = "에어컨";
                                 ac_img = ResourcesCompat.getDrawable(res, R.drawable.rm_air_conditioner2_100, null);
                                 MakeRoomOption(ac, i, ac_img);
                             }
-                            if(roomrefrigerator != null || roomrefrigerator.equals("Y")) {
+                            if (roomrefrigerator != null || roomrefrigerator.equals("Y")) {
                                 String rf = "냉장고";
                                 rf_img = ResourcesCompat.getDrawable(res, R.drawable.rm_fridge_100, null);
                                 MakeRoomOption(rf, i, rf_img);
                             }
-                            if(roominternet != null || roominternet.equals("Y")) {
+                            if (roominternet != null || roominternet.equals("Y")) {
                                 String in = "인터넷";
                                 in_img = ResourcesCompat.getDrawable(res, R.drawable.rm_wifi_100, null);
                                 MakeRoomOption(in, i, in_img);
                             }
-                            if(roomtv != null || roomtv.equals("Y")) {
-                                String tv = "TV";
-                                tv_img = ResourcesCompat.getDrawable(res, R.drawable.rm_tv_100, null);
-                                MakeRoomOption(tv, i, tv_img);
-                            }
-                            if(roomcable != null || roomcable.equals("Y")) {
-                                String cb = "케이블";
-                                cb_img = ResourcesCompat.getDrawable(res, R.drawable.rm_cable_100, null);
-                                MakeRoomOption(cb, i, cb_img);
-                            }
-                            if(roomtable != null || roomtable.equals("Y")) {
-                                String tb = "테이블";
-                                tb_img = ResourcesCompat.getDrawable(res, R.drawable.rm_table_100, null);
-                                MakeRoomOption(tb, i, tb_img);
-                            }
-                            if(roomhairdryer != null || roomhairdryer.equals("Y")) {
+                            if (roomhairdryer != null || roomhairdryer.equals("Y")) {
                                 String hd = "헤어 드라이어";
                                 hd_img = ResourcesCompat.getDrawable(res, R.drawable.rm_hair_dryer_100, null);
                                 MakeRoomOption(hd, i, hd_img);
                             }
-                            if(roombathfacility != null || roombathfacility.equals("Y")) {
+                            if (roomtv != null || roomtv.equals("Y")) {
+                                String tv = "TV";
+                                tv_img = ResourcesCompat.getDrawable(res, R.drawable.rm_tv_100, null);
+                                MakeRoomOption(tv, i, tv_img);
+                            }
+                            if (roomcable != null || roomcable.equals("Y")) {
+                                String cb = "케이블";
+                                cb_img = ResourcesCompat.getDrawable(res, R.drawable.rm_cable_100, null);
+                                MakeRoomOption(cb, i, cb_img);
+                            }
+                            if (roomtable != null || roomtable.equals("Y")) {
+                                String tb = "테이블";
+                                tb_img = ResourcesCompat.getDrawable(res, R.drawable.rm_table_100, null);
+                                MakeRoomOption(tb, i, tb_img);
+                            }
+                            if (roombathfacility != null || roombathfacility.equals("Y")) {
                                 String bt = "욕조";
                                 bt_img = ResourcesCompat.getDrawable(res, R.drawable.rm_bath_100, null);
                                 MakeRoomOption(bt, i, bt_img);
                             }
-                            if(roomtoiletries != null || roomtoiletries.equals("Y")) {
+                            if (roomtoiletries != null || roomtoiletries.equals("Y")) {
                                 String tl = "세면 용품";
                                 tl_img = ResourcesCompat.getDrawable(res, R.drawable.rm_toiletries_100, null);
                                 MakeRoomOption(tl, i, tl_img);
+                            }
+
+                            if(introcheck == false) {
+                                MakeTextView(roomintro[i], i, null, 14, 2, 30, 50, null);
                             }
 
                         }
@@ -470,7 +530,7 @@ public class HotelDetailActivity extends AppCompatActivity {
                 detail_to_url.putExtra(SearchManager.QUERY, Reservation_URL);
                 // 구글로 검색
 
-                if(detail_to_url.resolveActivity(getPackageManager()) != null) {
+                if (detail_to_url.resolveActivity(getPackageManager()) != null) {
                     startActivity(detail_to_url);
                 } else {
                     String msg = "웹페이지로 이동할 수 없습니다.";
@@ -486,7 +546,7 @@ public class HotelDetailActivity extends AppCompatActivity {
 
         tv_room_type.setText(t);
         tv_room_type.setTextSize(22);
-        tv_room_type.setPadding(0, 20, 0, 20);
+        tv_room_type.setPadding(0, 50, 0, 25);
         tv_room_type.setGravity(Gravity.CENTER);
         tv_room_type.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
 
@@ -497,12 +557,13 @@ public class HotelDetailActivity extends AppCompatActivity {
         ll_room_option[i].setBackgroundColor(getResources().getColor(R.color.basic_color_FFFFFF));
     }
 
-    public void MakeTextView(String t, int i, @Nullable String color, int Size, int gravity, int mt, int mb) {
+    public void MakeTextView(String t, int i, @Nullable String color, int Size, int gravity, int mt, int mb, @Nullable String backgoundColor) {
 
         TextView NotOption = new TextView(this);
 
         NotOption.setText(t);
         NotOption.setTextSize(Size);
+        NotOption.setPadding(10, 10, 10, 10);
         Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
         NotOption.setTypeface(typeface);
 
@@ -513,32 +574,46 @@ public class HotelDetailActivity extends AppCompatActivity {
 
         lp.topMargin = mt;
         lp.bottomMargin = mb;
-        if(gravity == 0) {
+        if (gravity == 0) {
             lp.gravity = Gravity.LEFT;
-        } else if(gravity == 1) {
+        } else if (gravity == 1) {
             lp.gravity = Gravity.CENTER;
-        } else if(gravity == 2) {
+        } else if (gravity == 2) {
             lp.gravity = Gravity.RIGHT;
         }
         NotOption.setLayoutParams(lp);
 
-        if(color != null) {
-            if(color.equals("BLUE"))
+        if (color != null) {
+            if (color.equals("BLUE"))
                 NotOption.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+            else if (color.equals("YELLOW"))
+                NotOption.setTextColor(getResources().getColor(R.color.basic_color_FFCD49));
+            else if (color.equals("WHITE"))
+                NotOption.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+        }
+
+        if (backgoundColor != null) {
+            if (backgoundColor.equals("BLUE"))
+                NotOption.setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
+            else if (color.equals("YELLOW"))
+                NotOption.setTextColor(getResources().getColor(R.color.basic_color_FFCD49));
+            else if (color.equals("WHITE"))
+                NotOption.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
         }
 
         ll_room_option[i].addView(NotOption);
     }
 
-    public void MakeRoomOption(String t, int i,  @Nullable Drawable img) {
+    public void MakeRoomOption(String t, int i, @Nullable Drawable img) {
 
         tv_room_option = new TextView(this);
 
         tv_room_option.setText(t);
         tv_room_option.setTextSize(14);
+        tv_room_option.setGravity(Gravity.CENTER);
         Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
         tv_room_option.setTypeface(typeface);
-        tv_room_option.setPadding(0, 10, 50, 50);
+        tv_room_option.setPadding(0, 10, 70, 50);
 
 //        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 //                LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -547,11 +622,12 @@ public class HotelDetailActivity extends AppCompatActivity {
 //
 //        tv_room_option.setLayoutParams(lp);
 
-        if(img != null) {
-            int h = 70;
-            int w = 70;
+        if (img != null) {
+            int h = 90;
+            int w = 90;
             img.setBounds(0, 0, h, w);
             tv_room_option.setCompoundDrawables(null, null, null, img);
+            tv_room_option.setCompoundDrawablePadding(20);
         }
 
         fl_option_list[i].addView(tv_room_option);
