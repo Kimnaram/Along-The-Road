@@ -106,9 +106,9 @@
         android:layout_height="250dp"
         android:layout_width="250dp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
         android:layout_marginRight="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
         android:visibility="gone">
 
         <fragment
@@ -181,7 +181,7 @@
                     android:padding="7dp"
                     android:text="가족과 함께! 가족 코스"
                     android:textColor="@color/basic_color_3A7AFF"
-                    android:textSize="22dp" />
+                    android:textSize="21dp" />
 
                 <RadioButton
                     android:id="@+id/Solo_Course"
@@ -194,7 +194,7 @@
                     android:padding="7dp"
                     android:text="혼자만의 여행, 나홀로 코스"
                     android:textColor="@color/basic_color_3A7AFF"
-                    android:textSize="22dp" />
+                    android:textSize="21dp" />
 
                 <RadioButton
                     android:id="@+id/Healing_Course"
@@ -207,7 +207,7 @@
                     android:padding="7dp"
                     android:text="일상을 벗어나, 힐링 코스"
                     android:textColor="@color/basic_color_3A7AFF"
-                    android:textSize="22dp" />
+                    android:textSize="21dp" />
 
                 <RadioButton
                     android:id="@+id/Walking_Course"
@@ -220,7 +220,7 @@
                     android:padding="7dp"
                     android:text="걸어서 즐기는 도보 코스"
                     android:textColor="@color/basic_color_3A7AFF"
-                    android:textSize="22dp" />
+                    android:textSize="21dp" />
 
                 <RadioButton
                     android:id="@+id/Camping_Course"
@@ -233,7 +233,7 @@
                     android:padding="7dp"
                     android:text="바베큐와 함께 캠핑 코스"
                     android:textColor="@color/basic_color_3A7AFF"
-                    android:textSize="22dp" />
+                    android:textSize="21dp" />
 
                 <RadioButton
                     android:id="@+id/Taste_Course"
@@ -246,11 +246,9 @@
                     android:padding="7dp"
                     android:text="먹는게 제일 좋아~ 맛집 코스"
                     android:textColor="@color/basic_color_3A7AFF"
-                    android:textSize="22dp" />
+                    android:textSize="21dp" />
 
             </RadioGroup>
-
-        </RelativeLayout>
 
             <Button
                 android:id="@+id/course_select"
@@ -258,13 +256,14 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="85dp"
                 android:layout_marginBottom="30dp"
                 android:background="@drawable/common_btn_style"
                 android:fontFamily="@font/nanumsquare"
                 android:text="검색하기"
                 android:textColor="@color/basic_color_3A7AFF"
                 android:textSize="20sp" />
+
+        </RelativeLayout>
 
     </RelativeLayout>
 

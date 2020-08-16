@@ -2,6 +2,7 @@ ext {
     var = 'x.x.x'
 }
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 29
@@ -23,7 +24,6 @@ android {
     }
 }
 
-apply plugin: 'com.google.gms.google-services'
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -45,8 +45,8 @@ dependencies {
     implementation project(path: ':AirCalendar')
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.google.firebase:firebase-database:19.3.1'
-    implementation 'com.google.firebase:firebase-auth:19.3.1'
-    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.google.firebase:firebase-auth:19.3.2'
+    implementation 'com.google.firebase:firebase-core:17.4.4'
     implementation 'com.google.firebase:firebase-firestore:21.2.1'
 
 }

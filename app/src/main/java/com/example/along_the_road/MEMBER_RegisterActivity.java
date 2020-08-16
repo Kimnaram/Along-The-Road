@@ -17,6 +17,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 public class MEMBER_RegisterActivity extends AppCompatActivity {
 
@@ -50,10 +54,9 @@ public class MEMBER_RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 //가입 정보 가져오기
-                final String email = ed_email_field.getText().toString().trim();
-                final String pwd = ed_pw_field.getText().toString().trim();
-                String pwdcheck = ed_pwcheck_field.getText().toString().trim();
-
+                String email = ed_email_field.getText().toString();
+                String pwd = ed_pw_field.getText().toString();
+                String pwdcheck = ed_pwcheck_field.getText().toString();
 
                 if (pwd.equals(pwdcheck)) {
 
@@ -68,18 +71,37 @@ public class MEMBER_RegisterActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        FirebaseUser user = firebaseAuth.getCurrentUser();
                                         mDialog.dismiss();
 
+                                        FirebaseUser user = firebaseAuth.getCurrentUser();
+                                        String email = user.getEmail();
+                                        String uid = user.getUid();
+                                        String name = ed_username_field.getText().toString();
+
+                                        //해쉬맵 테이블을 파이어베이스 데이터베이스에 저장
+                                        HashMap<Object, String> hashMap = new HashMap<>();
+                                        hashMap.put("email", email);
+                                        hashMap.put("uid", uid);
+                                        hashMap.put("name", name);
+
+                                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                        DatabaseReference reference = database.getReference("users");
+                                        reference.child(uid).setValue(hashMap);
+
+
+                                        //가입이 이루어졌을시 가입 화면을 빠져나감.
                                         Intent intent = new Intent(getApplicationContext(), MEMBER_LoginActivity.class);
+
                                         startActivity(intent);
+                                        finish();
+                                        Toast.makeText(MEMBER_RegisterActivity.this, "회원가입에 성공하셨습니다.", Toast.LENGTH_SHORT).show();
                                     } else {
                                         mDialog.dismiss();
-                                        Toast.makeText(getApplicationContext(), "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "이미 존재하는 계정입니다.", Toast.LENGTH_SHORT).show();
 
                                         // 파이어베이스 연동이 안 되어서 임시 조치
-                                        Intent intent = new Intent(getApplicationContext(), MEMBER_LoginActivity.class);
-                                        startActivity(intent);
+//                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                                        startActivity(intent);
                                     }
                                 }
                             });
@@ -91,23 +113,6 @@ public class MEMBER_RegisterActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        updateUI(currentUser);
-    }
-
-    private void updateUI(FirebaseUser user) {
-        if (user != null) {
-            Toast.makeText(this, "회원가입 되었습니다.", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(this, MEMBER_LoginActivity.class));
-        } else {
-            Toast.makeText(this, "회원가입에 실패했습니다.", Toast.LENGTH_LONG).show();
-        }
     }
 
 }

@@ -44,6 +44,7 @@
             android:fontFamily="@font/nanumsquarebold"
             android:hint="Email"
             android:textColor="@color/basic_color_FFFFFF"
+            android:inputType="textEmailAddress"
             android:textColorHint="@color/basic_color_FFFFFF" />
 
         <EditText
@@ -57,6 +58,7 @@
             android:textColor="@color/basic_color_FFFFFF"
             android:textColorHint="@color/basic_color_FFFFFF"
             android:layout_marginBottom="10dp"
+            android:inputType="textPassword"
             android:layout_below="@+id/ed_email_field" />
 
         <Button

@@ -33,7 +33,7 @@
                 android:backgroundTint="@color/basic_color_FFFFFF"
                 android:textColor="@color/basic_color_FFFFFF"
                 android:textColorHint="@color/basic_color_FFFFFF"
-                android:fontFamily="@font/nanumsquare"
+                android:fontFamily="@font/nanumsquarebold"
                 android:hint="User Name" />
 
             <EditText
@@ -45,7 +45,8 @@
                 android:backgroundTint="@color/basic_color_FFFFFF"
                 android:textColor="@color/basic_color_FFFFFF"
                 android:textColorHint="@color/basic_color_FFFFFF"
-                android:fontFamily="@font/nanumsquare"
+                android:fontFamily="@font/nanumsquarebold"
+                android:inputType="textEmailAddress"
                 android:hint="Email" />
 
             <EditText
@@ -57,7 +58,8 @@
                 android:backgroundTint="@color/basic_color_FFFFFF"
                 android:textColor="@color/basic_color_FFFFFF"
                 android:textColorHint="@color/basic_color_FFFFFF"
-                android:fontFamily="@font/nanumsquare"
+                android:fontFamily="@font/nanumsquarebold"
+                android:inputType="textPassword"
                 android:hint="Password" />
 
             <EditText
@@ -69,7 +71,8 @@
                 android:backgroundTint="@color/basic_color_FFFFFF"
                 android:textColor="@color/basic_color_FFFFFF"
                 android:textColorHint="@color/basic_color_FFFFFF"
-                android:fontFamily="@font/nanumsquare"
+                android:fontFamily="@font/nanumsquarebold"
+                android:inputType="textPassword"
                 android:hint="Password Check"
                 app:passwordToggleEnabled="true" />
 

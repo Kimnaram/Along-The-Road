@@ -49,7 +49,7 @@ public class ClearEditText extends AppCompatEditText
 
     private void init() {
 
-        Drawable tempDrawable = ContextCompat.getDrawable(getContext(), R.drawable.x_48);
+        Drawable tempDrawable = ContextCompat.getDrawable(getContext(), R.drawable.cm_x_48);
         clearDrawable = DrawableCompat.wrap(tempDrawable);
         clearDrawable.setBounds(0, 0, 70, 70);
 

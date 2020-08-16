@@ -17,13 +17,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/logo_text">
-            </ImageView>
+                android:src="@drawable/logo_text"></ImageView>
         </androidx.appcompat.widget.Toolbar>
 
         <!--메인 하단 배경 무늬 디자인-->
@@ -43,8 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="250dp"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="250dp"
             android:fontFamily="@font/nanumsquare"
             android:text="어디로 떠날까요?"
             android:textColor="#FFFFFF"
@@ -61,52 +61,56 @@
             android:scaleType="fitCenter"
             android:src="@drawable/local_go" />
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true">
 
-        <!--교통편 확인 버튼 -> 코스 추천 버튼-->
-        <ImageButton
-            android:id="@+id/course_button"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_marginLeft="45dp"
-            android:layout_marginTop="390dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check_course" />
-
-
-        <!--예산 관리 버튼-->
-        <ImageButton
-            android:id="@+id/budget_setting"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_marginTop="390dp"
-            android:layout_toRightOf="@+id/course_button"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check_budget" />
+            <!--교통편 확인 버튼 -> 코스 추천 버튼-->
+            <ImageButton
+                android:id="@+id/course_button"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="390dp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/check_course" />
 
 
-        <!--준비물 체크 버튼-->
-        <ImageButton
-            android:id="@+id/festival_button"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_marginLeft="45dp"
-            android:layout_below="@+id/course_button"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check_festival" />
+            <!--예산 관리 버튼-->
+            <ImageButton
+                android:id="@+id/budget_setting"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="390dp"
+                android:layout_toRightOf="@+id/course_button"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/check_budget" />
 
-        <!--후기 구경 버튼-->
-        <ImageButton
-            android:id="@+id/check_review"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_below="@+id/budget_setting"
-            android:layout_toRightOf="@+id/festival_button"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check_review" />
+
+            <!--준비물 체크 버튼-->
+            <ImageButton
+                android:id="@+id/festival_button"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_below="@+id/course_button"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/check_festival" />
+
+            <!--후기 구경 버튼-->
+            <ImageButton
+                android:id="@+id/check_review"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_below="@+id/budget_setting"
+                android:layout_toRightOf="@+id/festival_button"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/check_review" />
+
+        </RelativeLayout>
 
     </RelativeLayout>
 
