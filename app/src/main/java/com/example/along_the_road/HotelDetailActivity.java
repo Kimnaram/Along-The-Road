@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -19,6 +20,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
@@ -40,15 +47,29 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 public class HotelDetailActivity extends AppCompatActivity {
 
-    private final String API_KEY = "";
+    private final String API_KEY = "API KEY";
+
+    private static final int Seoul = 1;
+    private static final int Daegu = 4;
+    private static final int Busan = 6;
+    private static final int Gangwondo = 32;
+    private static final int Gyeongju = 35;
+    private static final int Jeonju = 37;
+    private static final int Yeosu = 38;
+    private static final int Jeju = 39;
+
     private String RoomDetail;
 
     private int ContentID;
     private String HotelName;
+    private int location;
+    private int locationDetail;
+    private String City;
     private String Start_Date;
     private String End_Date;
     private String URL;
@@ -110,6 +131,7 @@ public class HotelDetailActivity extends AppCompatActivity {
     private LinearLayout ll_room_list;
     private LinearLayout[] ll_room_option;
     private FlowLayout[] fl_option_list;
+    private FlowLayout[] fl_fee_view;
 
     private int fl_count = 0;
 
@@ -122,6 +144,10 @@ public class HotelDetailActivity extends AppCompatActivity {
     private ImageView RoomImage1;
 
     private Button btn_reservation;
+    private Button btn_plus_plan;
+
+    private FirebaseAuth firebaseAuth;
+    private FirebaseDatabase firebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +161,7 @@ public class HotelDetailActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
-        ll_room_list = findViewById(R.id.ll_room_list);
+        initAllComponent();
 
         Intent intent = getIntent();
 
@@ -147,21 +173,23 @@ public class HotelDetailActivity extends AppCompatActivity {
             System.out.println(strID);
             ContentID = Integer.parseInt(strID);
             HotelName = intent.getStringExtra("Name");
+            String s_location = intent.getStringExtra("Location");
+            String s_locationDetail = intent.getStringExtra("Location_Detail");
             Start_Date = intent.getStringExtra("Start_Date");
             End_Date = intent.getStringExtra("End_Date");
             URL = intent.getStringExtra("URL");
             CheckIn = intent.getStringExtra("CheckIn");
             CheckOut = intent.getStringExtra("CheckOut");
 
+            location = Integer.parseInt(s_location);
+            if(s_locationDetail != null) {
+                locationDetail = Integer.parseInt(s_locationDetail);
+            }
+
 //            Member = intent.getStringExtra("Member");
 
-            tv_hotel_name = findViewById(R.id.tv_hotel_name);
             tv_hotel_name.setText(HotelName);
-
-            tv_checkout_time = findViewById(R.id.tv_checkout_time);
             tv_checkout_time.setText(CheckOut);
-
-            tv_checkin_time = findViewById(R.id.tv_checkin_time);
             tv_checkin_time.setText(CheckIn);
 
             RoomDetail = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailInfo?ServiceKey=" + API_KEY +
@@ -211,6 +239,7 @@ public class HotelDetailActivity extends AppCompatActivity {
                     }
 
                     ll_room_option = new LinearLayout[list_len];
+                    fl_fee_view = new FlowLayout[list_len];
                     fl_option_list = new FlowLayout[list_len];
 
                     roomoffseasonminfee1 = new int[list_len];
@@ -247,11 +276,18 @@ public class HotelDetailActivity extends AppCompatActivity {
                             ll_room_option[i].setOrientation(LinearLayout.VERTICAL);
                             ll_room_list.addView(ll_room_option[i]);
 
-                            fl_option_list[i] = new FlowLayout(this);
-                            FlowLayout.LayoutParams fl_param = new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            fl_fee_view[i] = new FlowLayout(this);
+                            FlowLayout.LayoutParams fl_param1 = new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                     ViewGroup.LayoutParams.WRAP_CONTENT);
-                            fl_param.setGravity(Gravity.CENTER);
-                            fl_option_list[i].setLayoutParams(fl_param);
+                            fl_param1.setGravity(Gravity.CENTER);
+                            fl_fee_view[i].setLayoutParams(fl_param1);
+                            fl_fee_view[i].setOrientation(FlowLayout.HORIZONTAL);
+
+                            fl_option_list[i] = new FlowLayout(this);
+                            FlowLayout.LayoutParams fl_param2 = new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                            fl_param2.setGravity(Gravity.CENTER);
+                            fl_option_list[i].setLayoutParams(fl_param2);
                             fl_option_list[i].setOrientation(FlowLayout.HORIZONTAL);
 
                             JSONObject HotelObject = itemArray.getJSONObject(i);
@@ -401,12 +437,13 @@ public class HotelDetailActivity extends AppCompatActivity {
                                     count = "최대 " + roommaxcount[i] + "인";
                                 }
 
-                                MakeTextView(count, i, "WHITE", 18, 1, 10, 10, "BLUE");
+                                MakeTextView(count, i, 18, 1, 10, 10, 0, "WHITE", "BLUE");
                             }
+
 
                             if (offseasonfeecheck == false || peakseasonfeecheck == false) {
                                 String standard = "(1인 1객실 기준 가격)";
-                                MakeTextView(standard, i, null, 14, 2, 20, 10, null);
+                                MakeTextView(standard, i, 14, 2, 20, 10, 0, null, null);
                             }
 
                             String minfee = null;
@@ -415,24 +452,29 @@ public class HotelDetailActivity extends AppCompatActivity {
                                     && (peakseasonfeecheck == false && roompeakseasonminfee1[i] != 0)) {
                                 String offminfee = Integer.toString(roomoffseasonminfee1[i]);
                                 String peakminfee = Integer.toString(roompeakseasonminfee1[i]);
-                                minfee = "비성수기 최소 " + offminfee + "\\ / 성수기 최소 " + peakminfee + "\\";
+                                MakeTextView("비성수기 최소 ", i, 13, 0, 5, 0, 3, null, null);
+                                MakeTextView(offminfee + "\\ ~ ", i, 19, 0, 5, 0, 1, null, null);
+                                MakeTextView("성수기 최소 ", i, 13, 0, 5, 0, 3, null, null);
+                                MakeTextView(peakminfee + "\\", i, 19, 0, 5, 0, 1, null, null);
                             } else if ((offseasonfeecheck == false && roomoffseasonminfee1[i] != 0)
                                     && (peakseasonfeecheck == true || roompeakseasonminfee1[i] == 0)) {
                                 String offminfee = Integer.toString(roomoffseasonminfee1[i]);
-                                minfee = "비성수기 최소 " + offminfee + "\\";
+                                MakeTextView("비성수기 최소 ", i, 13, 0, 5, 0, 3, null, null);
+                                MakeTextView(offminfee + "\\", i, 19, 0, 5, 0, 1, null, null);
                             } else if ((offseasonfeecheck == true || roomoffseasonminfee1[i] == 0)
                                     && (peakseasonfeecheck == false && roompeakseasonminfee1[i] != 0)) {
                                 String peakminfee = Integer.toString(roompeakseasonminfee1[i]);
-                                minfee = "성수기 최소 " + peakminfee + "\\";
+                                MakeTextView("성수기 최소 ", i, 13, 0, 5, 0, 3, null, null);
+                                MakeTextView(peakminfee + "\\", i,  19, 0, 5, 0, 1, null, null);
                             } else if ((offseasonfeecheck == true || roomoffseasonminfee1[i] == 0)
                                 && (peakseasonfeecheck == true || roompeakseasonminfee1[i] == 0)) {
-                                minfee = "※ 가격 정보가 없습니다.";
+                                MakeTextView("※ 가격 정보가 없습니다.", i, 19, 0, 5, 5, 1, null, null);
                             }
 
-                            MakeTextView(minfee, i, null, 19, 1, 5, 5, null);
+                            ll_room_option[i].addView(fl_fee_view[i]);
 
                             String text = "객실 내 시설";
-                            MakeTextView(text, i, "WHITE", 18, 1, 25, 10, "BLUE");
+                            MakeTextView(text, i, 18, 1, 45, 15, 0, "WHITE", "BLUE");
 
                             ll_room_option[i].addView(fl_option_list[i]);
 
@@ -484,7 +526,7 @@ public class HotelDetailActivity extends AppCompatActivity {
                             }
 
                             if(introcheck == false) {
-                                MakeTextView(roomintro[i], i, null, 14, 2, 30, 50, null);
+                                MakeTextView(roomintro[i], i, 14, 2, 30, 50, 0, null, null);
                             }
 
                         }
@@ -502,13 +544,39 @@ public class HotelDetailActivity extends AppCompatActivity {
             }
         }
 
-        btn_reservation = findViewById(R.id.btn_reservation);
+        btn_plus_plan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    location(location, locationDetail);
+
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    String uid = user.getUid();
+
+                    HashMap<Object, String> hashMap = new HashMap<>();
+                    hashMap.put("city", City);
+                    hashMap.put("startDate", Start_Date);
+                    hashMap.put("endDate", End_Date);
+                    hashMap.put("hotelName", HotelName);
+
+                    firebaseDatabase = FirebaseDatabase.getInstance();
+                    DatabaseReference reference = firebaseDatabase.getReference("users");
+                    reference.child(uid).child("plan").setValue(hashMap);
+
+                    Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         btn_reservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String Reservation_URL = null;
                 if (URL != null) {
                     URL = URL.split("\"")[1];
+                    URL = URL.split("/")[0];
                     Reservation_URL = URL;
                     URL = null;
                 } else if (URL == null) {
@@ -516,12 +584,7 @@ public class HotelDetailActivity extends AppCompatActivity {
                     System.out.println(End_Date);
 //                    Reservation_URL = "https://www.hotelscombined.co.kr/hotels/" +
 //                            Start_Date + "/" + End_Date + "/1adults/1rooms?&placeName=hotel:" + HotelName.split("\\(")[0] + ", 대한민국";
-                    Reservation_URL = "https://www.agoda.com/ko-kr/search?asq=NQVGXW6jsE3tbdY9S%2BqUCm0fIC6ullFI1P8fQM5sxSLBXZwWj6Holnstfd7HRUeb92T76PjbadYnBzfdCsXMZOlsP%2" +
-                            "BnCWKwIe71Jv7u3e0MMriZKGNHSjteYroWkqcyRCeQfjsVtn6EgeauKhlth6cQ37cc3nlA%2BJXhCpn0ev1XBeXpNLyGArn6dMLK033Dp2yCLlkitcJbjMSEGlHpsuIpK0j93MeO9eTQGF7dDDKk6k9J" + "" +
-                            "qQ8%2FRWmcOQgB30Le1&selectedproperty=42779&hotel=42779&cid=1844104&tick=637294915929&languageId=9&userId=c332323e-0c3a-43fb-bb5d-9b9ee1a6c5f9&" +
-                            "sessionId=htvj0a3zeq2dh5xrk1tvc5tj&pageTypeId=1&origin=KR&locale=ko-KR&aid=130589&currencyCode=KRW&htmlLanguage=ko-kr&cultureInfoName=ko-KR&" +
-                            "checkIn=" + Start_Date + "&checkOut=" + End_Date + "&rooms=1&adults=1&children=0&priceCur=KRW&los=4&textToSearch=" + HotelName.split("\\(")[0] +
-                            "&productType=-1&travellerType=0&familyMode=off";
+                    Reservation_URL = HotelName + " 예약하기";
 
                 }
 
@@ -538,6 +601,54 @@ public class HotelDetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void initAllComponent() {
+
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        ll_room_list = findViewById(R.id.ll_room_list);
+
+        tv_hotel_name = findViewById(R.id.tv_hotel_name);
+        tv_checkout_time = findViewById(R.id.tv_checkout_time);
+        tv_checkin_time = findViewById(R.id.tv_checkin_time);
+
+        btn_reservation = findViewById(R.id.btn_reservation);
+        btn_plus_plan = findViewById(R.id.btn_plus_myplan);
+
+    }
+
+    public void location(int location, int locationDetail) {
+        switch (location) {
+            case Seoul:
+                City = "서울";
+                break;
+            case Daegu:
+                City = "대구";
+                break;
+            case Busan:
+                City = "부산";
+                break;
+            case Gangwondo:
+                if(locationDetail == 1) {
+                    City = "강릉";
+                } else if(locationDetail == 5) {
+                    City = "속초";
+                }
+                break;
+            case Gyeongju:
+                City = "경주";
+                break;
+            case Jeonju:
+                City = "전주";
+                break;
+            case Yeosu:
+                City = "여수";
+                break;
+            case Jeju:
+                City = "제주";
+                break;
+        }
     }
 
     public void MakeRoomType(String t, int i) {
@@ -557,23 +668,30 @@ public class HotelDetailActivity extends AppCompatActivity {
         ll_room_option[i].setBackgroundColor(getResources().getColor(R.color.basic_color_FFFFFF));
     }
 
-    public void MakeTextView(String t, int i, @Nullable String color, int Size, int gravity, int mt, int mb, @Nullable String backgoundColor) {
+    public void MakeTextView(String t, int i, int Size, int gravity,
+                             int margintop, int marginbottom, int textform,
+                             @Nullable String color, @Nullable String backgoundColor) {
 
         TextView NotOption = new TextView(this);
 
         NotOption.setText(t);
         NotOption.setTextSize(Size);
-        NotOption.setPadding(10, 10, 10, 10);
         Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
         NotOption.setTypeface(typeface);
 
+        if(textform == 0) {
+            NotOption.setPadding(15, 10, 15, 10);
+        } else if(textform == 3) {
+            NotOption.setPadding(10, 25, 10, 0);
+        }
+
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
         );
 
-        lp.topMargin = mt;
-        lp.bottomMargin = mb;
+        lp.topMargin = margintop;
+        lp.bottomMargin = marginbottom;
         if (gravity == 0) {
             lp.gravity = Gravity.LEFT;
         } else if (gravity == 1) {
@@ -601,7 +719,12 @@ public class HotelDetailActivity extends AppCompatActivity {
                 NotOption.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
         }
 
-        ll_room_option[i].addView(NotOption);
+        if(textform == 0) {
+            ll_room_option[i].addView(NotOption);
+        }
+        else if(textform == 1 || textform == 3) {
+            fl_fee_view[i].addView(NotOption);
+        }
     }
 
     public void MakeRoomOption(String t, int i, @Nullable Drawable img) {
@@ -641,14 +764,44 @@ public class HotelDetailActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(firebaseAuth.getCurrentUser() == null) {
+            getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
+        } else if(firebaseAuth.getCurrentUser() != null) {
+            getMenuInflater().inflate(R.menu.toolbar_al_menu, menu);
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home: { //툴바 뒤로가기 동작
                 finish();
                 return true;
             }
+            case R.id.menu_login:
+                startActivity(new Intent(getApplicationContext(), MEMBER_LoginActivity.class));
+                return true;
+            case R.id.menu_signup:
+                startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+                return true;
+            case R.id.menu_logout:
+                FirebaseAuth.getInstance().signOut();
+
+                final ProgressDialog mDialog = new ProgressDialog(HotelDetailActivity.this);
+                mDialog.setMessage("로그아웃 중입니다.");
+                mDialog.show();
+
+                finish();
+                mDialog.dismiss();
+
+                startActivity(new Intent(getApplicationContext(), HotelDetailActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     public class Task extends AsyncTask<String, Void, String> {

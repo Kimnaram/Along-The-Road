@@ -22,6 +22,7 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
     private Button btn_login;
 
     private TextView tv_go_register;
+    private TextView tv_go_nonmember;
     private TextView tv_notification_wrong;
 
     private EditText ed_email_field;
@@ -38,6 +39,7 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
 
         //버튼 등록하기
         tv_go_register = findViewById(R.id.tv_go_register);
+        tv_go_nonmember = findViewById(R.id.tv_go_nonmember);
 
         tv_notification_wrong = findViewById(R.id.tv_notification_wrong);
 
@@ -52,6 +54,15 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+
+            }
+        });
+
+        tv_go_nonmember.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
             }
         });

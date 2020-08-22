@@ -1,9 +1,11 @@
 package com.example.along_the_road;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -13,6 +15,7 @@ import android.widget.ToggleButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.yongbeom.aircalendar.AirCalendarDatePickerActivity;
 import com.yongbeom.aircalendar.core.AirCalendarIntent;
 
@@ -29,16 +32,7 @@ public class localselectActivity extends AppCompatActivity {
     public static final int COURSE_REQUEST_CODE = 1001;
     public static final int HOTEL_REQUEST_CODE = 1002;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: { //툴바 뒤로가기 동작
-                finish();
-                return true;
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -52,7 +46,9 @@ public class localselectActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
-        ImageButton local_btn = findViewById(R.id.local_conf_btn);
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        final ImageButton local_btn = findViewById(R.id.local_conf_btn);
 
         local_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -351,6 +347,47 @@ public class localselectActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(firebaseAuth.getCurrentUser() == null) {
+            getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
+        } else if(firebaseAuth.getCurrentUser() != null) {
+            getMenuInflater().inflate(R.menu.toolbar_al_menu, menu);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: { //툴바 뒤로가기 동작
+                finish();
+                return true;
+            }
+            case R.id.menu_login:
+                startActivity(new Intent(getApplicationContext(), MEMBER_LoginActivity.class));
+                return true;
+            case R.id.menu_signup:
+                startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+                return true;
+            case R.id.menu_logout:
+                FirebaseAuth.getInstance().signOut();
+
+                final ProgressDialog mDialog = new ProgressDialog(localselectActivity.this);
+                mDialog.setMessage("로그아웃 중입니다.");
+                mDialog.show();
+
+                finish();
+                mDialog.dismiss();
+
+                startActivity(new Intent(getApplicationContext(), localselectActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

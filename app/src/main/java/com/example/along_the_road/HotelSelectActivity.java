@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -20,11 +21,13 @@ import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -39,6 +42,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,13 +62,19 @@ import static com.example.along_the_road.localselectActivity.Detail_Code;
 
 public class HotelSelectActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private final String API_KEY = "";
+    private static final String TAG = "HotelSelectActivity";
 
+    private final String API_KEY = "API KEY";
+
+    // hotel theme code
     private final static String Hotel_t = "B02010100";
     private final static String Hotel_S = "B02010200";
     private final static String Hotel_tr = "B02010300";
     private final static String Hotel_f = "B02010400";
 
+    private String Hotel_theme = null;
+
+    // location code
     private static final int Seoul = 1;
     private static final int Daegu = 4;
     private static final int Busan = 6;
@@ -76,11 +86,10 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     public static final int AreaCodeIsNull = 1002;
 
-    private String Hotel_theme = null;
-
     private int areaCode = Code;
     private int detailCode = Detail_Code;
 
+    // hotel parsing url
     private String area_Hotel = null;
     private String detail_Hotel = null;
     private String search_url = null;
@@ -89,6 +98,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     private int ll_hl_count = 0;
 
+    // save hotel information
     private int[] ContentID;
     private String[] HotelName;
     private String[] HotelImage;
@@ -102,9 +112,11 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     private int[] state;
 
+    // get intent information
     private String Start_Date;
     private String End_Date;
 
+    // layout component
     private RelativeLayout rl_info_popup;
     private RelativeLayout rl_popup_info_ok;
     private RelativeLayout rl_map_container;
@@ -113,20 +125,22 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     private LinearLayout[] ll_hotel_text_box;
     private FlowLayout[] fl_hotel_text;
 
+    // other component
     private TextView tv_popup_msg;
     private TextView ith_hotel;
-
-    private ImageView hotelimg;
-
     private Drawable ea_img;
-
+    private ImageView hotelimg;
     private Spinner spinner;
-
     private String[] spinnerArr;
     private String selected_spinner = null;
-
     private Bitmap bitmap;
+    private Button btn_map_remove;
+
+    // handler
     Handler handler = new Handler();
+
+    // firebase
+    private FirebaseAuth firebaseAuth;
 
     /************* Google Map API 관련 변수 *************/
     private GoogleMap mMap;
@@ -137,6 +151,8 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hotel_select);
+
+        initAllComponent();
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -150,7 +166,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 .findFragmentById(R.id.fr_hotel_map);
         mapFragment.getMapAsync(this);
 
-        rl_map_container = findViewById(R.id.rl_map_container);
 
         //상단 툴바 설정
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -159,13 +174,24 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
-        rl_info_popup = findViewById(R.id.rl_info_popup);
-        rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
-        ll_hotel_list = findViewById(R.id.ll_hotel_list);
-
         initView();
 
         HotelListPrint(); // 호텔 리스트 출력
+
+    }
+
+    public void initAllComponent() {
+
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        rl_info_popup = findViewById(R.id.rl_info_popup);
+        rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
+        ll_hotel_list = findViewById(R.id.ll_hotel_list);
+        rl_map_container = findViewById(R.id.rl_map_container);
+
+        btn_map_remove = findViewById(R.id.btn_map_remove);
+
+        spinner = findViewById(R.id.sp_reselect);
 
     }
 
@@ -178,7 +204,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     }
 
     private void initView() {
-        spinner = findViewById(R.id.sp_reselect);
         spinnerArr = getResources().getStringArray(R.array.reselect_local_from_hotel);
         selected_spinner = spinnerArr[0];
         final ArrayAdapter<CharSequence> spinnerLargerAdapter =
@@ -441,6 +466,14 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                 if (state[no] == 0) {
                                     fl_hotel_text[no].setVisibility(View.VISIBLE);
                                     rl_map_container.setVisibility(View.VISIBLE);
+
+                                    btn_map_remove.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            rl_map_container.setVisibility(View.GONE);
+                                        }
+                                    });
+
                                     state[no] = 1;
 
                                     markerOptions = new MarkerOptions();
@@ -554,6 +587,14 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                 fl_hotel_text[no].setVisibility(View.VISIBLE);
 
                                 rl_map_container.setVisibility(View.VISIBLE);
+
+                                btn_map_remove.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        rl_map_container.setVisibility(View.GONE);
+                                    }
+                                });
+
                                 state[no] = 1;
 
                             } else if (state[no] == 1) {
@@ -683,7 +724,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
         final Resources res = getResources();
 
-        ea_img = ResourcesCompat.getDrawable(res, R.drawable.expand_arrow_48, null);
+        ea_img = ResourcesCompat.getDrawable(res, R.drawable.cm_expand_arrow_48, null);
         ea_img.setBounds(0, 0, 40, 40);
         ith_hotel.setCompoundDrawables(null, null, ea_img, null);
         ith_hotel.setCompoundDrawablePadding(20);
@@ -729,7 +770,15 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 System.out.println(ContentId);
                 Intent hotel_to_detail = new Intent(getApplicationContext(), HotelDetailActivity.class);
                 hotel_to_detail.putExtra("ID", ContentId);
+
+                String cityCode = Integer.toString(areaCode);
+                String cityDetailCode = Integer.toString(detailCode);
+
+                Log.d("HotelSelectActivity", "Area : " + cityCode + ", AreaDetail : " + cityDetailCode);
+
                 hotel_to_detail.putExtra("Name", HotelName[no]);
+                hotel_to_detail.putExtra("Location", cityCode);
+                hotel_to_detail.putExtra("Location_Datail", cityDetailCode);
                 hotel_to_detail.putExtra("Start_Date", Start_Date);
                 hotel_to_detail.putExtra("End_Date", End_Date);
                 hotel_to_detail.putExtra("URL", reservationurl[no]);
@@ -749,14 +798,44 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(firebaseAuth.getCurrentUser() == null) {
+            getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
+        } else if(firebaseAuth.getCurrentUser() != null) {
+            getMenuInflater().inflate(R.menu.toolbar_al_menu, menu);
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home: { //툴바 뒤로가기 동작
                 finish();
                 return true;
             }
+            case R.id.menu_login:
+                startActivity(new Intent(getApplicationContext(), MEMBER_LoginActivity.class));
+                return true;
+            case R.id.menu_signup:
+                startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+                return true;
+            case R.id.menu_logout:
+                FirebaseAuth.getInstance().signOut();
+
+                final ProgressDialog mDialog = new ProgressDialog(HotelSelectActivity.this);
+                mDialog.setMessage("로그아웃 중입니다.");
+                mDialog.show();
+
+                finish();
+                mDialog.dismiss();
+
+                startActivity(new Intent(getApplicationContext(), HotelSelectActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     public class Task extends AsyncTask<String, Void, String> {
