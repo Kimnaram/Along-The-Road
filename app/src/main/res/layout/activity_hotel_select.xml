@@ -22,67 +22,66 @@
             android:textSize="25dp"></TextView>
     </androidx.appcompat.widget.Toolbar>
 
-    <ScrollView
+    <RelativeLayout
+        android:id="@+id/rl_hotellist_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/toolbar" >
 
-        <RelativeLayout
+        <com.example.along_the_road.ClearEditText
+            android:id="@+id/et_search_text"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/less_rounded"
+            android:backgroundTint="@color/basic_color_FFFFFF"
+            android:fontFamily="@font/nanumsquarebold"
+            android:gravity="center_vertical"
+            android:hint="검색어를 입력하세요."
+            android:paddingLeft="10dp"
+            android:textColor="@color/basic_color_3A7AFF"
+            android:textColorHint="@color/basic_color_3A7AFF"
+            android:textSize="18dp" />
+
+        <Spinner
+            android:id="@+id/sp_reselect"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:background="@null"
+            android:entries="@array/reselect_local_from_hotel"
+            android:gravity="center"
+            android:spinnerMode="dropdown" />
+
+        <TextView
+            android:id="@+id/tv_info_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nanumsquarebold"
+            android:text="짧게 누르면 객실 리스트로 넘어갑니다.\n길게 누르면 호텔 위치를 볼 수 있습니다."
+            android:textSize="15dp"
+            android:layout_alignParentRight="true"
+            android:gravity="right"
+            android:layout_below="@+id/sp_reselect"
+            android:padding="5dp"
+            android:layout_margin="5dp" />
+
+        <ListView
+            android:id="@+id/lv_hotel_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="20dp">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_info_text"
+            android:layout_margin="10dp" />
 
-            <com.example.along_the_road.ClearEditText
-                android:id="@+id/et_search_text"
-                android:layout_width="250dp"
-                android:layout_height="40dp"
-                android:layout_marginLeft="10dp"
-                android:paddingLeft="10dp"
-                android:gravity="center_vertical"
-                android:textColor="@color/basic_color_3A7AFF"
-                android:fontFamily="@font/nanumsquarebold"
-                android:backgroundTint="@color/basic_color_FFFFFF"
-                android:background="@drawable/less_rounded"
-                android:hint="검색어를 입력하세요."
-                android:textColorHint="@color/basic_color_3A7AFF"
-                android:textSize="18dp" />
+    </RelativeLayout>
 
-            <Spinner
-                android:id="@+id/sp_reselect"
-                android:layout_width="120dp"
-                android:layout_height="40dp"
-                android:layout_alignParentRight="true"
-                android:entries="@array/reselect_local_from_hotel"
-                android:gravity="center"
-                android:layout_marginRight="10dp"
-                android:background="@null"
-                android:spinnerMode="dropdown" />
-
-            <ListView
-                android:id="@+id/lv_hotel_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/sp_reselect"
-                android:layout_margin="10dp" />
-
-            <LinearLayout
-                android:id="@+id/ll_hotel_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/sp_reselect"
-                android:layout_margin="10dp"
-                android:orientation="vertical">
-
-            </LinearLayout>
-
-        </RelativeLayout>
-
-    </ScrollView>
 
     <RelativeLayout
         android:id="@+id/rl_map_container"
-        android:layout_height="280dp"
         android:layout_width="250dp"
+        android:layout_height="280dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="20dp"
@@ -93,11 +92,11 @@
             android:id="@+id/btn_map_remove"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="@drawable/cm_x_48"
-            android:backgroundTint="@null"
             android:layout_above="@+id/fr_hotel_map"
             android:layout_alignParentRight="true"
-            android:gravity="center"/>
+            android:background="@drawable/cm_x_48"
+            android:backgroundTint="@null"
+            android:gravity="center" />
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -106,8 +105,8 @@
             android:layout_width="250dp"
             android:layout_height="250dp"
             android:layout_alignParentBottom="true"
-            tools:context="com.example.along_the_road.HotelSelectActivity"
-            map:liteMode="true" />
+            map:liteMode="true"
+            tools:context="com.example.along_the_road.HotelSelectActivity" />
 
     </RelativeLayout>
 

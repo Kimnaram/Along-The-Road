@@ -7,6 +7,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,9 +19,12 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,11 +34,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import org.apmem.tools.layouts.FlowLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.along_the_road.adapters.ListViewAdapter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -57,6 +64,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
+import static android.view.View.GONE;
 import static com.example.along_the_road.localselectActivity.Code;
 import static com.example.along_the_road.localselectActivity.Detail_Code;
 
@@ -89,11 +97,12 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     private int areaCode = Code;
     private int detailCode = Detail_Code;
 
-    // hotel parsing url
+    // parsing url
     private String area_Hotel = null;
     private String detail_Hotel = null;
     private String search_url = null;
 
+    // list_length
     private int list_len = 0;
 
     private int ll_hl_count = 0;
@@ -112,34 +121,39 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     private int[] state;
 
-    // get intent information
-    private String Start_Date;
-    private String End_Date;
+    // intent information
+    private String startDate;
+    private String endDate;
 
-    // layout component
+    // layout
     private RelativeLayout rl_info_popup;
     private RelativeLayout rl_popup_info_ok;
     private RelativeLayout rl_map_container;
     private LinearLayout ll_hotel_list;
-    private LinearLayout[] ll_hotel_list_view;
-    private LinearLayout[] ll_hotel_text_box;
-    private FlowLayout[] fl_hotel_text;
+    private FlowLayout fl_hotel_text;
 
-    // other component
+    // listview
+    private ListViewAdapter adapter;
+    private ListView lv_hotel_list;
+    private ListHotel listHotel;
+
+    // component
+    private ClearEditText et_search_text;
     private TextView tv_popup_msg;
     private TextView ith_hotel;
-    private Drawable ea_img;
+    private Button btn_map_remove;
     private ImageView hotelimg;
+    private Drawable ea_img;
+    private Drawable hotelImg;
     private Spinner spinner;
+
+
     private String[] spinnerArr;
     private String selected_spinner = null;
-    private Bitmap bitmap;
-    private Button btn_map_remove;
 
-    // handler
+    private Bitmap bitmap;
     Handler handler = new Handler();
 
-    // firebase
     private FirebaseAuth firebaseAuth;
 
     /************* Google Map API 관련 변수 *************/
@@ -158,14 +172,13 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
         if (intent == null) {
             // 오류 메시지 팝업
         } else if (intent != null) {
-            Start_Date = intent.getStringExtra("Start_Date");
-            End_Date = intent.getStringExtra("End_Date");
+            startDate = intent.getStringExtra("startDate");
+            endDate = intent.getStringExtra("endDate");
         }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fr_hotel_map);
         mapFragment.getMapAsync(this);
-
 
         //상단 툴바 설정
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -176,7 +189,98 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
         initView();
 
-        HotelListPrint(); // 호텔 리스트 출력
+        listviewSetting();
+
+        et_search_text.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if(keyCode == event.KEYCODE_ENTER) {
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        et_search_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                rl_map_container.setVisibility(GONE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String search = et_search_text.getText().toString();
+                adapter.fillter(search);
+            }
+        });
+
+        btn_map_remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                rl_map_container.setVisibility(GONE);
+
+            }
+        });
+
+        lv_hotel_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent intent = new Intent(getApplicationContext(), HotelDetailActivity.class);
+
+                int listNumber = adapter.getItem(position).getListNumber();
+                int number = adapter.getItem(position).getContentID();
+
+                intent.putExtra("contentID", Integer.toString(number));
+                intent.putExtra("hotelName", adapter.getItem(position).getHotelname());
+                intent.putExtra("location", Integer.toString(areaCode));
+                intent.putExtra("locationDetail", Integer.toString(detailCode));
+                intent.putExtra("startDate", startDate);
+                intent.putExtra("endDate", endDate);
+                intent.putExtra("URL", reservationurl[listNumber]);
+                intent.putExtra("checkIn", adapter.getItem(position).getCheckIn());
+                intent.putExtra("checkOut", adapter.getItem(position).getCheckOut());
+
+                adapter.notifyDataSetChanged();
+
+                startActivity(intent);
+
+            }
+        });
+
+        lv_hotel_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                int listNumber = adapter.getItem(position).getListNumber();
+
+                rl_map_container.setVisibility(View.VISIBLE);
+
+                markerOptions = new MarkerOptions();
+                markerOptions.position(HotelLocation[listNumber]);
+
+                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_64);
+                Bitmap b = bitmapdraw.getBitmap();
+                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 120, 120, false);
+                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+                markerOptions.title(HotelName[listNumber]);
+
+                mMap.addMarker(markerOptions);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(HotelLocation[listNumber]));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+
+                onMapReady(mMap);
+
+                return true;
+            }
+        });
+
 
     }
 
@@ -184,10 +288,16 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        adapter = new ListViewAdapter();
+
         rl_info_popup = findViewById(R.id.rl_info_popup);
         rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
-        ll_hotel_list = findViewById(R.id.ll_hotel_list);
+//        ll_hotel_list = findViewById(R.id.ll_hotel_list);
         rl_map_container = findViewById(R.id.rl_map_container);
+        fl_hotel_text = findViewById(R.id.fl_hotel_text);
+        lv_hotel_list = findViewById(R.id.lv_hotel_list);
+
+        et_search_text = findViewById(R.id.et_search_text);
 
         btn_map_remove = findViewById(R.id.btn_map_remove);
 
@@ -195,88 +305,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     }
 
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-        mMap = googleMap;
-
-    }
-
-    private void initView() {
-        spinnerArr = getResources().getStringArray(R.array.reselect_local_from_hotel);
-        selected_spinner = spinnerArr[0];
-        final ArrayAdapter<CharSequence> spinnerLargerAdapter =
-                ArrayAdapter.createFromResource(this, R.array.reselect_local_from_hotel, R.layout.spinner_item);
-        spinner.setAdapter(spinnerLargerAdapter);
-        spinner.setSelection(0);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                        break;
-                    case 1:
-                        break;
-                    case 2:
-                        areaCode = Seoul;
-                        HotelListPrint();
-                        break;
-                    case 3:
-                        areaCode = Gangwondo;
-                        detailCode = 5;
-                        HotelListPrint();
-                        break;
-                    case 4:
-                        areaCode = Gangwondo;
-                        detailCode = 1;
-                        HotelListPrint();
-                        break;
-                    case 5:
-                        areaCode = Daegu;
-                        HotelListPrint();
-                        break;
-                    case 6:
-                        areaCode = Gyeongju;
-                        detailCode = 2;
-                        HotelListPrint();
-                        break;
-                    case 7:
-                        areaCode = Busan;
-                        HotelListPrint();
-                        break;
-                    case 8:
-                        areaCode = Jeonju;
-                        detailCode = 12;
-                        HotelListPrint();
-                        break;
-                    case 9:
-                        areaCode = Yeosu;
-                        detailCode = 13;
-                        HotelListPrint();
-                        break;
-                    case 10:
-                        areaCode = Jeju;
-                        HotelListPrint();
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
-
-    public void HotelListPrint() {
-
-        if(ll_hl_count > 0) {
-            ll_hotel_list.removeAllViews();
-        }
+    private void listviewSetting() {
 
         String resultText = "값이 없음";
 
@@ -301,7 +330,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
         try {
 
             search_url = area_Hotel;
-            System.out.println(area_Hotel);
             resultText = new Task().execute().get();
 
             search_url = null;
@@ -324,7 +352,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        rl_info_popup.setVisibility(View.GONE);
+                        rl_info_popup.setVisibility(GONE);
                     }
                 });
 
@@ -355,9 +383,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 HotelName = new String[list_len];
                 HotelImage = new String[list_len];
                 HotelLocation = new LatLng[list_len];
-                ll_hotel_list_view = new LinearLayout[list_len];
-                ll_hotel_text_box = new LinearLayout[list_len];
-                fl_hotel_text = new FlowLayout[list_len];
                 state = new int[list_len];
 
                 checkintime = new String[list_len];
@@ -372,34 +397,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
                     for (int i = 0; i < list_len; i++) {
 
-                        ll_hotel_text_box[i] = new LinearLayout(HotelSelectActivity.this);
-                        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-                        param.bottomMargin = 10;
-                        param.topMargin = 10;
-                        ll_hotel_text_box[i].setLayoutParams(param);
-                        ll_hotel_text_box[i].setOrientation(LinearLayout.VERTICAL);
-                        ll_hotel_list.addView(ll_hotel_text_box[i]);
-
-                        ll_hotel_list_view[i] = new LinearLayout(HotelSelectActivity.this);
-                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-                        ll_hotel_list_view[i].setOrientation(LinearLayout.HORIZONTAL);
-                        ll_hotel_list_view[i].setBackgroundColor(getResources().getColor(R.color.basic_color_FFFFFF));
-                        ll_hotel_text_box[i].addView(ll_hotel_list_view[i]);
-
-                        fl_hotel_text[i] = new FlowLayout(HotelSelectActivity.this);
-                        fl_hotel_text[i].setLayoutParams(new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT));
-                        fl_hotel_text[i].setOrientation(FlowLayout.HORIZONTAL);
-                        fl_hotel_text[i].setPadding(10, 20, 10, 20);
-                        fl_hotel_text[i].setVisibility(View.GONE);
-                        fl_hotel_text[i].setBackground(getResources().getDrawable(R.drawable.rounded));
-                        fl_hotel_text[i].setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
-                        // 레이아웃 생성
-
-                        state[i] = 0;
-
                         JSONObject HotelObject = itemArray.getJSONObject(i);
 
                         String contentId = HotelObject.getString("contentid");
@@ -410,8 +407,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                         boolean imagecheck = HotelObject.isNull("firstimage");
                         if(imagecheck == false) {
                             HotelImage[i] = HotelObject.getString("firstimage");
-
-                            hotelimg = new ImageView(this);
 
                             final String img_url = HotelImage[i];
                             final int no = i;
@@ -441,17 +436,8 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                             try {
                                 thread.join();
 
-                                hotelimg.setImageBitmap(bitmap);
-                                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT
-                                );
-                                int size = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
-                                lp.width = size;
-                                lp.height = size;
-                                hotelimg.setLayoutParams(lp);
-                                hotelimg.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                                ll_hotel_list_view[no].addView(hotelimg);
+                                hotelImg = new BitmapDrawable(bitmap);
+
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -460,79 +446,95 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
                         final int no = i;
 
-                        ll_hotel_list_view[i].setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (state[no] == 0) {
-                                    fl_hotel_text[no].setVisibility(View.VISIBLE);
-                                    rl_map_container.setVisibility(View.VISIBLE);
-
-                                    btn_map_remove.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            rl_map_container.setVisibility(View.GONE);
-                                        }
-                                    });
-
-                                    state[no] = 1;
-
-                                    markerOptions = new MarkerOptions();
-                                    markerOptions.position(HotelLocation[no]);
-
-                                    BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_64);
-                                    Bitmap b = bitmapdraw.getBitmap();
-                                    Bitmap smallMarker = Bitmap.createScaledBitmap(b, 120, 120, false);
-                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-                                    markerOptions.title(HotelName[no]);
-
-                                    mMap.addMarker(markerOptions);
-                                    mMap.moveCamera(CameraUpdateFactory.newLatLng(HotelLocation[no]));
-                                    mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-
-                                    onMapReady(mMap);
-
-
-                                } else if (state[no] == 1) {
-                                    fl_hotel_text[no].setVisibility(View.GONE);
-                                    rl_map_container.setVisibility(View.GONE);
-
-                                    state[no] = 0;
-                                }
-                            }
-                        });
-
                         Double Hotelmapx = Double.parseDouble(HotelObject.getString("mapx"));
                         Double Hotelmapy = Double.parseDouble(HotelObject.getString("mapy"));
 
                         HotelLocation[i] = new LatLng(Hotelmapy, Hotelmapx);
 
-                        MakeListTextView(HotelName[i], HotelImage[i], i);
+                        detail_Hotel = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailIntro?" +
+                                "ServiceKey=" + API_KEY + "&contentId=" + ContentID[i] + "&contentTypeId=32" +
+                                "&MobileOS=ETC&MobileApp=AppTest&_type=json";
+
+                        System.out.println(detail_Hotel);
+
+                        String resultText2 = "값이 없음";
+
+                        try {
+
+                            search_url = detail_Hotel;
+                            resultText2 = new Task().execute().get(); // URL에 있는 내용을 받아옴
+
+                            search_url = null;
+
+                            JSONObject Object2 = new JSONObject(resultText2);
+
+                            String response2 = Object2.getString("response");
+                            JSONObject responseObject2 = new JSONObject(response2);
+
+                            boolean bodycheck = responseObject2.isNull("body");
+                            if(bodycheck == true) {
+                                String errmsg = "LIMITED NUMBER OF SERVICE REQUESTS EXCEEDS ERROR\n" +
+                                        "다음날 다시 시도해주세요.";
+                            }
+                            else if(bodycheck == false) {
+                                String body2 = responseObject2.getString("body");
+
+                                JSONObject bodyObject2 = new JSONObject(body2);
+
+                                String items2 = bodyObject2.getString("items");
+                                JSONObject itemsObject2 = new JSONObject(items2);
+
+                                String item2 = itemsObject2.getString("item");
+
+                                itemArray = new JSONArray(item);
+                                list_len = itemArray.length();
+
+                                JSONObject itemObject2 = new JSONObject(item2);
+
+                                checkintime[i] = itemObject2.getString("checkintime");
+                                checkouttime[i] = itemObject2.getString("checkouttime");
+                                parkinglodging[i] = itemObject2.getString("parkinglodging");
+                                roomtype[i] = itemObject2.getString("roomtype");
+                                foodplace[i] = itemObject2.getString("foodplace");
+                                boolean urlcheck = itemObject2.isNull("reservationurl");
+                                if (urlcheck == false) {
+                                    reservationurl[i] = itemObject2.getString("reservationurl");
+                                }
+                                subfacility[i] = itemObject2.getString("subfacility");
+
+                                if(hotelImg == null) {
+                                    listHotel = new ListHotel(ContentID[i], HotelName[i], checkintime[i], checkouttime[i], parkinglodging[i], i);
+                                } else {
+                                    listHotel = new ListHotel(ContentID[i], hotelImg, HotelName[i], checkintime[i], checkouttime[i], parkinglodging[i], i);
+                                }
+
+                                Log.d(TAG, "listHotel : " + listHotel.getHotelname());
+
+                                adapter.addItem(listHotel);
+
+                                hotelImg = null;
+
+                            }
+
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
                     }
 
                 } else if (ItemIsWhat.equals("{")) {
-
-                    ll_hotel_text_box[0] = new LinearLayout(HotelSelectActivity.this);
-                    ll_hotel_text_box[0].setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT));
-                    ll_hotel_text_box[0].setOrientation(LinearLayout.HORIZONTAL);
-                    ll_hotel_list.addView(ll_hotel_text_box[0]);
-
-                    fl_hotel_text[0] = new FlowLayout(HotelSelectActivity.this);
-                    fl_hotel_text[0].setLayoutParams(new FlowLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT));
-                    fl_hotel_text[0].setOrientation(FlowLayout.HORIZONTAL);
-                    fl_hotel_text[0].setVisibility(View.GONE);
-                    fl_hotel_text[0].setBackground(getResources().getDrawable(R.drawable.rounded));
-                    fl_hotel_text[0].setBackgroundColor(getResources().getColor(R.color.basic_color_3A7AFF));
 
                     String contentId = itemObject.getString("contentid");
                     ContentID[0] = Integer.parseInt(contentId);
                     boolean imagecheck = itemObject.isNull("firstimage");
                     if(imagecheck == false) {
                         HotelImage[0] = itemObject.getString("firstimage");
-
-                        hotelimg = new ImageView(this);
 
                         final String img_url = HotelImage[0];
 
@@ -561,17 +563,8 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                         try {
                             thread.join();
 
-                            hotelimg.setImageBitmap(bitmap);
-                            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT
-                            );
-                            int size = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
-                            lp.width = size;
-                            lp.height = size;
-                            hotelimg.setLayoutParams(lp);
-                            hotelimg.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                            ll_hotel_list_view[0].addView(hotelimg);
+                            hotelImg = new BitmapDrawable(bitmap);
+
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -580,42 +573,33 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
                     final int no = 0;
 
-                    ll_hotel_list_view[0].setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (state[no] == 0) {
-                                fl_hotel_text[no].setVisibility(View.VISIBLE);
-
-                                rl_map_container.setVisibility(View.VISIBLE);
-
-                                btn_map_remove.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        rl_map_container.setVisibility(View.GONE);
-                                    }
-                                });
-
-                                state[no] = 1;
-
-                            } else if (state[no] == 1) {
-                                fl_hotel_text[no].setVisibility(View.GONE);
-                                //mMap.clear();
-                                rl_map_container.setVisibility(View.GONE);
-
-                                state[no] = 0;
-                            }
-                        }
-                    });
-
                     HotelName[0] = itemObject.getString("title");
                     Double Hotelmapx = Double.parseDouble(itemObject.getString("mapx"));
                     Double Hotelmapy = Double.parseDouble(itemObject.getString("mapy"));
 
                     HotelLocation[0] = new LatLng(Hotelmapy, Hotelmapx);
 
-                    MakeListTextView(HotelName[0], HotelImage[0], 0);
+                    checkintime[0] = "14:00";
+                    checkouttime[0] = "11:00";
+                    parkinglodging[0] = "52대";
+
+                    if(hotelImg == null) {
+                        listHotel = new ListHotel(ContentID[0], HotelName[0], checkintime[0], checkouttime[0], parkinglodging[0], 0);
+                    } else {
+                        listHotel = new ListHotel(ContentID[0], hotelImg, HotelName[0], checkintime[0], checkouttime[0], parkinglodging[0], 0);
+                    }
+
+                    Log.d(TAG, "listHotel : " + listHotel.getHotelname());
+                    Log.d(TAG, "hotelImg : " + hotelImg.getAlpha());
+
+                    adapter.addItem(listHotel);
+
+                    hotelImg = null;
 
                 }
+
+                lv_hotel_list.setAdapter(adapter);
+
             }
 
         } catch (NullPointerException e) {
@@ -628,167 +612,93 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
             e.printStackTrace();
         }
 
-        if (ContentID != null) {
-            HotelDetailPrint();
-        }
+    }
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        mMap = googleMap;
 
     }
 
-    public void HotelDetailPrint() {
+    private void initView() {
 
-        for (int k = 0; k < ContentID.length; k++) {
-            detail_Hotel = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailIntro?" +
-                    "ServiceKey=" + API_KEY + "&contentId=" + ContentID[k] + "&contentTypeId=32" +
-                    "&MobileOS=ETC&MobileApp=AppTest&_type=json";
+        spinnerArr = getResources().getStringArray(R.array.reselect_local_from_hotel);
+        selected_spinner = spinnerArr[0];
+        final ArrayAdapter<CharSequence> spinnerLargerAdapter =
+                ArrayAdapter.createFromResource(this, R.array.reselect_local_from_hotel, R.layout.spinner_item);
+        spinner.setAdapter(spinnerLargerAdapter);
+        spinner.setSelection(0);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-            System.out.println(detail_Hotel);
-
-            String resultText2 = "값이 없음";
-
-            try {
-
-                search_url = detail_Hotel;
-                resultText2 = new Task().execute().get(); // URL에 있는 내용을 받아옴
-
-                search_url = null;
-
-                JSONObject Object = new JSONObject(resultText2);
-
-                String response = Object.getString("response");
-                JSONObject responseObject = new JSONObject(response);
-
-                boolean bodycheck = responseObject.isNull("body");
-                if(bodycheck == true) {
-                    String errmsg = "LIMITED NUMBER OF SERVICE REQUESTS EXCEEDS ERROR\n" +
-                            "다음날 다시 시도해주세요.";
-                    MakeTextView(errmsg, k, ContentID[k]);
-                }
-                else if(bodycheck == false) {
-                    String body = responseObject.getString("body");
-
-                    JSONObject bodyObject = new JSONObject(body);
-
-                    String items = bodyObject.getString("items");
-                    JSONObject itemsObject = new JSONObject(items);
-
-                    String item = itemsObject.getString("item");
-                    JSONObject itemObject = new JSONObject(item);
-
-                    checkintime[k] = itemObject.getString("checkintime");
-                    checkouttime[k] = itemObject.getString("checkouttime");
-                    parkinglodging[k] = itemObject.getString("parkinglodging");
-                    roomtype[k] = itemObject.getString("roomtype");
-                    foodplace[k] = itemObject.getString("foodplace");
-                    boolean urlcheck = itemObject.isNull("reservationurl");
-                    if (urlcheck == false) {
-                        reservationurl[k] = itemObject.getString("reservationurl");
-                    }
-                    subfacility[k] = itemObject.getString("subfacility");
-
-                    //subdetailimg[i] = CourseObject.getString("subdetailimg");
-
-                    String Text = "체크인 시간 " + checkintime[k] + ", 체크아웃 시간 " + checkouttime[k] +
-                            "\n주차 가능 여부 : " + parkinglodging[k] +
-                            "\n\n클릭하면 객실 리스트로 넘어갑니다.";
-//                        "\n음식점 : " + foodplace[k] +
-//                        "\n사용 가능 시설 : " + subfacility[k];
-                    // "\n룸 타입 : " + roomtype +
-                    // "\n예약 URL : " + reservationurl;
-
-                    MakeTextView(Text, k, ContentID[k]);
-                }
-
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void MakeListTextView(String t, @Nullable String iurl, int i) {
-
-        ith_hotel = new TextView(this);
-        ith_hotel.setText(t);
-        ith_hotel.setTextSize(18);
-        ith_hotel.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
-        ith_hotel.setPadding(25, 25, 25, 25);
-        ith_hotel.setCompoundDrawablePadding(2);
-
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
-        ith_hotel.setTypeface(typeface);
-
-        final Resources res = getResources();
-
-        ea_img = ResourcesCompat.getDrawable(res, R.drawable.cm_expand_arrow_48, null);
-        ea_img.setBounds(0, 0, 40, 40);
-        ith_hotel.setCompoundDrawables(null, null, ea_img, null);
-        ith_hotel.setCompoundDrawablePadding(20);
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-        );
-        ith_hotel.setLayoutParams(lp);
-        ith_hotel.setGravity(Gravity.CENTER_VERTICAL);
-
-        ll_hl_count += 1;
-        ll_hotel_list_view[i].addView(ith_hotel);
-        ll_hotel_text_box[i].addView(fl_hotel_text[i]);
-    }
-
-    public void MakeTextView(String t, int k, int id) {
-
-        int intid = id;
-
-        TextView hotel_txt = null;
-
-        hotel_txt = new TextView(this);
-        hotel_txt.setText(t);
-        hotel_txt.setTextSize(17);
-        hotel_txt.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
-        hotel_txt.setPadding(20, 20, 20, 20);
-        hotel_txt.setCompoundDrawablePadding(2);
-
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquareregular.ttf");
-        hotel_txt.setTypeface(typeface);
-
-        hotel_txt.setGravity(Gravity.CENTER_VERTICAL);
-
-        fl_hotel_text[k].addView(hotel_txt);
-
-        final int no = k;
-        final String ContentId = Integer.toString(intid);
-
-        hotel_txt.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                System.out.println(ContentId);
-                Intent hotel_to_detail = new Intent(getApplicationContext(), HotelDetailActivity.class);
-                hotel_to_detail.putExtra("ID", ContentId);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        areaCode = Seoul;
+                        adapter.clearAllItem();
+                        listviewSetting();
+                        break;
+                    case 3:
+                        areaCode = Gangwondo;
+                        detailCode = 5;
+                        adapter.clearAllItem();
+                        listviewSetting();
+                        break;
+                    case 4:
+                        areaCode = Gangwondo;
+                        detailCode = 1;
+                        adapter.clearAllItem();
+                        listviewSetting();
+                        break;
+                    case 5:
+                        areaCode = Daegu;
+                        adapter.clearAllItem();
+                        listviewSetting();
+                        break;
+                    case 6:
+                        areaCode = Gyeongju;
+                        detailCode = 2;
+                        adapter.clearAllItem();
+                        listviewSetting();
+                        break;
+                    case 7:
+                        areaCode = Busan;
+                        adapter.clearAllItem();
+                        listviewSetting();
+                        break;
+                    case 8:
+                        areaCode = Jeonju;
+                        detailCode = 12;
+                        adapter.clearAllItem();
+                        listviewSetting();
+                        break;
+                    case 9:
+                        areaCode = Yeosu;
+                        detailCode = 13;
+                        adapter.clearAllItem();
+                        listviewSetting();
+                        break;
+                    case 10:
+                        areaCode = Jeju;
+                        adapter.clearAllItem();
+                        listviewSetting();
+                        break;
+                    default:
+                        break;
+                }
+            }
 
-                String cityCode = Integer.toString(areaCode);
-                String cityDetailCode = Integer.toString(detailCode);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-                Log.d("HotelSelectActivity", "Area : " + cityCode + ", AreaDetail : " + cityDetailCode);
-
-                hotel_to_detail.putExtra("Name", HotelName[no]);
-                hotel_to_detail.putExtra("Location", cityCode);
-                hotel_to_detail.putExtra("Location_Datail", cityDetailCode);
-                hotel_to_detail.putExtra("Start_Date", Start_Date);
-                hotel_to_detail.putExtra("End_Date", End_Date);
-                hotel_to_detail.putExtra("URL", reservationurl[no]);
-                hotel_to_detail.putExtra("CheckIn", checkintime[no]);
-                hotel_to_detail.putExtra("CheckOut", checkouttime[no]);
-
-                startActivity(hotel_to_detail);
             }
         });
-
     }
 
     @Override
@@ -842,6 +752,18 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
         private String str, receiveMsg;
 
+//        private ProgressDialog mDialog = new ProgressDialog(HotelSelectActivity.this);
+//
+//        @Override
+//        protected void onPreExecute() {
+//
+//            mDialog.setMessage("로딩중입니다.");
+//
+//            mDialog.show();
+//            super.onPreExecute();
+//
+//        }
+
         @Override
         protected String doInBackground(String... params) {
             URL url = null;
@@ -871,6 +793,12 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
             return receiveMsg;
         }
+
+//        @Override
+//        protected void onPostExecute(String result) {
+//            mDialog.dismiss();
+//            super.onPostExecute(result);
+//        }
     }
 
 }

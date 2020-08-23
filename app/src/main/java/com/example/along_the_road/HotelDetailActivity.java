@@ -52,7 +52,9 @@ import java.util.concurrent.ExecutionException;
 
 public class HotelDetailActivity extends AppCompatActivity {
 
-    private final String API_KEY = "API KEY";
+    private static final String TAG = "HotelDetailActivity";
+
+    private static final String API_KEY = "API KEY";
 
     private static final int Seoul = 1;
     private static final int Daegu = 4;
@@ -169,17 +171,16 @@ public class HotelDetailActivity extends AppCompatActivity {
             // 오류 메시지 팝업
         } else if (intent != null) {
             String strID = "";
-            strID = intent.getStringExtra("ID");
-            System.out.println(strID);
+            strID = intent.getStringExtra("contentID");
             ContentID = Integer.parseInt(strID);
-            HotelName = intent.getStringExtra("Name");
-            String s_location = intent.getStringExtra("Location");
-            String s_locationDetail = intent.getStringExtra("Location_Detail");
-            Start_Date = intent.getStringExtra("Start_Date");
-            End_Date = intent.getStringExtra("End_Date");
+            HotelName = intent.getStringExtra("hotelName");
+            String s_location = intent.getStringExtra("location");
+            String s_locationDetail = intent.getStringExtra("locationDetail");
+            Start_Date = intent.getStringExtra("startDate");
+            End_Date = intent.getStringExtra("endDate");
             URL = intent.getStringExtra("URL");
-            CheckIn = intent.getStringExtra("CheckIn");
-            CheckOut = intent.getStringExtra("CheckOut");
+            CheckIn = intent.getStringExtra("checkIn");
+            CheckOut = intent.getStringExtra("checkOut");
 
             location = Integer.parseInt(s_location);
             if(s_locationDetail != null) {
@@ -195,8 +196,6 @@ public class HotelDetailActivity extends AppCompatActivity {
             RoomDetail = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailInfo?ServiceKey=" + API_KEY +
                     "&numOfRows=40&pageNo=1&areaCode=1&contentTypeId=32&contentId=" + ContentID +
                     "&MobileOS=ETC&MobileApp=AppTest&_type=json";
-
-            System.out.println(RoomDetail);
 
             String ResultText = "값이 없음";
 
@@ -576,19 +575,16 @@ public class HotelDetailActivity extends AppCompatActivity {
                 String Reservation_URL = null;
                 if (URL != null) {
                     URL = URL.split("\"")[1];
-                    URL = URL.split("/")[0];
                     Reservation_URL = URL;
                     URL = null;
                 } else if (URL == null) {
-                    System.out.println(Start_Date);
-                    System.out.println(End_Date);
 //                    Reservation_URL = "https://www.hotelscombined.co.kr/hotels/" +
 //                            Start_Date + "/" + End_Date + "/1adults/1rooms?&placeName=hotel:" + HotelName.split("\\(")[0] + ", 대한민국";
-                    Reservation_URL = HotelName + " 예약하기";
+                    Reservation_URL = "https://www.google.co.kr/search?q=" + HotelName + " 예약하기";
 
                 }
 
-                System.out.println(Reservation_URL);
+                Log.d(TAG, "Reservation URL : " + Reservation_URL);
                 Intent detail_to_url = new Intent(Intent.ACTION_WEB_SEARCH);
                 detail_to_url.putExtra(SearchManager.QUERY, Reservation_URL);
                 // 구글로 검색

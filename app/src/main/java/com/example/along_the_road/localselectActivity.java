@@ -397,8 +397,8 @@ public class localselectActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == CALENDAR_REQUEST_CODE) {
             if(data != null){
                 Intent intent = new Intent(getApplicationContext(), HotelSelectActivity.class);
-                intent.putExtra("Start_Date", data.getStringExtra(AirCalendarDatePickerActivity.RESULT_SELECT_START_DATE));
-                intent.putExtra("End_Date", data.getStringExtra(AirCalendarDatePickerActivity.RESULT_SELECT_END_DATE));
+                intent.putExtra("startDate", data.getStringExtra(AirCalendarDatePickerActivity.RESULT_SELECT_START_DATE));
+                intent.putExtra("endDate", data.getStringExtra(AirCalendarDatePickerActivity.RESULT_SELECT_END_DATE));
 
                 startActivity(intent);
             }

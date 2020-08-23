@@ -16,6 +16,8 @@ import com.example.along_the_road.R;
 import java.util.ArrayList;
 
 public class ListViewAdapter extends BaseAdapter {
+    private static final String TAG = "ListViewAdapter";
+
     // Adapter에 추가된 데이터를 저장하기 위한 ArrayList
     private ArrayList<ListHotel> listViewItemList = new ArrayList<ListHotel>();
     private ArrayList<ListHotel> displayItemList = new ArrayList<ListHotel>();
@@ -27,7 +29,7 @@ public class ListViewAdapter extends BaseAdapter {
     // Adapter에 사용되는 데이터의 개수를 리턴. : 필수 구현
     @Override
     public int getCount() {
-        return listViewItemList.size();
+        return displayItemList.size();
     }
 
     // position에 위치한 데이터를 화면에 출력하는데 사용될 View를 리턴. : 필수 구현
@@ -51,13 +53,14 @@ public class ListViewAdapter extends BaseAdapter {
         ListHotel listViewItem = getItem(position);
 
         // 아이템 내 각 위젯에 데이터 반영
-        iv_item_image.setImageDrawable(listViewItem.getHotelimage());
+        if(listViewItem.getHotelname() != null) {
+            iv_item_image.setImageDrawable(listViewItem.getHotelimage());
+        }
         tv_item_name.setText(listViewItem.getHotelname());
 
         String detail = "체크인 시간 " + listViewItem.getCheckIn() +
-                "체크아웃 시간 " + listViewItem.getCheckOut() +
-                "주차 가능 여부 : " + listViewItem.getParking() +
-                "\n\n클릭하면 객실 리스트로 넘어갑니다.";
+                ", 체크아웃 시간 " + listViewItem.getCheckOut() +
+                "\n주차 가능 여부 : " + listViewItem.getParking();
 
         tv_item_detail.setText(detail);
 
@@ -73,7 +76,7 @@ public class ListViewAdapter extends BaseAdapter {
     // 지정한 위치(position)에 있는 데이터 리턴 : 필수 구현
     @Override
     public ListHotel getItem(int position) {
-        return listViewItemList.get(position);
+        return displayItemList.get(position);
     }
 
     // 아이템 데이터 추가를 위한 함수. 개발자가 원하는대로 작성 가능.
@@ -85,9 +88,16 @@ public class ListViewAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void clearAllItem() {
+        listViewItemList.clear();
+        displayItemList.clear();
+    }
+
     public void fillter(String search) {
 
         displayItemList.clear();
+
+        Log.d(TAG, "search keyword : " + search);
 
         if(search.length() == 0) {
             displayItemList.addAll(listViewItemList);
@@ -95,6 +105,7 @@ public class ListViewAdapter extends BaseAdapter {
             for(ListHotel item : listViewItemList) {
                 if(item.getHotelname().toLowerCase().contains(search)
                         || item.getHotelname().toUpperCase().contains(search)) {
+
                     displayItemList.add(item);
                 }
             }
