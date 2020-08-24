@@ -57,9 +57,8 @@
             android:hint="Password"
             android:textColorHint="@color/basic_color_FFFFFF"
             android:layout_marginBottom="10dp"
+            android:textColor="@color/colorWhite"
             android:inputType="textPassword"
-            android:textColor="@color/basic_color_FFFFFF"
-            android:textColorLink="@color/basic_color_FFFFFF"
             android:layout_below="@+id/ed_email_field" />
 
         <Button
@@ -94,6 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_non_account"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="1.5dp"
         android:orientation="horizontal">
 
     <TextView
