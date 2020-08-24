@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String username;
 
+    @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +79,14 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams param1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
+        //Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
+        // 커스텀폰트 오류 발생, 시스템폰트 사용으로 변경
+        Typeface typeface = null;
+        try{
+            typeface = Typeface.createFromAsset(this.getAssets(),"nanumsquarebold.ttf");
+        } catch(Exception e){
+            typeface = Typeface.defaultFromStyle(0);
+        }
 
         final TextView tv_username = new TextView(this);
         tv_username.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
