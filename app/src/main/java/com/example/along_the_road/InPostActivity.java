@@ -35,21 +35,20 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
-
         mTitle = findViewById(R.id.post_title_edit);
-       mContents= findViewById(R.id.post_contents_edit);
-       findViewById(R.id.post_save_button).setOnClickListener(this);
+        mContents = findViewById(R.id.post_contents_edit);
+        findViewById(R.id.post_save_button).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
 
-        String postId = mStore.collection(FirebaseID.post).document().getId();
+        String postId = mStore.collection(FirebaseID.getPost()).document().getId();
         Map<String,Object> data = new HashMap<>();
-        data.put(FirebaseID.documentId,mAuth.getUid());
-        data.put(FirebaseID.title,mTitle.getText().toString());
-        data.put(FirebaseID.contents,mContents.getText().toString());
-        mStore.collection(FirebaseID.post).document(postId).set(data, SetOptions.merge());
+        data.put(FirebaseID.getDocumentId(),mAuth.getUid());
+        data.put(FirebaseID.getTitle(),mTitle.getText().toString());
+        data.put(FirebaseID.getContents(),mContents.getText().toString());
+        mStore.collection(FirebaseID.getPost()).document(postId).set(data, SetOptions.merge());
         finish();
 
     }

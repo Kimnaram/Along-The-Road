@@ -46,7 +46,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -57,10 +56,10 @@ import static com.example.along_the_road.localselectActivity.Detail_Code;
 
 public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private final String COURSE_API_KEY = "";
-    private final String MAP_API_KEY = "";
+    private final String COURSE_API_KEY = "c%2BrEUarPSYgJ%2FND6wKCRcSn1oSTDp1R8LM7EanqslnUCnQlIffN8q%2BIyuDljYHdOLwTD67w0LccbXpw0%2BFUJkA%3D%3D";
+    private final String MAP_API_KEY = "AIzaSyBEFfmlGQNbUyZpc8Iaf9V27tECiiQ0lgg";
 
-    private String[] Polyline;
+    private String[][] Polyline;
     private LatLng end_LatLng;
 
     private String area_Course = null; // URL
@@ -71,6 +70,10 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
     private String selected_course_txt = null;
     private String d_and_t = null;
 
+    private String via_arr = "&optimize:true";
+    private String Origin = null;
+    private String Destination = null;
+
     //    private int areaCode = 1; // 테스트를 위함
     private int areaCode = Code;
     private int detailCode = Detail_Code;
@@ -80,7 +83,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
     private int[] ContentID;
     private String[] CourseImg;
     private String[] Title;
-    private String[] subname;
+    private String[][] subname;
     private String[] subdetailimg;
 
     private String from = null;
@@ -510,112 +513,16 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                             JSONArray itemArray = new JSONArray(item);
                             d_list_len = itemArray.length();
 
-                            subname = new String[d_list_len];
+                            subname = new String[list_len][d_list_len];
                             subdetailimg = new String[d_list_len];
 
                             for (int i = 0; i < d_list_len; i++) {
 
                                 JSONObject CourseObject = itemArray.getJSONObject(i);
 
-                                subname[i] = CourseObject.getString("subname");
+                                subname[k][i] = CourseObject.getString("subname");
 
-                                MakeCourseDetail(subname[i], i, k);
-
-                            }
-
-                            String via_arr = "&optimize:true";
-                            String Origin = null;
-                            String Destination = null;
-
-                            for (int i = 0; i < d_list_len; i++) {
-
-                                if(i == 0) {
-                                    Origin = subname[i];
-                                }
-                                else if(i > 0 && i < d_list_len - 1) {
-                                    via_arr += "|" + subname[i];
-                                }
-                                else {
-                                    Destination = subname[i];
-                                }
-                            }
-
-                            String url_part1 = "https://maps.googleapis.com/maps/api/directions/json?origin=" +
-                                    Origin + "&destination=" + Destination;
-                            String url_part2 = "&mode=transit&departure_time=now" +
-                                    "&alternatives=true&key=" + MAP_API_KEY;
-                            String Directions_URL = null;
-
-                            Directions_URL = url_part1 + via_arr + url_part2;
-                            System.out.println(Directions_URL);
-
-                            String resultText3 = "값이 없음";
-
-                            try {
-
-                                search_url = Directions_URL;
-                                resultText3 = new Task().execute().get(); // URL에 있는 내용을 받아옴
-
-                                JSONObject jsonObject = new JSONObject(resultText3);
-                                boolean routecheck = jsonObject.isNull("routes");
-                                if (routecheck == true) {
-                                    Toast.makeText(getApplicationContext(), "경로가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
-                                    System.out.println("경로 x");
-                                } else {
-                                    String routes = jsonObject.getString("routes");
-
-                                    JSONArray routesArray = new JSONArray(routes);
-
-                                    JSONObject subJsonObject = routesArray.getJSONObject(0);
-                                    String legs = subJsonObject.getString("legs");
-                                    JSONArray LegArray = new JSONArray(legs);
-                                    JSONObject legJsonObject = LegArray.getJSONObject(0);
-
-                                    String steps = legJsonObject.getString("steps");
-                                    JSONArray stepsArray = new JSONArray(steps);
-
-                                    p_list_len = stepsArray.length();
-
-                                    Polyline = new String[p_list_len];
-
-                                    for(int i = 0; i < p_list_len; i++) {
-
-                                        JSONObject stepsObject = stepsArray.getJSONObject(i);
-
-                                        String end_location = stepsObject.getString("end_location");
-                                        JSONObject endJsonObject = new JSONObject(end_location);
-                                        String arrival_lat = endJsonObject.getString("lat");
-                                        String arrival_lng = endJsonObject.getString("lng");
-                                        Double arr_lat = Double.parseDouble(arrival_lat);
-                                        Double arr_lng = Double.parseDouble(arrival_lng);
-                                        LatLng arr_location = new LatLng(arr_lat, arr_lng);
-
-                                        MarkerOptions arr_markerOptions = new MarkerOptions();
-                                        arr_markerOptions.position(arr_location);
-
-                                        mMap.addMarker(arr_markerOptions);
-
-                                        String start_location = stepsObject.getString("start_location");
-                                        JSONObject startJsonObject = new JSONObject(start_location);
-                                        String departure_lat = startJsonObject.getString("lat");
-                                        String departure_lng = startJsonObject.getString("lng");
-                                        Double dep_lat = Double.parseDouble(departure_lat);
-                                        Double dep_lng = Double.parseDouble(departure_lng);
-                                        LatLng dep_location = new LatLng(dep_lat, dep_lng);
-
-                                        MarkerOptions dep_markerOptions = new MarkerOptions();
-                                        dep_markerOptions.position(dep_location);
-
-                                        mMap.addMarker(dep_markerOptions);
-
-                                        String polyline = stepsObject.getString("polyline");
-                                        JSONObject polylineObject = new JSONObject(polyline);
-                                        Polyline[i] = polylineObject.getString("points");
-                                    }
-
-                                }
-
-                            } catch (NullPointerException e) {
+                                MakeCourseDetail(subname[k][i], k, i);
 
                             }
 
@@ -672,27 +579,27 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                     switch(Theme) {
                         case Family_C:
                             course = "가족 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.family_64, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.csr_family_64, null);
                             break;
                         case Solo_C:
                             course = "나홀로 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.solo_64, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.csr_solo_64, null);
                             break;
                         case Healing_C:
                             course = "힐링 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.healing_64, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.csr_healing_64, null);
                             break;
                         case Walking_C:
                             course = "도보 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.walk_64, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.csr_walk_64, null);
                             break;
                         case Camping_C:
                             course = "캠핑 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.camping_64, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.csr_camping_64, null);
                             break;
                         case Taste_C:
                             course = "맛집 코스";
-                            c_img = ResourcesCompat.getDrawable(res, R.drawable.taste_64, null);
+                            c_img = ResourcesCompat.getDrawable(res, R.drawable.csr_taste_64, null);
                     }
 
                     selected_city_txt = city;
@@ -772,7 +679,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 
         final Resources res = getResources();
 
-        ea_img = ResourcesCompat.getDrawable(res, R.drawable.expand_arrow_48, null);
+        ea_img = ResourcesCompat.getDrawable(res, R.drawable.cm_expand_arrow_48, null);
         ea_img.setBounds(0, 0, 40, 40);
         ith_course.setCompoundDrawables(null, null, ea_img, null);
         ith_course.setCompoundDrawablePadding(20);
@@ -796,8 +703,15 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                     rl_course_map.setVisibility(View.VISIBLE);
                     state[no] = 1;
 
-                    for(int i = 0; i < p_list_len; i++) {
-                        ArrayList<LatLng> path_points = decodePolyPoints(Polyline[i]); // 폴리라인 포인트 디코드 후 ArrayList에 저장
+                    Log.d("CourseRecoActivity", "list : " + no + "detail course : " + Polyline[no].length);
+                    for(int k = 0; k < Polyline[no].length; k++) {
+                        Log.d("CourseRecoActivity", "detail polyline : " + Polyline[no][k]);
+                        ArrayList<LatLng> path_points = decodePolyPoints(Polyline[no][k]); // 폴리라인 포인트 디코드 후 ArrayList에 저장
+
+                        LatLng START_LOC = new LatLng(path_points.get(0).latitude, path_points.get(0).longitude);
+
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(START_LOC));
+                        mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
 
                         Polyline line = null;
 
@@ -872,9 +786,112 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 
     }
 
-    public void MakeCourseDetail(String t, int i, int k) {
+    public void MakeCourseDetail(String t, int k, int i) {
 
         TextView course_txt = null;
+
+        if(i == 0) {
+            Origin = subname[k][i]; // Origin에는 i가 0일 때의 변수를 집어넣고
+        }
+        else if(i > 0 && i < d_list_len - 1) {
+            if(subname[k][i].split("\\(")[0].equals("점심식사")) {
+                String via = subname[k][i].split("\\(")[1];
+                via = via.split("\\)")[0];
+                via_arr += "|" + via;
+            } else {
+                via_arr += "|" + subname[k][i]; // via_arr에는 i가 0이나 d_list_len이 되기 전까지의 변수를 집어넣고
+            }
+        }
+        else {
+            Destination = subname[k][i]; // Destination에는 i가 d_list_len - 1일 때의 변수를 집어넣은 후에
+        }
+
+        if(i >= d_list_len -1) {
+            String url_part1 = "https://maps.googleapis.com/maps/api/directions/json?origin=" +
+                    Origin + "&destination=" + Destination;
+            String url_part2 = "&mode=transit&departure_time=now" +
+                    "&alternatives=true&key=" + MAP_API_KEY; // URL을 만들고
+            String Directions_URL = null;
+
+            Directions_URL = url_part1 + via_arr + url_part2;
+            System.out.println(Directions_URL);
+
+            String resultText3 = "값이 없음";
+
+            try {
+
+                search_url = Directions_URL;
+                resultText3 = new Task().execute().get(); // URL에 있는 내용을 받아옴
+
+                JSONObject jsonObject = new JSONObject(resultText3);
+                boolean routecheck = jsonObject.isNull("routes");
+                if (routecheck == true) {
+                    Toast.makeText(getApplicationContext(), "경로가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+                } else {
+                    String routes = jsonObject.getString("routes");
+
+                    JSONArray routesArray = new JSONArray(routes);
+
+                    JSONObject subJsonObject = routesArray.getJSONObject(0);
+                    String legs = subJsonObject.getString("legs");
+                    JSONArray LegArray = new JSONArray(legs);
+                    JSONObject legJsonObject = LegArray.getJSONObject(0);
+
+                    String steps = legJsonObject.getString("steps");
+                    JSONArray stepsArray = new JSONArray(steps);
+
+                    p_list_len = stepsArray.length();
+
+                    Polyline = new String[list_len][p_list_len];
+
+                    for (int j = 0; j < p_list_len; j++) {
+
+                        JSONObject stepsObject = stepsArray.getJSONObject(j);
+
+                        String end_location = stepsObject.getString("end_location");
+                        JSONObject endJsonObject = new JSONObject(end_location);
+                        String arrival_lat = endJsonObject.getString("lat");
+                        String arrival_lng = endJsonObject.getString("lng");
+                        Double arr_lat = Double.parseDouble(arrival_lat);
+                        Double arr_lng = Double.parseDouble(arrival_lng);
+                        LatLng arr_location = new LatLng(arr_lat, arr_lng);
+
+                        MarkerOptions arr_markerOptions = new MarkerOptions();
+                        arr_markerOptions.position(arr_location);
+
+                        mMap.addMarker(arr_markerOptions);
+
+                        String start_location = stepsObject.getString("start_location");
+                        JSONObject startJsonObject = new JSONObject(start_location);
+                        String departure_lat = startJsonObject.getString("lat");
+                        String departure_lng = startJsonObject.getString("lng");
+                        Double dep_lat = Double.parseDouble(departure_lat);
+                        Double dep_lng = Double.parseDouble(departure_lng);
+                        LatLng dep_location = new LatLng(dep_lat, dep_lng);
+
+                        MarkerOptions dep_markerOptions = new MarkerOptions();
+                        dep_markerOptions.position(dep_location);
+
+                        mMap.addMarker(dep_markerOptions);
+
+                        String polyline = stepsObject.getString("polyline");
+                        JSONObject polylineObject = new JSONObject(polyline);
+                        Polyline[k][j] = polylineObject.getString("points");
+                        Log.d("CourseRecoActivity", "course list : " + k + ", detail course : " + j + ", and Points : " + Polyline[k][j]);
+                    }
+
+                }
+
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
 
         course_txt = new TextView(this);
         if(i >= d_list_len - 1) {
@@ -964,11 +981,6 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        LatLng SEOUL = new LatLng(37.56, 126.97);
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(SEOUL));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
     }
 
     public class Task extends AsyncTask<String, Void, String> {

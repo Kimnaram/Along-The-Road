@@ -188,11 +188,9 @@ public class MainActivity extends AppCompatActivity {
                 int id = menuItem.getItemId();
 
                 if(id == R.id.item_directions) {
-                    Intent main_to_directions = new Intent(getApplicationContext(), TrafficSearchActivity.class);
-
-                    startActivity(main_to_directions);
+                    startActivity(new Intent(getApplicationContext(), TrafficSearchActivity.class));
                 } else if (id == R.id.item_checkplan) {
-
+                    startActivity(new Intent(getApplicationContext(), UserPlanActivity.class));
                 }
 
                 return true;

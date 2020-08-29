@@ -56,6 +56,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -72,7 +73,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     private static final String TAG = "HotelSelectActivity";
 
-    private final String API_KEY = "API KEY";
+    private final String API_KEY = "c%2BrEUarPSYgJ%2FND6wKCRcSn1oSTDp1R8LM7EanqslnUCnQlIffN8q%2BIyuDljYHdOLwTD67w0LccbXpw0%2BFUJkA%3D%3D";
 
     // hotel theme code
     private final static String Hotel_t = "B02010100";
@@ -237,6 +238,15 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 int listNumber = adapter.getItem(position).getListNumber();
                 int number = adapter.getItem(position).getContentID();
 
+                Drawable image = adapter.getItem(position).getHotelimage();
+                byte[] hotelImage = null;
+                if(image != null) {
+                    Bitmap bitmap = ((BitmapDrawable) image).getBitmap();
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    hotelImage = stream.toByteArray();
+                }
+
                 intent.putExtra("contentID", Integer.toString(number));
                 intent.putExtra("hotelName", adapter.getItem(position).getHotelname());
                 intent.putExtra("location", Integer.toString(areaCode));
@@ -246,6 +256,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 intent.putExtra("URL", reservationurl[listNumber]);
                 intent.putExtra("checkIn", adapter.getItem(position).getCheckIn());
                 intent.putExtra("checkOut", adapter.getItem(position).getCheckOut());
+                intent.putExtra("hotelImage", hotelImage);
 
                 adapter.notifyDataSetChanged();
 
