@@ -11,7 +11,7 @@
 
         <item
             android:id="@+id/item_checkplan"
-            android:title="내 여행 계획 보기"
+            android:title="내 여행 계획"
             android:icon="@drawable/plan_check"
             app:showAsAction="always" />
 
@@ -20,7 +20,5 @@
             android:title="후기 구경하기"
             android:icon="@drawable/review"
             app:showAsAction="always" />
-
     </group>
-
 </menu>

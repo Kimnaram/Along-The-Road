@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserPlanActivity">
+
+    <!--상단 툴바-->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/handon600"
+            android:text="내 여행 계획"
+            android:textColor="#ffffff"
+            android:textSize="25dp"></TextView>
+    </androidx.appcompat.widget.Toolbar>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar" >
+
+        <RelativeLayout
+            android:id="@+id/rl_plan_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_margin="20dp">
+
+            <ImageView
+                android:id="@+id/iv_hotel_image"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginBottom="20dp"/>
+
+            <TextView
+                android:id="@+id/tv_area_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_hotel_image"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/nanumsquare"
+                android:text="지역"
+                android:textSize="21dp" />
+
+            <TextView
+                android:id="@+id/tv_area_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_hotel_image"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_toRightOf="@+id/tv_area_info"
+                android:fontFamily="@font/nanumsquarebold"
+                android:text="Area"
+                android:textSize="21dp" />
+
+            <org.apmem.tools.layouts.FlowLayout
+                android:id="@+id/fl_plan_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_area_info"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_date_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/nanumsquare"
+                    android:text="일정"
+                    android:textSize="21dp" />
+
+                <TextView
+                    android:id="@+id/tv_start_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@+id/tv_date_info"
+                    android:fontFamily="@font/nanumsquarebold"
+                    android:text="0000-00-00"
+                    android:textSize="21dp" />
+
+                <TextView
+                    android:id="@+id/tv_symbol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@+id/tv_start_date"
+                    android:fontFamily="@font/nanumsquarebold"
+                    android:text="~"
+                    android:textSize="21dp" />
+
+                <TextView
+                    android:id="@+id/tv_end_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@+id/tv_start_date"
+                    android:fontFamily="@font/nanumsquarebold"
+                    android:text="0000-00-00"
+                    android:textSize="21dp" />
+
+            </org.apmem.tools.layouts.FlowLayout>
+
+            <TextView
+                android:id="@+id/tv_hotel_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fl_plan_container"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/nanumsquare"
+                android:text="호텔"
+                android:textSize="21dp" />
+
+            <TextView
+                android:id="@+id/tv_hotel_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fl_plan_container"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_toRightOf="@+id/tv_hotel_info"
+                android:fontFamily="@font/nanumsquarebold"
+                android:text="Hotel name"
+                android:textSize="21dp" />
+
+            <TextView
+                android:id="@+id/tv_course_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="코스"
+                android:layout_below="@+id/tv_hotel_info"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/nanumsquare"
+                android:textSize="21dp" />
+
+            <org.apmem.tools.layouts.FlowLayout
+                android:id="@+id/fl_course_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_hotel_name"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/tv_course_info">
+
+                <TextView
+                    android:id="@+id/tv_course_x"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="코스 없음"
+                    android:fontFamily="@font/nanumsquarebold"
+                    android:textSize="21dp" />
+
+            </org.apmem.tools.layouts.FlowLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

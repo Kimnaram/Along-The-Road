@@ -54,7 +54,7 @@ public class HotelDetailActivity extends AppCompatActivity {
 
     private static final String TAG = "HotelDetailActivity";
 
-    private static final String API_KEY = "API KEY";
+    private static final String API_KEY = "c%2BrEUarPSYgJ%2FND6wKCRcSn1oSTDp1R8LM7EanqslnUCnQlIffN8q%2BIyuDljYHdOLwTD67w0LccbXpw0%2BFUJkA%3D%3D";
 
     private static final int Seoul = 1;
     private static final int Daegu = 4;
@@ -78,6 +78,8 @@ public class HotelDetailActivity extends AppCompatActivity {
     private String CheckIn;
     private String CheckOut;
 //    private String Member;
+    private byte[] hotelImage;
+    private Drawable Image;
 
     private int list_len = 0;
 
@@ -150,6 +152,7 @@ public class HotelDetailActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
+    private byte[] hotelImage1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +184,7 @@ public class HotelDetailActivity extends AppCompatActivity {
             URL = intent.getStringExtra("URL");
             CheckIn = intent.getStringExtra("checkIn");
             CheckOut = intent.getStringExtra("checkOut");
+            hotelImage = intent.getByteArrayExtra("hotelImage");
 
             location = Integer.parseInt(s_location);
             if(s_locationDetail != null) {
@@ -551,12 +555,14 @@ public class HotelDetailActivity extends AppCompatActivity {
 
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     String uid = user.getUid();
+                    String image = hotelImage.toString();
 
                     HashMap<Object, String> hashMap = new HashMap<>();
                     hashMap.put("city", City);
                     hashMap.put("startDate", Start_Date);
                     hashMap.put("endDate", End_Date);
                     hashMap.put("hotelName", HotelName);
+                    hashMap.put("hotelImage", image);
 
                     firebaseDatabase = FirebaseDatabase.getInstance();
                     DatabaseReference reference = firebaseDatabase.getReference("users");
