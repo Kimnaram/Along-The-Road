@@ -2,14 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/item_directions"
-            android:title="길찾기"
+            android:title="길 찾기"
+            android:icon="@drawable/place"
             app:showAsAction="always" />
 
         <item
             android:id="@+id/item_checkplan"
-            android:title="내 여행 계획 확인하기"
+            android:title="내 여행 계획 보기"
+            android:icon="@drawable/plan_check"
             app:showAsAction="always" />
+
+        <item
+            android:id="@+id/item_review"
+            android:title="후기 구경하기"
+            android:icon="@drawable/review"
+            app:showAsAction="always" />
+
     </group>
+
 </menu>
