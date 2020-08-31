@@ -35,6 +35,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.example.along_the_road.R.drawable.main_menu;
+
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
@@ -63,14 +65,15 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayShowCustomEnabled(true); //커스터마이징 하기 위해 필요
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //툴바 메뉴버튼 생성
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.main_menu); // 메뉴 버튼 모양 설정
+        getSupportActionBar().setHomeAsUpIndicator(main_menu); // 메뉴 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3A7AFF"))); //툴바 배경색
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        //네비게이션 드로어 헤더 설정
         LinearLayout ll_navigation_container = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.navigation_item, null);
         ll_navigation_container.setBackground(getResources().getDrawable(R.color.basic_color_3A7AFF));
-        ll_navigation_container.setPadding(20, 50, 20, 50);
+        ll_navigation_container.setPadding(20, 150, 40, 50);
         ll_navigation_container.setOrientation(LinearLayout.VERTICAL);
         ll_navigation_container.setGravity(Gravity.BOTTOM);
         ll_navigation_container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -187,10 +190,16 @@ public class MainActivity extends AppCompatActivity {
 
                 int id = menuItem.getItemId();
 
+                //길 찾기
                 if(id == R.id.item_directions) {
                     startActivity(new Intent(getApplicationContext(), TrafficSearchActivity.class));
-                } else if (id == R.id.item_checkplan) {
+                }
+                //내 여행 계획 보기
+                if (id == R.id.item_checkplan) {
                     startActivity(new Intent(getApplicationContext(), UserPlanActivity.class));
+                }
+                //후기 구경하기
+                if (id == R.id.item_review) {
                 }
 
                 return true;
@@ -274,25 +283,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder alBuilder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
-        alBuilder.setMessage("종료하시겠습니까?");
+        //뒤로가기 버튼으로 네비게이션 드로어 닫기
+        DrawerLayout drawer = findViewById(R.id.drawerLayout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
+        else {
+            AlertDialog.Builder alBuilder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
+            alBuilder.setMessage("종료하시겠습니까?");
 
-        // "예" 버튼을 누르면 실행되는 리스너
-        alBuilder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finishAffinity();
-            }
-        });
-        // "아니오" 버튼을 누르면 실행되는 리스너
-        alBuilder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                return; // 아무런 작업도 하지 않고 돌아간다
-            }
-        });
-        alBuilder.setTitle("프로그램 종료");
-        alBuilder.show(); // AlertDialog.Bulider로 만든 AlertDialog를 보여준다.
-
+            // "예" 버튼을 누르면 실행되는 리스너
+            alBuilder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finishAffinity();
+                }
+            });
+            // "아니오" 버튼을 누르면 실행되는 리스너
+            alBuilder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    return; // 아무런 작업도 하지 않고 돌아간다
+                }
+            });
+            alBuilder.setTitle("프로그램 종료");
+            alBuilder.show(); // AlertDialog.Bulider로 만든 AlertDialog를 보여준다.
+        }
     }
 }
