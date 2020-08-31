@@ -56,6 +56,8 @@ public class ListViewAdapter extends BaseAdapter {
         if(listViewItem.getHotelname() != null) {
             iv_item_image.setImageDrawable(listViewItem.getHotelimage());
             iv_item_image.setVisibility(View.VISIBLE);
+        } else {
+            iv_item_image.setVisibility(View.GONE);
         }
         tv_item_name.setText(listViewItem.getHotelname());
 

@@ -185,6 +185,7 @@ public class HotelDetailActivity extends AppCompatActivity {
             CheckIn = intent.getStringExtra("checkIn");
             CheckOut = intent.getStringExtra("checkOut");
             hotelImage = intent.getByteArrayExtra("hotelImage");
+            Log.d(TAG, "hotelImage : " + hotelImage);
 
             location = Integer.parseInt(s_location);
             if(s_locationDetail != null) {
@@ -555,7 +556,13 @@ public class HotelDetailActivity extends AppCompatActivity {
 
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     String uid = user.getUid();
-                    String image = hotelImage.toString();
+                    String image;
+                    if(hotelImage != null) {
+                        image = byteArrayToBinaryString(hotelImage);
+                        Log.d(TAG, "String image : " + image);
+                    } else {
+                        image = null;
+                    }
 
                     HashMap<Object, String> hashMap = new HashMap<>();
                     hashMap.put("city", City);
@@ -618,6 +625,26 @@ public class HotelDetailActivity extends AppCompatActivity {
         btn_reservation = findViewById(R.id.btn_reservation);
         btn_plus_plan = findViewById(R.id.btn_plus_myplan);
 
+    }
+
+    // 바이너리 바이트 배열을 스트링으로
+    public static String byteArrayToBinaryString(byte[] b) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < b.length; ++i) {
+            sb.append(byteToBinaryString(b[i]));
+        }
+        return sb.toString();
+    }
+
+    // 바이너리 바이트를 스트링으로
+    public static String byteToBinaryString(byte n) {
+        StringBuilder sb = new StringBuilder("00000000");
+        for (int bit = 0; bit < 8; bit++) {
+            if (((n >> bit) & 1) > 0) {
+                sb.setCharAt(7 - bit, '1');
+            }
+        }
+        return sb.toString();
     }
 
     public void location(int location, int locationDetail) {

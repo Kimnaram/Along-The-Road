@@ -19,6 +19,8 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.NetworkOnMainThreadException;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -37,7 +39,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+
 import org.apmem.tools.layouts.FlowLayout;
+
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -54,6 +58,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -153,6 +161,8 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     private String selected_spinner = null;
 
     private Bitmap bitmap;
+    private String google_url;
+    private String google_image;
     Handler handler = new Handler();
 
     private FirebaseAuth firebaseAuth;
@@ -195,7 +205,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
         et_search_text.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(keyCode == event.KEYCODE_ENTER) {
+                if (keyCode == event.KEYCODE_ENTER) {
                     return true;
                 }
                 return false;
@@ -240,7 +250,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
                 Drawable image = adapter.getItem(position).getHotelimage();
                 byte[] hotelImage = null;
-                if(image != null) {
+                if (image != null) {
                     Bitmap bitmap = ((BitmapDrawable) image).getBitmap();
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
@@ -257,6 +267,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 intent.putExtra("checkIn", adapter.getItem(position).getCheckIn());
                 intent.putExtra("checkOut", adapter.getItem(position).getCheckOut());
                 intent.putExtra("hotelImage", hotelImage);
+                Log.d(TAG, "hotelImage : " + hotelImage);
 
                 adapter.notifyDataSetChanged();
 
@@ -354,7 +365,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
             JSONObject bodyObject = new JSONObject(body);
 
             boolean itemscheck = bodyObject.isNull("items");
-            if(itemscheck == true || bodyObject.getString("items").equals("")) { // 호텔이 존재하지 않는다면
+            if (itemscheck == true || bodyObject.getString("items").equals("")) { // 호텔이 존재하지 않는다면
                 String popup_msg = "조건에 해당되는 호텔이 존재하지 않습니다.";
                 tv_popup_msg = findViewById(R.id.tv_popup_msg);
                 tv_popup_msg.setText(popup_msg);
@@ -416,7 +427,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                         HotelName[i] = HotelName[i].split("\\[")[0];
 
                         boolean imagecheck = HotelObject.isNull("firstimage");
-                        if(imagecheck == false) {
+                        if (imagecheck == false) {
                             HotelImage[i] = HotelObject.getString("firstimage");
 
                             final String img_url = HotelImage[i];
@@ -428,7 +439,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                     // TODO Auto-generated method stub
                                     try {
                                         URL url = new URL(img_url);
-                                        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                                         conn.setDoInput(true);
                                         conn.connect();
 
@@ -452,6 +463,44 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
+
+                        } else if (imagecheck == true) {
+
+                            google_url = "https://www.google.com/search?q=" + HotelName[i] + "&tbm=isch";
+
+                            final String google_img = new ImageTask().execute().get();
+                            Log.d(TAG, "google_img : " + google_img);
+
+//                            Thread thread = new Thread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    // TODO Auto-generated method stub
+//                                    try {
+//                                        URL url = new URL(google_img);
+//                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                                        conn.setDoInput(true);
+//                                        conn.connect();
+//
+//                                        InputStream is = conn.getInputStream();
+//                                        bitmap = BitmapFactory.decodeStream(is);
+//                                    } catch (MalformedURLException e) {
+//                                        e.printStackTrace();
+//                                    } catch (IOException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            });
+//
+//                            thread.start();
+//
+//                            try {
+//                                thread.join();
+//
+//                                hotelImg = new BitmapDrawable(bitmap);
+//
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
 
                         }
 
@@ -483,11 +532,10 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                             JSONObject responseObject2 = new JSONObject(response2);
 
                             boolean bodycheck = responseObject2.isNull("body");
-                            if(bodycheck == true) {
+                            if (bodycheck == true) {
                                 String errmsg = "LIMITED NUMBER OF SERVICE REQUESTS EXCEEDS ERROR\n" +
                                         "다음날 다시 시도해주세요.";
-                            }
-                            else if(bodycheck == false) {
+                            } else if (bodycheck == false) {
                                 String body2 = responseObject2.getString("body");
 
                                 JSONObject bodyObject2 = new JSONObject(body2);
@@ -513,7 +561,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                 }
                                 subfacility[i] = itemObject2.getString("subfacility");
 
-                                if(hotelImg == null) {
+                                if (hotelImg == null) {
                                     listHotel = new ListHotel(ContentID[i], HotelName[i], checkintime[i], checkouttime[i], parkinglodging[i], i);
                                 } else {
                                     listHotel = new ListHotel(ContentID[i], hotelImg, HotelName[i], checkintime[i], checkouttime[i], parkinglodging[i], i);
@@ -544,7 +592,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                     String contentId = itemObject.getString("contentid");
                     ContentID[0] = Integer.parseInt(contentId);
                     boolean imagecheck = itemObject.isNull("firstimage");
-                    if(imagecheck == false) {
+                    if (imagecheck == false) {
                         HotelImage[0] = itemObject.getString("firstimage");
 
                         final String img_url = HotelImage[0];
@@ -555,7 +603,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                 // TODO Auto-generated method stub
                                 try {
                                     URL url = new URL(img_url);
-                                    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                                     conn.setDoInput(true);
                                     conn.connect();
 
@@ -575,10 +623,18 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                             thread.join();
 
                             hotelImg = new BitmapDrawable(bitmap);
+                            bitmap = null;
 
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+
+                    } else if (imagecheck == true) {
+
+                        google_url = "https://www.google.com/search?q=" + HotelName[0] + "&tbm=isch";
+                        Log.d(TAG, "google_url : " + google_url);
+
+                        String google_img = new ImageTask().execute().get();
 
                     }
 
@@ -594,7 +650,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                     checkouttime[0] = "11:00";
                     parkinglodging[0] = "52대";
 
-                    if(hotelImg == null) {
+                    if (hotelImg == null) {
                         listHotel = new ListHotel(ContentID[0], HotelName[0], checkintime[0], checkouttime[0], parkinglodging[0], 0);
                     } else {
                         listHotel = new ListHotel(ContentID[0], hotelImg, HotelName[0], checkintime[0], checkouttime[0], parkinglodging[0], 0);
@@ -720,9 +776,9 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(firebaseAuth.getCurrentUser() == null) {
+        if (firebaseAuth.getCurrentUser() == null) {
             getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
-        } else if(firebaseAuth.getCurrentUser() != null) {
+        } else if (firebaseAuth.getCurrentUser() != null) {
             getMenuInflater().inflate(R.menu.toolbar_al_menu, menu);
         }
 
@@ -805,11 +861,36 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
             return receiveMsg;
         }
 
-//        @Override
-//        protected void onPostExecute(String result) {
-//            mDialog.dismiss();
-//            super.onPostExecute(result);
-//        }
     }
 
+    public class ImageTask extends AsyncTask<String, Void, String> {
+
+        private String str, receiveMsg;
+
+        @Override
+        protected String doInBackground(String... params) {
+            URL url = null;
+            try {
+                Document doc = Jsoup.connect(google_url).get();
+                Log.d(TAG, "url : " + google_url);
+                final Elements hotel_image = doc.select("div.islrc div.isv-r.PNCib.MSM1fd.BUooTd a.wXeWr.islib.nfEiy.mM5pbd div.bRMDJf.islir").select("img");
+                Handler handler = new Handler(Looper.getMainLooper()); // 객체생성
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 이미지정보
+                        receiveMsg = hotel_image.attr("src");
+                        Log.d(TAG, "google_image : " + receiveMsg);
+                    }
+                });
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (NetworkOnMainThreadException e) {
+                e.printStackTrace();
+            }
+
+            return receiveMsg;
+        }
+    }
 }

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -65,7 +66,8 @@ public class UserPlanActivity extends AppCompatActivity {
                             tv_hotel_name.setText(dataSnapshot.getValue().toString());
                         } else if (dataSnapshot.getKey().equals("hotelImage")) {
                             String image = dataSnapshot.getValue().toString();
-                            byte[] b = image.getBytes();
+                            byte[] b = binaryStringToByteArray(image);
+                            Log.d("UserPlanActivity", "b : " + b);
                             ByteArrayInputStream is = new ByteArrayInputStream(b);
                             Drawable hotelImage = Drawable.createFromStream(is, "hotelImage");
                             iv_hotel_image.setImageDrawable(hotelImage);
@@ -94,6 +96,24 @@ public class UserPlanActivity extends AppCompatActivity {
 
     }
 
+    public static byte[] binaryStringToByteArray(String s) {
+        int count = s.length() / 8;
+        byte[] b = new byte[count];
+        for (int i = 1; i < count; ++i) {
+            String t = s.substring((i - 1) * 8, i * 8);
+            b[i - 1] = binaryStringToByte(t);
+        }
+        return b;
+    }
+
+    public static byte binaryStringToByte(String s) {
+        byte ret = 0, total = 0;
+        for (int i = 0; i < 8; ++i) {
+            ret = (s.charAt(7 - i) == '1') ? (byte) (1 << i) : 0;
+            total = (byte) (ret | total);
+        }
+        return total;
+    }
 
     @Override
     public void onBackPressed() {
