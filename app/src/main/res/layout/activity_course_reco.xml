@@ -101,6 +101,22 @@
 
     </ScrollView>
 
+    <Button
+        android:id="@+id/btn_plus_myplan"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:text="+"
+        android:fontFamily="@font/nanumsquare"
+        android:background="@drawable/common_round_btn_style"
+        android:textColor="@color/basic_color_FFFFFF"
+        android:backgroundTint="@color/basic_color_3A7AFF"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:textSize="30dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone"/>
+
     <RelativeLayout
         android:id="@+id/rl_course_map"
         android:layout_height="250dp"

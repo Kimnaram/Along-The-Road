@@ -27,6 +27,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,23 +43,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 import static com.example.along_the_road.localselectActivity.Code;
 import static com.example.along_the_road.localselectActivity.Detail_Code;
 
-
-public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class CourseRecoActivity extends AppCompatActivity {
 
     private final String COURSE_API_KEY = "c%2BrEUarPSYgJ%2FND6wKCRcSn1oSTDp1R8LM7EanqslnUCnQlIffN8q%2BIyuDljYHdOLwTD67w0LccbXpw0%2BFUJkA%3D%3D";
     private final String MAP_API_KEY = "AIzaSyBEFfmlGQNbUyZpc8Iaf9V27tECiiQ0lgg";
@@ -70,15 +65,12 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
     private String selected_course_txt = null;
     private String d_and_t = null;
 
-    private String via_arr = "&optimize:true";
-    private String Origin = null;
-    private String Destination = null;
-
     //    private int areaCode = 1; // 테스트를 위함
     private int areaCode = Code;
     private int detailCode = Detail_Code;
     private String Theme = null;
     private String Total_Theme = null;
+    private boolean bodycheck;
 
     private int[] ContentID;
     private String[] CourseImg;
@@ -109,7 +101,6 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 
     private int list_len = 0;
     private int d_list_len = 0;
-    private int p_list_len = 0;
     private int C_ll_count = 0;
 
     private int[] state;
@@ -126,6 +117,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
     private TextView tv_selected_city;
     private TextView tv_popup_msg;
     private TextView ith_course;
+    private Button btn_plus_myplan;
 
     private Drawable ea_img = null;
     private Drawable c_img = null;
@@ -133,11 +125,8 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
     private String[] spinnerArr;
     private String selected_spinner = null;
 
-    private boolean bodycheck;
-
-    /************* Google Map API 관련 변수 *************/
-    private RelativeLayout rl_course_map;
-    private GoogleMap mMap;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseDatabase firebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,11 +140,8 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.fr_course_map);
-        mapFragment.getMapAsync(this);
-
-        rl_course_map = findViewById(R.id.rl_course_map);
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
 
         rl_info_popup = findViewById(R.id.rl_info_popup);
         rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
@@ -187,6 +173,8 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
         rl_course = findViewById(R.id.rl_course);
         rl_top = findViewById(R.id.rl_top);
         ll_course_list = findViewById(R.id.ll_course_list);
+
+        btn_plus_myplan = findViewById(R.id.btn_plus_myplan);
 
         tv_selected_city = findViewById(R.id.tv_selected_city);
         tv_selected_course = findViewById(R.id.tv_selected_course);
@@ -233,11 +221,13 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
             @Override
             public void onClick(View view) {
 
+                btn_plus_myplan.setVisibility(View.VISIBLE);
+
                 String resultText = "값이 없음";
 
                 if (detailCode != 0) {
                     area_Course = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?" +
-                            "ServiceKey=" + COURSE_API_KEY + "&numOfRows=15&pageNo=1" +
+                            "ServiceKey=" + API_KEY + "&numOfRows=15&pageNo=1" +
                             "&areaCode=" + areaCode + "&sigunguCode=" + detailCode + "&contentTypeId=25&cat1=C01" +
                             Total_Theme + "&MobileOS=ETC&MobileApp=AppTest&_type=json";
 
@@ -245,7 +235,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 
                 } else {
                     area_Course = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?" +
-                            "ServiceKey=" + COURSE_API_KEY + "&numOfRows=15&pageNo=1" +
+                            "ServiceKey=" + API_KEY + "&numOfRows=15&pageNo=1" +
                             "&areaCode=" + areaCode + "&contentTypeId=25&cat1=C01" +
                             Total_Theme + "&MobileOS=ETC&MobileApp=AppTest&_type=json";
                 }
@@ -331,7 +321,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 //                                CourseImg[i] = CourseObject.getString("firstimage");
 
                                 time_and_distance = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailIntro?" +
-                                        "ServiceKey=" + COURSE_API_KEY + "&contentId=" + ContentID[i] + "&contentTypeId=25" +
+                                        "ServiceKey=" + API_KEY + "&contentId=" + ContentID[i] + "&contentTypeId=25" +
                                         "&MobileOS=ETC&MobileApp=AppTest&_type=json";
 
                                 System.out.println(time_and_distance);
@@ -407,7 +397,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                             ContentID[0] = Integer.parseInt(contentId);
 
                             time_and_distance = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailIntro?" +
-                                    "ServiceKey=" + COURSE_API_KEY + "&contentId=" + ContentID[0] + "&contentTypeId=25" +
+                                    "ServiceKey=" + API_KEY + "&contentId=" + ContentID[0] + "&contentTypeId=25" +
                                     "&MobileOS=ETC&MobileApp=AppTest&_type=json";
 
                             String resultText3 = "값이 없음";
@@ -483,7 +473,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                     for (int k = 0; k < ContentID.length; k++) {
 
                         detail_Course = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailInfo?" +
-                                "ServiceKey=" + COURSE_API_KEY + "&contentId=" + ContentID[k] + "&contentTypeId=25" +
+                                "ServiceKey=" + API_KEY + "&contentId=" + ContentID[k] + "&contentTypeId=25" +
                                 "&MobileOS=ETC&MobileApp=AppTest&_type=json";
 
                         System.out.println(detail_Course);
@@ -513,7 +503,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                             JSONArray itemArray = new JSONArray(item);
                             d_list_len = itemArray.length();
 
-                            subname = new String[list_len][d_list_len];
+                            subname[k] = new String[d_list_len];
                             subdetailimg = new String[d_list_len];
 
                             for (int i = 0; i < d_list_len; i++) {
@@ -522,9 +512,17 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 
                                 subname[k][i] = CourseObject.getString("subname");
 
-                                MakeCourseDetail(subname[k][i], k, i);
+                                //subdetailimg[i] = CourseObject.getString("subdetailimg");
+
+                                MakeCourseDetail(subname[k][i], i, k);
 
                             }
+
+                            for (int i = 0; i < d_list_len; i++) {
+
+                                System.out.println(subname[i]);
+                            }
+
 
                         } catch (NullPointerException e) {
                             e.printStackTrace();
@@ -700,46 +698,33 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                 // 코스가 눌리면 상세 코스가 나오도록
                 if(state[no] == 0) {
                     fl_course_text[no].setVisibility(View.VISIBLE);
-                    rl_course_map.setVisibility(View.VISIBLE);
                     state[no] = 1;
 
-                    Log.d("CourseRecoActivity", "list : " + no + "detail course : " + Polyline[no].length);
-                    for(int k = 0; k < Polyline[no].length; k++) {
-                        Log.d("CourseRecoActivity", "detail polyline : " + Polyline[no][k]);
-                        ArrayList<LatLng> path_points = decodePolyPoints(Polyline[no][k]); // 폴리라인 포인트 디코드 후 ArrayList에 저장
+                    btn_plus_myplan.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(firebaseAuth.getCurrentUser() != null) {
 
-                        LatLng START_LOC = new LatLng(path_points.get(0).latitude, path_points.get(0).longitude);
+                                FirebaseUser user = firebaseAuth.getCurrentUser();
+                                String uid = user.getUid();
 
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(START_LOC));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+                                HashMap<Object, String> hashMap = new HashMap<>();
+                                hashMap.put("0", subname[no][0]);
 
-                        Polyline line = null;
+                                firebaseDatabase = FirebaseDatabase.getInstance();
+                                DatabaseReference reference = firebaseDatabase.getReference("users/" + uid + "/plan");
+                                reference.child("course").setValue(hashMap);
 
-                        if (line == null) {
-                            line = mMap.addPolyline(new PolylineOptions()
-                                    .color(Color.rgb(58, 122, 255))
-                                    .geodesic(true)
-                                    .addAll(path_points));
-                        } else {
-                            line.remove();
-                            line = mMap.addPolyline(new PolylineOptions()
-                                    .color(Color.rgb(58, 122, 255))
-                                    .geodesic(true)
-                                    .addAll(path_points));
+                                Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-
-//                    Drawable ca_img = ResourcesCompat.getDrawable(res, R.drawable.collapse_arrow_48, null);
-//                    ca_img.setBounds(0, 0, 40, 40);
-//
-//                    ith_course.setCompoundDrawables(null, null, ca_img, null);
+                    });
                 }
                 else if(state[no] == 1) {
                     fl_course_text[no].setVisibility(View.GONE);
-                    rl_course_map.setVisibility(View.GONE);
                     state[no] = 0;
-//                    ea_img.setBounds(0, 0, 40, 40);
-//                    ith_course.setCompoundDrawables(null, null, ea_img, null);
                 }
             }
         });
@@ -761,137 +746,11 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 
         ll_course_text_box[i].addView(time_dist);
 
-        final int no = i;
-
-        time_dist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 코스가 눌리면 상세 코스가 나오도록
-                if(state[no] == 0) {
-                    fl_course_text[no].setVisibility(View.VISIBLE);
-                    state[no] = 1;
-//                    Drawable ca_img = ResourcesCompat.getDrawable(res, R.drawable.collapse_arrow_48, null);
-//                    ca_img.setBounds(0, 0, 40, 40);
-//
-//                    ith_course.setCompoundDrawables(null, null, ca_img, null);
-                }
-                else if(state[no] == 1) {
-                    fl_course_text[no].setVisibility(View.GONE);
-                    state[no] = 0;
-//                    ea_img.setBounds(0, 0, 40, 40);
-//                    ith_course.setCompoundDrawables(null, null, ea_img, null);
-                }
-            }
-        });
-
     }
 
-    public void MakeCourseDetail(String t, int k, int i) {
+    public void MakeCourseDetail(String t, int i, int k) {
 
         TextView course_txt = null;
-
-        if(i == 0) {
-            Origin = subname[k][i]; // Origin에는 i가 0일 때의 변수를 집어넣고
-        }
-        else if(i > 0 && i < d_list_len - 1) {
-            if(subname[k][i].split("\\(")[0].equals("점심식사")) {
-                String via = subname[k][i].split("\\(")[1];
-                via = via.split("\\)")[0];
-                via_arr += "|" + via;
-            } else {
-                via_arr += "|" + subname[k][i]; // via_arr에는 i가 0이나 d_list_len이 되기 전까지의 변수를 집어넣고
-            }
-        }
-        else {
-            Destination = subname[k][i]; // Destination에는 i가 d_list_len - 1일 때의 변수를 집어넣은 후에
-        }
-
-        if(i >= d_list_len -1) {
-            String url_part1 = "https://maps.googleapis.com/maps/api/directions/json?origin=" +
-                    Origin + "&destination=" + Destination;
-            String url_part2 = "&mode=transit&departure_time=now" +
-                    "&alternatives=true&key=" + MAP_API_KEY; // URL을 만들고
-            String Directions_URL = null;
-
-            Directions_URL = url_part1 + via_arr + url_part2;
-            System.out.println(Directions_URL);
-
-            String resultText3 = "값이 없음";
-
-            try {
-
-                search_url = Directions_URL;
-                resultText3 = new Task().execute().get(); // URL에 있는 내용을 받아옴
-
-                JSONObject jsonObject = new JSONObject(resultText3);
-                boolean routecheck = jsonObject.isNull("routes");
-                if (routecheck == true) {
-                    Toast.makeText(getApplicationContext(), "경로가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
-                } else {
-                    String routes = jsonObject.getString("routes");
-
-                    JSONArray routesArray = new JSONArray(routes);
-
-                    JSONObject subJsonObject = routesArray.getJSONObject(0);
-                    String legs = subJsonObject.getString("legs");
-                    JSONArray LegArray = new JSONArray(legs);
-                    JSONObject legJsonObject = LegArray.getJSONObject(0);
-
-                    String steps = legJsonObject.getString("steps");
-                    JSONArray stepsArray = new JSONArray(steps);
-
-                    p_list_len = stepsArray.length();
-
-                    Polyline = new String[list_len][p_list_len];
-
-                    for (int j = 0; j < p_list_len; j++) {
-
-                        JSONObject stepsObject = stepsArray.getJSONObject(j);
-
-                        String end_location = stepsObject.getString("end_location");
-                        JSONObject endJsonObject = new JSONObject(end_location);
-                        String arrival_lat = endJsonObject.getString("lat");
-                        String arrival_lng = endJsonObject.getString("lng");
-                        Double arr_lat = Double.parseDouble(arrival_lat);
-                        Double arr_lng = Double.parseDouble(arrival_lng);
-                        LatLng arr_location = new LatLng(arr_lat, arr_lng);
-
-                        MarkerOptions arr_markerOptions = new MarkerOptions();
-                        arr_markerOptions.position(arr_location);
-
-                        mMap.addMarker(arr_markerOptions);
-
-                        String start_location = stepsObject.getString("start_location");
-                        JSONObject startJsonObject = new JSONObject(start_location);
-                        String departure_lat = startJsonObject.getString("lat");
-                        String departure_lng = startJsonObject.getString("lng");
-                        Double dep_lat = Double.parseDouble(departure_lat);
-                        Double dep_lng = Double.parseDouble(departure_lng);
-                        LatLng dep_location = new LatLng(dep_lat, dep_lng);
-
-                        MarkerOptions dep_markerOptions = new MarkerOptions();
-                        dep_markerOptions.position(dep_location);
-
-                        mMap.addMarker(dep_markerOptions);
-
-                        String polyline = stepsObject.getString("polyline");
-                        JSONObject polylineObject = new JSONObject(polyline);
-                        Polyline[k][j] = polylineObject.getString("points");
-                        Log.d("CourseRecoActivity", "course list : " + k + ", detail course : " + j + ", and Points : " + Polyline[k][j]);
-                    }
-
-                }
-
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
 
         course_txt = new TextView(this);
         if(i >= d_list_len - 1) {
@@ -942,45 +801,6 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                 }
             }
         });
-    }
-
-    public static ArrayList<LatLng> decodePolyPoints(String encodedPath) {
-        int len = encodedPath.length();
-
-        final ArrayList<LatLng> path = new ArrayList<LatLng>();
-        int index = 0;
-        int lat = 0;
-        int lng = 0;
-
-        while (index < len) {
-            int result = 1;
-            int shift = 0;
-            int b;
-            do {
-                b = encodedPath.charAt(index++) - 63 - 1;
-                result += b << shift;
-                shift += 5;
-            } while (b >= 0x1f);
-            lat += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-
-            result = 1;
-            shift = 0;
-            do {
-                b = encodedPath.charAt(index++) - 63 - 1;
-                result += b << shift;
-                shift += 5;
-            } while (b >= 0x1f);
-            lng += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-
-            path.add(new LatLng(lat * 1e-5, lng * 1e-5));
-        }
-
-        return path;
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
     }
 
     public class Task extends AsyncTask<String, Void, String> {
@@ -1077,5 +897,3 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
     }
 
 }
-
-

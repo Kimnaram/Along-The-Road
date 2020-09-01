@@ -465,7 +465,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                             }
 
                         } else if (imagecheck == true) {
-
                             google_url = "https://www.google.com/search?q=" + HotelName[i] + "&tbm=isch";
 
                             final String google_img = new ImageTask().execute().get();
@@ -865,7 +864,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     public class ImageTask extends AsyncTask<String, Void, String> {
 
-        private String str, receiveMsg;
+        private String str = "", receiveMsg = "";
 
         @Override
         protected String doInBackground(String... params) {
@@ -873,13 +872,15 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
             try {
                 Document doc = Jsoup.connect(google_url).get();
                 Log.d(TAG, "url : " + google_url);
-                final Elements hotel_image = doc.select("div.islrc div.isv-r.PNCib.MSM1fd.BUooTd a.wXeWr.islib.nfEiy.mM5pbd div.bRMDJf.islir").select("img");
+                final Elements hotel_image = doc.body().select("div#islrg div.islrc div.isv-r a.wXeWr div.bRMDJf img");
                 Handler handler = new Handler(Looper.getMainLooper()); // 객체생성
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         // 이미지정보
-                        receiveMsg = hotel_image.attr("src");
+                        for(Element element : hotel_image) {
+                            receiveMsg = element.absUrl("src");
+                        }
                         Log.d(TAG, "google_image : " + receiveMsg);
                     }
                 });

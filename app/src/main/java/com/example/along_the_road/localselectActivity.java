@@ -88,6 +88,7 @@ public class localselectActivity extends AppCompatActivity {
                             if (Code != 0) {
                                 Intent local_to_course = new Intent(getApplicationContext(), CourseRecoActivity.class);
 
+                                finish();
                                 startActivity(local_to_course);
                             } else {
                                 Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();

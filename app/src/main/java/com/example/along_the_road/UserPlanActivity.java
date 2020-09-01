@@ -7,12 +7,14 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,15 +24,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.apmem.tools.layouts.FlowLayout;
+
 import java.io.ByteArrayInputStream;
 
 public class UserPlanActivity extends AppCompatActivity {
+
+    private FlowLayout fl_course_list;
 
     private ImageView iv_hotel_image;
     private TextView tv_area_name;
     private TextView tv_start_date;
     private TextView tv_end_date;
     private TextView tv_hotel_name;
+    private TextView tv_course_x;
 
     private FirebaseAuth firebaseAuth;
 
@@ -71,6 +78,14 @@ public class UserPlanActivity extends AppCompatActivity {
                             ByteArrayInputStream is = new ByteArrayInputStream(b);
                             Drawable hotelImage = Drawable.createFromStream(is, "hotelImage");
                             iv_hotel_image.setImageDrawable(hotelImage);
+                        } else if (dataSnapshot.getKey().equals("course")) {
+                            TextView tv_course_name = new TextView(UserPlanActivity.this);
+                            tv_course_name.setText(dataSnapshot.child("course").getValue().toString());
+                            Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
+                            tv_course_name.setTypeface(typeface);
+                            tv_course_name.setTextSize(21);
+                            tv_course_x.setVisibility(View.GONE);
+                            fl_course_list.addView(tv_course_name);
                         }
                     }
                 }
@@ -88,11 +103,14 @@ public class UserPlanActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        fl_course_list = findViewById(R.id.fl_course_list);
+
         iv_hotel_image = findViewById(R.id.iv_hotel_image);
         tv_area_name = findViewById(R.id.tv_area_name);
         tv_start_date = findViewById(R.id.tv_start_date);
         tv_end_date = findViewById(R.id.tv_end_date);
         tv_hotel_name = findViewById(R.id.tv_hotel_name);
+        tv_course_x = findViewById(R.id.tv_course_x);
 
     }
 
