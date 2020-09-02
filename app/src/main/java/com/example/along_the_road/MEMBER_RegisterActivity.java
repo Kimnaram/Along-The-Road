@@ -58,58 +58,63 @@ public class MEMBER_RegisterActivity extends AppCompatActivity {
                 String pwd = ed_pw_field.getText().toString();
                 String pwdcheck = ed_pwcheck_field.getText().toString();
 
-                if (pwd.equals(pwdcheck)) {
+                if(!email.isEmpty() && !pwd.isEmpty() && !pwdcheck.isEmpty()) {
 
-                    Log.d(TAG, "등록 버튼 " + email + " , " + pwd);
-                    final ProgressDialog mDialog = new ProgressDialog(MEMBER_RegisterActivity.this);
-                    mDialog.setMessage("회원가입 중입니다.");
-                    mDialog.show();
+                    if (pwd.equals(pwdcheck)) {
 
-                    //파이어베이스에 신규계정 등록하기
-                    firebaseAuth.createUserWithEmailAndPassword(email, pwd)
-                            .addOnCompleteListener(MEMBER_RegisterActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        mDialog.dismiss();
+                        Log.d(TAG, "등록 버튼 " + email + " , " + pwd);
+                        final ProgressDialog mDialog = new ProgressDialog(MEMBER_RegisterActivity.this);
+                        mDialog.setMessage("회원가입 중입니다.");
+                        mDialog.show();
 
-                                        FirebaseUser user = firebaseAuth.getCurrentUser();
-                                        String email = user.getEmail();
-                                        String uid = user.getUid();
-                                        String name = ed_username_field.getText().toString();
+                        //파이어베이스에 신규계정 등록하기
+                        firebaseAuth.createUserWithEmailAndPassword(email, pwd)
+                                .addOnCompleteListener(MEMBER_RegisterActivity.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            mDialog.dismiss();
 
-                                        //해쉬맵 테이블을 파이어베이스 데이터베이스에 저장
-                                        HashMap<Object, String> hashMap = new HashMap<>();
-                                        hashMap.put("email", email);
-                                        hashMap.put("uid", uid);
-                                        hashMap.put("name", name);
+                                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                                            String email = user.getEmail();
+                                            String uid = user.getUid();
+                                            String name = ed_username_field.getText().toString();
 
-                                        FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                        DatabaseReference reference = database.getReference("users");
-                                        reference.child(uid).setValue(hashMap);
+                                            //해쉬맵 테이블을 파이어베이스 데이터베이스에 저장
+                                            HashMap<Object, String> hashMap = new HashMap<>();
+                                            hashMap.put("email", email);
+                                            hashMap.put("uid", uid);
+                                            hashMap.put("name", name);
+
+                                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                            DatabaseReference reference = database.getReference("users");
+                                            reference.child(uid).setValue(hashMap);
 
 
-                                        //가입이 이루어졌을시 가입 화면을 빠져나감.
-                                        Intent intent = new Intent(getApplicationContext(), MEMBER_LoginActivity.class);
+                                            //가입이 이루어졌을시 가입 화면을 빠져나감.
+                                            Intent intent = new Intent(getApplicationContext(), MEMBER_LoginActivity.class);
 
-                                        startActivity(intent);
-                                        finish();
-                                        Toast.makeText(MEMBER_RegisterActivity.this, "회원가입에 성공하셨습니다.", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        mDialog.dismiss();
-                                        Toast.makeText(getApplicationContext(), "이미 존재하는 계정입니다.", Toast.LENGTH_SHORT).show();
+                                            startActivity(intent);
+                                            finish();
+                                            Toast.makeText(MEMBER_RegisterActivity.this, "회원가입에 성공하셨습니다.", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            mDialog.dismiss();
+                                            Toast.makeText(getApplicationContext(), "이미 존재하는 계정입니다.", Toast.LENGTH_SHORT).show();
 
-                                        // 파이어베이스 연동이 안 되어서 임시 조치
+                                            // 파이어베이스 연동이 안 되어서 임시 조치
 //                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 //                                        startActivity(intent);
+                                        }
                                     }
-                                }
-                            });
+                                });
 
-                    //비밀번호 오류시
+                        //비밀번호 오류시
+                    } else {
+                        Toast.makeText(getApplicationContext(), "비밀번호가 틀렸습니다. 다시 입력해 주세요.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 } else {
-                    Toast.makeText(getApplicationContext(), "비밀번호가 틀렸습니다. 다시 입력해 주세요.", Toast.LENGTH_SHORT).show();
-                    return;
+                    Toast.makeText(getApplicationContext(), "작성폼을 모두 작성해야 합니다.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

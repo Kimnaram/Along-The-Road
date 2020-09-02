@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -14,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -470,6 +472,8 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                 if (ContentID != null) {
 
+                    subname = new String[ContentID.length][];
+
                     for (int k = 0; k < ContentID.length; k++) {
 
                         detail_Course = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailInfo?" +
@@ -520,7 +524,7 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                             for (int i = 0; i < d_list_len; i++) {
 
-                                System.out.println(subname[i]);
+                                System.out.println(subname[k][i]);
                             }
 
 
@@ -709,7 +713,10 @@ public class CourseRecoActivity extends AppCompatActivity {
                                 String uid = user.getUid();
 
                                 HashMap<Object, String> hashMap = new HashMap<>();
-                                hashMap.put("0", subname[no][0]);
+
+                                for(int k = 0; k < subname[no].length; k++) {
+                                    hashMap.put(Integer.toString(k), subname[no][k]);
+                                }
 
                                 firebaseDatabase = FirebaseDatabase.getInstance();
                                 DatabaseReference reference = firebaseDatabase.getReference("users/" + uid + "/plan");
@@ -874,14 +881,44 @@ public class CourseRecoActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(firebaseAuth.getCurrentUser() == null) {
+            getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
+        } else if(firebaseAuth.getCurrentUser() != null) {
+            getMenuInflater().inflate(R.menu.toolbar_al_menu, menu);
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:{ //툴바 뒤로가기 동작
+        switch (item.getItemId()) {
+            case android.R.id.home: { //툴바 뒤로가기 동작
                 finish();
                 return true;
             }
+            case R.id.menu_login:
+                startActivity(new Intent(getApplicationContext(), MEMBER_LoginActivity.class));
+                return true;
+            case R.id.menu_signup:
+                startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+                return true;
+            case R.id.menu_logout:
+                FirebaseAuth.getInstance().signOut();
+
+                final ProgressDialog mDialog = new ProgressDialog(CourseRecoActivity.this);
+                mDialog.setMessage("로그아웃 중입니다.");
+                mDialog.show();
+
+                finish();
+                mDialog.dismiss();
+
+                startActivity(new Intent(getApplicationContext(), CourseRecoActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,6 +31,9 @@ import java.io.ByteArrayInputStream;
 
 public class UserPlanActivity extends AppCompatActivity {
 
+    private RelativeLayout rl_info_popup;
+    private RelativeLayout rl_popup_info_ok;
+    private RelativeLayout rl_plan_container;
     private FlowLayout fl_course_list;
 
     private ImageView iv_hotel_image;
@@ -38,6 +42,7 @@ public class UserPlanActivity extends AppCompatActivity {
     private TextView tv_end_date;
     private TextView tv_hotel_name;
     private TextView tv_course_x;
+    private TextView tv_popup_msg;
 
     private FirebaseAuth firebaseAuth;
 
@@ -79,13 +84,20 @@ public class UserPlanActivity extends AppCompatActivity {
                             Drawable hotelImage = Drawable.createFromStream(is, "hotelImage");
                             iv_hotel_image.setImageDrawable(hotelImage);
                         } else if (dataSnapshot.getKey().equals("course")) {
-                            TextView tv_course_name = new TextView(UserPlanActivity.this);
-                            tv_course_name.setText(dataSnapshot.child("course").getValue().toString());
-                            Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
-                            tv_course_name.setTypeface(typeface);
-                            tv_course_name.setTextSize(21);
+                            int length = Integer.parseInt(Long.toString(dataSnapshot.getChildrenCount()));
+                            for(int i = 0; i < length; i++) {
+                                TextView tv_course_name = new TextView(UserPlanActivity.this);
+                                if(i < length - 1) {
+                                    tv_course_name.setText(dataSnapshot.child(Integer.toString(i)).getValue().toString() + " > ");
+                                } else {
+                                    tv_course_name.setText(dataSnapshot.child(Integer.toString(i)).getValue().toString());
+                                }
+                                Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
+                                tv_course_name.setTypeface(typeface);
+                                tv_course_name.setTextSize(21);
+                                fl_course_list.addView(tv_course_name);
+                            }
                             tv_course_x.setVisibility(View.GONE);
-                            fl_course_list.addView(tv_course_name);
                         }
                     }
                 }
@@ -93,6 +105,16 @@ public class UserPlanActivity extends AppCompatActivity {
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
 
+                }
+            });
+        } else {
+            rl_plan_container.setVisibility(View.GONE);
+            tv_popup_msg.setText("로그인이 필요한 기능입니다.");
+            rl_info_popup.setVisibility(View.VISIBLE);
+            rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
                 }
             });
         }
@@ -103,6 +125,9 @@ public class UserPlanActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        rl_info_popup = findViewById(R.id.rl_info_popup);
+        rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
+        rl_plan_container = findViewById(R.id.rl_plan_container);
         fl_course_list = findViewById(R.id.fl_course_list);
 
         iv_hotel_image = findViewById(R.id.iv_hotel_image);
@@ -111,6 +136,7 @@ public class UserPlanActivity extends AppCompatActivity {
         tv_end_date = findViewById(R.id.tv_end_date);
         tv_hotel_name = findViewById(R.id.tv_hotel_name);
         tv_course_x = findViewById(R.id.tv_course_x);
+        tv_popup_msg = findViewById(R.id.tv_popup_msg);
 
     }
 

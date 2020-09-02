@@ -152,7 +152,6 @@ public class HotelDetailActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
-    private byte[] hotelImage1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -570,6 +569,9 @@ public class HotelDetailActivity extends AppCompatActivity {
                     hashMap.put("endDate", End_Date);
                     hashMap.put("hotelName", HotelName);
                     hashMap.put("hotelImage", image);
+                    if(URL != null) {
+                        hashMap.put("hotelWeb", URL.split("\"")[1]);
+                    }
 
                     firebaseDatabase = FirebaseDatabase.getInstance();
                     DatabaseReference reference = firebaseDatabase.getReference("users");

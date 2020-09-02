@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +42,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
@@ -83,6 +86,8 @@ public class TrafficSearchActivity extends AppCompatActivity
     private LatLng End_location; // 도착 위치 표시
 
     private Drawable img = null;
+
+    private FirebaseAuth firebaseAuth;
 
     /****************************** Directions API 관련 변수 *******************************/
     private static final String API_KEY = "API KEY";
@@ -135,6 +140,7 @@ public class TrafficSearchActivity extends AppCompatActivity
         rl_route_view = findViewById(R.id.rl_route_view);
         rl_another_view = findViewById(R.id.rl_another_view);
         ll_flow_container = findViewById(R.id.ll_flow_container);
+        firebaseAuth = FirebaseAuth.getInstance();
 
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
@@ -850,14 +856,44 @@ public class TrafficSearchActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(firebaseAuth.getCurrentUser() == null) {
+            getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
+        } else if(firebaseAuth.getCurrentUser() != null) {
+            getMenuInflater().inflate(R.menu.toolbar_al_menu, menu);
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home: { //툴바 뒤로가기 동작
                 finish();
                 return true;
             }
+            case R.id.menu_login:
+                startActivity(new Intent(getApplicationContext(), MEMBER_LoginActivity.class));
+                return true;
+            case R.id.menu_signup:
+                startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+                return true;
+            case R.id.menu_logout:
+                FirebaseAuth.getInstance().signOut();
+
+                final ProgressDialog mDialog = new ProgressDialog(TrafficSearchActivity.this);
+                mDialog.setMessage("로그아웃 중입니다.");
+                mDialog.show();
+
+                finish();
+                mDialog.dismiss();
+
+                startActivity(new Intent(getApplicationContext(), TrafficSearchActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
 }

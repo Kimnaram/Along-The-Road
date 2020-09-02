@@ -4,10 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -27,7 +30,7 @@ import java.util.Map;
 
 public class PostActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private FirebaseAuth firebaseAuth;
     private FirebaseFirestore mStore = FirebaseFirestore.getInstance();
     private RecyclerView mPostRecyclerView;
     private PostAdapter mAdapter;
@@ -44,6 +47,8 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3a7aff"))); //툴바 배경색
 
+        firebaseAuth = FirebaseAuth.getInstance();
+
         mPostRecyclerView = findViewById(R.id.main_rc);
 
         findViewById(R.id.main_post_edit).setOnClickListener(this);
@@ -53,7 +58,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStart() {
         super.onStart();
         mDatas = new ArrayList<>();
-        mStore.collection(FirebaseID.post)
+        mStore.collection(FirebaseID.getPost())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -62,9 +67,9 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                             if (task.getResult() != null) {
                                 for (DocumentSnapshot snap: task.getResult()) {
                                     Map<String,Object> shot = snap.getData();
-                                    String documentId = String.valueOf(shot.get(FirebaseID.documentId));
-                                    String title = String.valueOf(shot.get(FirebaseID.title));
-                                    String contents = String.valueOf(shot.get(FirebaseID.contents));
+                                    String documentId = String.valueOf(shot.get(FirebaseID.getDocumentId()));
+                                    String title = String.valueOf(shot.get(FirebaseID.getTitle()));
+                                    String contents = String.valueOf(shot.get(FirebaseID.getContents()));
                                     Post data = new Post(documentId, title, contents);
                                     mDatas.add(data);
                                 }
@@ -90,14 +95,44 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(firebaseAuth.getCurrentUser() == null) {
+            getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
+        } else if(firebaseAuth.getCurrentUser() != null) {
+            getMenuInflater().inflate(R.menu.toolbar_al_menu, menu);
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:{ //툴바 뒤로가기 동작
+        switch (item.getItemId()) {
+            case android.R.id.home: { //툴바 뒤로가기 동작
                 finish();
                 return true;
             }
+            case R.id.menu_login:
+                startActivity(new Intent(getApplicationContext(), MEMBER_LoginActivity.class));
+                return true;
+            case R.id.menu_signup:
+                startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+                return true;
+            case R.id.menu_logout:
+                FirebaseAuth.getInstance().signOut();
+
+                final ProgressDialog mDialog = new ProgressDialog(PostActivity.this);
+                mDialog.setMessage("로그아웃 중입니다.");
+                mDialog.show();
+
+                finish();
+                mDialog.dismiss();
+
+                startActivity(new Intent(getApplicationContext(), PostActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
 }

@@ -81,28 +81,34 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
                 final String email = ed_email_field.getText().toString();
                 final String pwd = ed_pw_field.getText().toString();
 
-                firebaseAuth.signInWithEmailAndPassword(email, pwd)
-                        .addOnCompleteListener(MEMBER_LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()){
-                                    mDialog.dismiss();
+                if(!email.isEmpty() && !pwd.isEmpty()) {
 
-                                    Intent intent = new Intent(MEMBER_LoginActivity.this, MainActivity.class);
-                                    startActivity(intent);
+                    firebaseAuth.signInWithEmailAndPassword(email, pwd)
+                            .addOnCompleteListener(MEMBER_LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        mDialog.dismiss();
 
-                                }else{
-                                    mDialog.dismiss();
-                                    tv_notification_wrong.setVisibility(View.VISIBLE);
-                                    Toast.makeText(getApplicationContext(), "로그인에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(MEMBER_LoginActivity.this, MainActivity.class);
+                                        startActivity(intent);
+
+                                    } else {
+                                        mDialog.dismiss();
+                                        tv_notification_wrong.setVisibility(View.VISIBLE);
+                                        Toast.makeText(getApplicationContext(), "로그인에 실패하였습니다.", Toast.LENGTH_SHORT).show();
 
 
-                                    // 파이어베이스 연동이 안 되어서 임시 조치
-                                    Intent intent = new Intent(MEMBER_LoginActivity.this, MainActivity.class);
-                                    startActivity(intent);
+                                        // 파이어베이스 연동이 안 되어서 임시 조치
+                                        Intent intent = new Intent(MEMBER_LoginActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                } else {
+                    mDialog.dismiss();
+                    Toast.makeText(getApplicationContext(), "아이디와 비밀번호를 모두 작성해야 합니다.", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });

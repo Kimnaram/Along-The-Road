@@ -35,39 +35,82 @@
             android:layout_marginTop="11dp"
             android:layout_marginLeft="7dp"
             android:background="@color/basic_color_FFFFFF"
-            android:fontFamily="@font/nanumsquare"
+            android:fontFamily="@font/nanumsquarebold"
             android:hint="리뷰 제목"
             android:paddingLeft="5dp"
             android:textStyle="bold"
             android:inputType="text"
             android:textColor="@color/basic_color_3A7AFF"
-            android:textSize="24sp"
+            android:textSize="20dp"
             tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/post_save_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="@drawable/common_btn_style"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="11dp"
             android:fontFamily="@font/nanumsquare"
             android:textColor="@color/basic_color_3A7AFF"
             android:layout_toRightOf="@+id/post_title_edit"
+            android:textSize="20dp"
             android:text="저장"/>
+
+        <TextView
+            android:id="@+id/tv_image_upload"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:text="사진 올리기"
+            android:background="@color/basic_color_3A7AFF"
+            android:textColor="@color/basic_color_FFFFFF"
+            android:fontFamily="@font/nanumsquarebold"
+            android:textSize="18dp"
+            android:layout_marginTop="11dp"
+            android:layout_marginLeft="7dp"
+            android:gravity="center"
+            android:layout_below="@+id/post_title_edit"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_image_container"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="7dp"
+            android:layout_below="@+id/tv_image_upload"
+            android:visibility="gone" >
+
+            <ImageView
+                android:id="@+id/iv_review_image"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:background="@color/basic_color_FFFFFF"
+                android:scaleType="centerCrop" />
+
+            <ImageButton
+                android:id="@+id/ib_image_remove"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_margin="5dp"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/rv_delete_64" />
+
+        </RelativeLayout>
 
         <EditText
             android:id="@+id/post_contents_edit"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            android:layout_below="@+id/post_save_button"
-            android:layout_marginLeft="10dp"
+            android:layout_below="@+id/rl_image_container"
+            android:layout_marginLeft="7dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
+            android:layout_marginTop="10dp"
+            android:gravity="top|left"
+            android:textSize="19dp"
             android:padding="5dp"
-            android:fontFamily="@font/nanumsquare"
-            android:background="@drawable/less_rounded"
+            android:fontFamily="@font/nanumsquareregular"
+            android:background="@color/basic_color_FFFFFF"
             android:textColor="@color/basic_color_3A7AFF"
             android:hint="내용" />
 
