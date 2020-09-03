@@ -116,6 +116,7 @@
 
         <!--가격입력-->
         <EditText
+            android:inputType="number"
             android:id="@+id/edit_price"
             android:layout_width="0dp"
             android:layout_height="match_parent"

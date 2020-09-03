@@ -47,7 +47,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".DaySelectActivity" />
-        <activity android:name=".managebudgetActivity" />
+        <activity android:name=".managebudgetActivity"
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".MainActivity" />
         <activity android:name=".CalendarActivity" />
 
@@ -56,7 +57,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA1gd-XALxx4AWAA2nTWt_mNLlw6g85Hto" />
+            android:value="" />
     </application>
 
 </manifest>
