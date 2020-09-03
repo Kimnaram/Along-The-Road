@@ -14,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 
 public class InPostActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "InPostActivity";
     private static final int REQUEST_CODE = 1001;
 
     private RelativeLayout rl_image_container;
@@ -48,6 +50,7 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
     private ImageButton ib_image_remove;
 
     private int reviewCount = 0;
+    private String username = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +119,9 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         firebaseDatabase.getReference("reviews").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                reviewCount = Integer.parseInt(Long.toString(snapshot.getChildrenCount()));
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    reviewCount = Integer.parseInt(dataSnapshot.getKey());
+                }
             }
 
             @Override
@@ -125,19 +130,23 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
-        String postId = Integer.toString(reviewCount);
-        HashMap<String,Object> hashMap = new HashMap<>();
+        String postId = Integer.toString(reviewCount + 1);
 
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        String uid = firebaseUser.getUid();
 
-        if(firebaseAuth.getCurrentUser() != null) {
-            hashMap.put("uid", firebaseAuth.getUid());
-        } else {
-            hashMap.put("uid", "비회원");
+        Intent intent = getIntent();
+        if(intent != null) {
+            username = intent.getStringExtra("username");
+            Log.d(TAG, "name : " + username);
         }
-        hashMap.put("name", firebaseUser.getDisplayName());
+
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("uid", uid);
+        hashMap.put("name", username);
         hashMap.put("title", mTitle.getText().toString());
         hashMap.put("content", mContents.getText().toString());
+        hashMap.put("like", Integer.toString(0));
         if(iv_review_image != null) {
             hashMap.put("image", image);
         }
@@ -209,10 +218,10 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
                 return true;
             }
             case R.id.menu_login:
-                startActivity(new Intent(getApplicationContext(), MEMBER_LoginActivity.class));
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                 return true;
             case R.id.menu_signup:
-                startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+                startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                 return true;
             case R.id.menu_logout:
                 FirebaseAuth.getInstance().signOut();

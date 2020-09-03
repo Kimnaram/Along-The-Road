@@ -813,10 +813,10 @@ public class HotelDetailActivity extends AppCompatActivity {
                 return true;
             }
             case R.id.menu_login:
-                startActivity(new Intent(getApplicationContext(), MEMBER_LoginActivity.class));
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                 return true;
             case R.id.menu_signup:
-                startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+                startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                 return true;
             case R.id.menu_logout:
                 FirebaseAuth.getInstance().signOut();

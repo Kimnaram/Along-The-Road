@@ -13,20 +13,16 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.media.Image;
 import android.os.Bundle;
-import android.util.LayoutDirection;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.along_the_road.models.Post;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -50,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton festival_btn; // 페이지 전환 버튼 (지역 축제)
     private ImageButton review_btn; // 페이지 전환 버튼 (리뷰 작성)
 
-    private String username;
+    private String username = "비회원";
 
     @SuppressLint("WrongConstant")
     @Override
@@ -59,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initAllComponent();
-
 
         // 상단 툴바 설정
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -167,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             tv_login_or_out.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent navi_to_login = new Intent(getApplicationContext(), MEMBER_LoginActivity.class);
+                    Intent navi_to_login = new Intent(getApplicationContext(), LoginActivity.class);
 
                     startActivity(navi_to_login);
                 }
@@ -200,6 +195,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 //후기 구경하기
                 if (id == R.id.item_review) {
+                    Intent intent = new Intent(getApplicationContext(), PostListActivity.class);
+                    intent.putExtra("name", username);
+
+                    startActivity(intent);
                 }
 
                 return true;
@@ -237,9 +236,9 @@ public class MainActivity extends AppCompatActivity {
         festival_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent cntent = new Intent(getApplicationContext(), FestivalActivity.class);
+                Intent intent = new Intent(getApplicationContext(), FestivalActivity.class);
 
-                startActivity(cntent);
+                startActivity(intent);
             }
         });
 
@@ -247,7 +246,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PostActivity.class);
+                Intent intent = new Intent(getApplicationContext(), PostListActivity.class);
+                intent.putExtra("username", username);
 
                 startActivity(intent);
             }

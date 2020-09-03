@@ -22,9 +22,9 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
-public class MEMBER_RegisterActivity extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity {
 
-    private static final String TAG = "MEMBER_RegisterActivity";
+    private static final String TAG = "SignupActivity";
 
     private EditText ed_email_field;
     private EditText ed_username_field;
@@ -37,7 +37,7 @@ public class MEMBER_RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_member__register);
+        setContentView(R.layout.activity_signup);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -63,13 +63,13 @@ public class MEMBER_RegisterActivity extends AppCompatActivity {
                     if (pwd.equals(pwdcheck)) {
 
                         Log.d(TAG, "등록 버튼 " + email + " , " + pwd);
-                        final ProgressDialog mDialog = new ProgressDialog(MEMBER_RegisterActivity.this);
+                        final ProgressDialog mDialog = new ProgressDialog(SignupActivity.this);
                         mDialog.setMessage("회원가입 중입니다.");
                         mDialog.show();
 
                         //파이어베이스에 신규계정 등록하기
                         firebaseAuth.createUserWithEmailAndPassword(email, pwd)
-                                .addOnCompleteListener(MEMBER_RegisterActivity.this, new OnCompleteListener<AuthResult>() {
+                                .addOnCompleteListener(SignupActivity.this, new OnCompleteListener<AuthResult>() {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if (task.isSuccessful()) {
@@ -92,11 +92,11 @@ public class MEMBER_RegisterActivity extends AppCompatActivity {
 
 
                                             //가입이 이루어졌을시 가입 화면을 빠져나감.
-                                            Intent intent = new Intent(getApplicationContext(), MEMBER_LoginActivity.class);
+                                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
 
                                             startActivity(intent);
                                             finish();
-                                            Toast.makeText(MEMBER_RegisterActivity.this, "회원가입에 성공하셨습니다.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(SignupActivity.this, "회원가입에 성공하셨습니다.", Toast.LENGTH_SHORT).show();
                                         } else {
                                             mDialog.dismiss();
                                             Toast.makeText(getApplicationContext(), "이미 존재하는 계정입니다.", Toast.LENGTH_SHORT).show();

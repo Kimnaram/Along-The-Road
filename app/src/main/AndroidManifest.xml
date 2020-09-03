@@ -16,13 +16,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".UserPlanActivity"></activity>
-        <activity android:name=".MEMBER_LoginActivity" />
-        <activity android:name=".MEMBER_RegisterActivity" />
+        <activity android:name=".PostUpdateActivity"></activity>
+        <activity android:name=".PostListActivity" />
+        <activity android:name=".PostDetailActivity" />
+        <activity android:name=".UserPlanActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".SignupActivity" />
         <activity android:name=".HotelDetailActivity" />
         <activity android:name=".CourseRecoActivity" />
         <activity android:name=".FestivalActivity" />
-        <activity android:name=".PostActivity" />
         <activity android:name=".InPostActivity" />
         <activity android:name=".SplashActivity">
             <intent-filter>

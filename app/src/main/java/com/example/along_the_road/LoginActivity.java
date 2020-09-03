@@ -7,10 +7,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,7 +17,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MEMBER_LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private Button btn_login;
 
@@ -35,7 +33,7 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_member__login);
+        setContentView(R.layout.activity_login);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -55,7 +53,7 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(getApplicationContext(), MEMBER_RegisterActivity.class));
+                startActivity(new Intent(getApplicationContext(), SignupActivity.class));
 
             }
         });
@@ -74,7 +72,7 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                final ProgressDialog mDialog = new ProgressDialog(MEMBER_LoginActivity.this);
+                final ProgressDialog mDialog = new ProgressDialog(LoginActivity.this);
                 mDialog.setMessage("로그인 중입니다.");
                 mDialog.show();
 
@@ -84,13 +82,13 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
                 if(!email.isEmpty() && !pwd.isEmpty()) {
 
                     firebaseAuth.signInWithEmailAndPassword(email, pwd)
-                            .addOnCompleteListener(MEMBER_LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                            .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
                                         mDialog.dismiss();
 
-                                        Intent intent = new Intent(MEMBER_LoginActivity.this, MainActivity.class);
+                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                         startActivity(intent);
 
                                     } else {
@@ -100,7 +98,7 @@ public class MEMBER_LoginActivity extends AppCompatActivity {
 
 
                                         // 파이어베이스 연동이 안 되어서 임시 조치
-                                        Intent intent = new Intent(MEMBER_LoginActivity.this, MainActivity.class);
+                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                         startActivity(intent);
                                     }
                                 }
