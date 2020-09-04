@@ -26,31 +26,30 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        android:layout_marginBottom="10dp" >
 
         <com.example.along_the_road.ClearEditText
             android:id="@+id/post_title_edit"
             android:layout_width="300dp"
             android:layout_height="40dp"
-            android:layout_marginTop="11dp"
-            android:layout_marginLeft="7dp"
-            android:background="@color/basic_color_FFFFFF"
+            android:background="@drawable/btn_style_border_line_white_background"
             android:fontFamily="@font/nanumsquarebold"
-            android:hint="리뷰 제목"
-            android:paddingLeft="5dp"
-            android:textStyle="bold"
+            android:hint="제목"
+            android:paddingLeft="7dp"
             android:inputType="text"
             android:textColor="@color/basic_color_3A7AFF"
-            android:textSize="20dp"
+            android:textColorHint="@color/basic_color_3A7AFF"
+            android:textSize="18sp"
             tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/post_save_button"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:background="@drawable/common_btn_style"
+            android:background="@drawable/btn_style_common"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="11dp"
             android:fontFamily="@font/nanumsquare"
             android:textColor="@color/basic_color_3A7AFF"
             android:layout_toRightOf="@+id/post_title_edit"
@@ -65,9 +64,8 @@
             android:background="@color/basic_color_3A7AFF"
             android:textColor="@color/basic_color_FFFFFF"
             android:fontFamily="@font/nanumsquarebold"
-            android:textSize="18dp"
-            android:layout_marginTop="11dp"
-            android:layout_marginLeft="7dp"
+            android:layout_marginTop="5dp"
+            android:textSize="17sp"
             android:gravity="center"
             android:layout_below="@+id/post_title_edit"/>
 
@@ -77,7 +75,6 @@
             android:layout_height="150dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="5dp"
-            android:layout_marginLeft="7dp"
             android:layout_below="@+id/tv_image_upload"
             android:visibility="gone" >
 
@@ -90,11 +87,12 @@
 
             <ImageButton
                 android:id="@+id/ib_image_remove"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_margin="5dp"
+                android:background="@null"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/rv_delete_64" />
+                android:src="@drawable/rv_delete_100" />
 
         </RelativeLayout>
 
@@ -103,15 +101,14 @@
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:layout_below="@+id/rl_image_container"
-            android:layout_marginLeft="7dp"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
             android:gravity="top|left"
             android:textSize="19dp"
             android:padding="5dp"
             android:fontFamily="@font/nanumsquareregular"
-            android:background="@color/basic_color_FFFFFF"
+            android:background="@drawable/btn_style_border_line_white_background"
             android:textColor="@color/basic_color_3A7AFF"
+            android:textColorHint="@color/basic_color_3A7AFF"
             android:hint="내용" />
 
     </RelativeLayout>

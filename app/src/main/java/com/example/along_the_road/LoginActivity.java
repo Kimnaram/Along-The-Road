@@ -95,11 +95,6 @@ public class LoginActivity extends AppCompatActivity {
                                         mDialog.dismiss();
                                         tv_notification_wrong.setVisibility(View.VISIBLE);
                                         Toast.makeText(getApplicationContext(), "로그인에 실패하였습니다.", Toast.LENGTH_SHORT).show();
-
-
-                                        // 파이어베이스 연동이 안 되어서 임시 조치
-                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                        startActivity(intent);
                                     }
                                 }
                             });

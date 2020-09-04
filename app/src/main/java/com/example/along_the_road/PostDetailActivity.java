@@ -19,7 +19,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,10 +42,13 @@ public class PostDetailActivity extends AppCompatActivity {
     private TextView tv_review_content;
     private Button btn_review_delete;
     private Button btn_review_update;
+    private Button btn_review_like;
 
     private int PostId;
+    private int PostLike;
 
     private FirebaseAuth firebaseAuth;
+    private FirebaseDatabase firebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +67,8 @@ public class PostDetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent != null) {
-            String TempID = intent.getStringExtra("_id");
+            String TempID = intent.getStringExtra("PostId");
             PostId = Integer.parseInt(TempID);
-//            selectColumn(index);
             selectFirebase(PostId);
         }
 
@@ -73,7 +78,7 @@ public class PostDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // 수정 화면으로 이동
                 Intent detail_to_update = new Intent(getApplicationContext(), PostUpdateActivity.class);
-                detail_to_update.putExtra("_id", Long.toString(PostId));
+                detail_to_update.putExtra("PostId", Long.toString(PostId));
 
                 startActivity(detail_to_update);
             }
@@ -93,6 +98,18 @@ public class PostDetailActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         // 파이어베이스에서 삭제하는 코드 필요
+                        firebaseDatabase.getReference("reviews").child(PostId + "").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getApplicationContext(), "삭제에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
                         finish();
 
@@ -110,6 +127,20 @@ public class PostDetailActivity extends AppCompatActivity {
 
             }
         });
+
+        btn_review_like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    PostLike += 1;
+                    firebaseDatabase.getReference("reviews/" + PostId + "/like").setValue(PostLike);
+                    // 좋아요 누르는거 어떻게 컨트롤할지가 필요!
+
+                    Toast.makeText(getApplicationContext(), "해당 글을 추천하셨습니다!", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
     }
 
     public void initAllComponent() {
@@ -122,9 +153,10 @@ public class PostDetailActivity extends AppCompatActivity {
 
         btn_review_update = findViewById(R.id.btn_review_update);
         btn_review_delete = findViewById(R.id.btn_review_delete);
+        btn_review_like = findViewById(R.id.btn_review_like);
 
         firebaseAuth = FirebaseAuth.getInstance();
-
+        firebaseDatabase = FirebaseDatabase.getInstance();
 
     }
 
@@ -151,18 +183,26 @@ public class PostDetailActivity extends AppCompatActivity {
                         ByteArrayInputStream is = new ByteArrayInputStream(b);
                         Drawable reviewImage = Drawable.createFromStream(is, "reviewImage");
                         iv_review_image.setImageDrawable(reviewImage);
+                        iv_review_image.setVisibility(View.VISIBLE);
+                    } else if(dataSnapshot.getKey().equals("like")) {
+                        String like = dataSnapshot.getValue().toString();
+                        PostLike = Integer.parseInt(like);
+                        btn_review_like.setText("추천 " + PostLike);
                     } else if(dataSnapshot.getKey().equals("uid")) {
                         if (firebaseAuth.getCurrentUser() != null) {
                             if (firebaseAuth.getCurrentUser().getUid().equals(dataSnapshot.getValue().toString())) {
                                 btn_review_update.setVisibility(View.VISIBLE);
                                 btn_review_delete.setVisibility(View.VISIBLE);
+                                btn_review_like.setVisibility(View.GONE);
                             } else {
                                 btn_review_update.setVisibility(View.GONE);
                                 btn_review_delete.setVisibility(View.GONE);
+                                btn_review_like.setVisibility(View.VISIBLE);
                             }
                         } else if (firebaseAuth.getCurrentUser() == null) {
                             btn_review_update.setVisibility(View.GONE);
                             btn_review_delete.setVisibility(View.GONE);
+                            btn_review_like.setVisibility(View.VISIBLE);
                         }
                     }
                 }

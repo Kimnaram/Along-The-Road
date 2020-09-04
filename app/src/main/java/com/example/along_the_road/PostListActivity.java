@@ -65,14 +65,15 @@ public class PostListActivity extends AppCompatActivity {
             username = intent.getStringExtra("username");
         }
 
+//        recyclerviewSetting();
+
         adapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int pos) {
                 int _id = adapter.getItem(pos).get_id();
 
                 Intent intent = new Intent(getApplicationContext(), PostDetailActivity.class);
-                intent.putExtra("_id", Integer.toString(_id));
-                Log.d(TAG, "_id : " + _id);
+                intent.putExtra("PostId", Integer.toString(_id));
 
                 startActivity(intent);
             }
@@ -107,9 +108,6 @@ public class PostListActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-
-        adapter.clearAllItem();
-        adapter.notifyDataSetChanged();
 
         super.onPause();
 
@@ -148,8 +146,6 @@ public class PostListActivity extends AppCompatActivity {
 
     public void recyclerviewSetting() {
 
-        adapter.clearAllItem();
-
         firebaseDatabase.getReference("reviews").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -174,19 +170,17 @@ public class PostListActivity extends AppCompatActivity {
 
                             }
 
-                            Log.d(TAG, "id : " + id + ", title : " + title);
+                            Log.d(TAG, "id : " + id + ", title : " + title + " and like : " + like);
                             listReview = new ListReview(id, title, name, like);
                             adapter.addItem(listReview);
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
-
+                            Log.d(TAG, error.getMessage());
                         }
 
                     });
-
-                    adapter.notifyDataSetChanged();
 
                 }
             }
@@ -197,79 +191,9 @@ public class PostListActivity extends AppCompatActivity {
             }
         });
 
-        Log.d(TAG, "review list : " + reviewlist);
-
         rv_review_container.setAdapter(adapter);
 
     }
-
-//    public void showDatabase(String sort){
-//        Cursor iCursor = mDBOpenHelper.sortColumn(sort);
-//        Log.d("showDatabase", "DB Size: " + iCursor.getCount());
-//        adapter.clearAllItem();
-//        while(iCursor.moveToNext()){
-//            String tempIndex = iCursor.getString(iCursor.getColumnIndex("_id"));
-//            String tempTitle = iCursor.getString(iCursor.getColumnIndex("title"));
-////            tempTitle = setTextLength(tempTitle, 10);
-//            String tempUID = iCursor.getString(iCursor.getColumnIndex("userid"));
-////            tempID = setTextLength(tempID,10);
-//            String tempName = iCursor.getString(iCursor.getColumnIndex("name"));
-////            tempName = setTextLength(tempName,10);
-//            String tempContent = iCursor.getString(iCursor.getColumnIndex("content"));
-////            tempContent = setTextLength(tempContent,50);
-//            String tempLike = iCursor.getString(iCursor.getColumnIndex("like"));
-//            Drawable tempImage = getResources().getDrawable(R.mipmap.ic_launcher);
-//
-//            int tempID = Integer.parseInt(tempIndex);
-//
-//            listReview = new ListReview(tempID, tempTitle, tempUID, tempName, Integer.parseInt(tempLike), tempContent, tempImage);
-//            adapter.addItem(listReview);
-//        }
-//        adapter.notifyDataSetChanged();
-//    }
-
-//    public void showFirebase() {
-//
-//        Log.d(TAG, "showFirebase Start");
-//
-//        for (int i = 0; i < reviewlist; i++) {
-//            final int reviewid = i;
-//
-//            firebaseDatabase.getReference("board/" + i).addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//
-//                    Log.d(TAG, "리뷰 보이긴 하니?");
-//
-//                    int id = reviewid;
-//                    String title = "";
-//                    String name = "";
-//                    int like = 0;
-//
-//                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-//                        if (dataSnapshot.getKey().equals("title")) {
-//                            title = dataSnapshot.getValue().toString();
-//                        } else if (dataSnapshot.getKey().equals("name")) {
-//                            name = dataSnapshot.getValue().toString();
-//                        } else if (dataSnapshot.getKey().equals("like")) {
-//                            like = Integer.parseInt(dataSnapshot.getValue().toString());
-//                        }
-//
-//                        Log.d(TAG, "id : " + id + "title : " + title);
-//                        listReview = new ListReview(id, title, name, like);
-//                        adapter.addItem(listReview);
-//
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {
-//
-//                }
-//            });
-//        }
-//
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

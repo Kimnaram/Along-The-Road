@@ -107,15 +107,14 @@
         android:layout_height="45dp"
         android:text="+"
         android:fontFamily="@font/nanumsquare"
-        android:background="@drawable/common_round_btn_style"
+        android:background="@drawable/btn_style_common_reversal"
         android:textColor="@color/basic_color_FFFFFF"
-        android:backgroundTint="@color/basic_color_3A7AFF"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:textSize="30dp"
         android:layout_marginLeft="20dp"
         android:layout_marginBottom="20dp"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
 
     <RelativeLayout
         android:id="@+id/rl_course_map"
@@ -273,7 +272,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="30dp"
-                android:background="@drawable/common_btn_style"
+                android:background="@drawable/btn_style_common"
                 android:fontFamily="@font/nanumsquare"
                 android:text="검색하기"
                 android:textColor="@color/basic_color_3A7AFF"

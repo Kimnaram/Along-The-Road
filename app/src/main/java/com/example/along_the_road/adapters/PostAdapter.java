@@ -97,6 +97,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemViewHolder
         void onBind(ListReview listReview) {
             tv_item_title.setText(listReview.getTitle());
             tv_item_userid.setText(listReview.getName());
+            tv_item_like.setText(Integer.toString(listReview.getLike()));
         }
 
     }

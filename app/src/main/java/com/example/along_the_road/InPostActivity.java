@@ -98,29 +98,12 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         ib_image_remove = findViewById(R.id.ib_image_remove);
         findViewById(R.id.post_save_button).setOnClickListener(this);
 
-    }
-
-    @Override
-    public void onClick(View v) {
-
-        Drawable rimage = iv_review_image.getDrawable();
-        String image = "";
-        byte[] reviewImage = null;
-        if (iv_review_image != null) {
-
-            Bitmap bitmap = ((BitmapDrawable) rimage).getBitmap();
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            reviewImage = stream.toByteArray();
-            image = byteArrayToBinaryString(reviewImage);
-
-        }
-
         firebaseDatabase.getReference("reviews").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     reviewCount = Integer.parseInt(dataSnapshot.getKey());
+                    Log.d(TAG, "reviewCount : " + reviewCount);
                 }
             }
 
@@ -130,7 +113,27 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
-        String postId = Integer.toString(reviewCount + 1);
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        Drawable rimage = iv_review_image.getDrawable();
+        String image = "";
+        byte[] reviewImage = null;
+        if (iv_review_image.getDrawable() != null) {
+
+            Bitmap bitmap = ((BitmapDrawable) rimage).getBitmap();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            reviewImage = stream.toByteArray();
+            image = byteArrayToBinaryString(reviewImage);
+
+        }
+
+        int tempId = reviewCount + 1;
+        String postId = Integer.toString(tempId);
+        Log.d(TAG, "PostId : " + postId);
 
         final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         String uid = firebaseUser.getUid();

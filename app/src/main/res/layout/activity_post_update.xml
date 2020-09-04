@@ -1,9 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PostUpdateActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!--상단 툴바-->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:minHeight="?attr/actionBarSize">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/handon600"
+            android:text="내 후기 수정"
+            android:textColor="#ffffff"
+            android:textSize="25dp" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <RelativeLayout
+        android:id="@+id/rl_review_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:padding="5dp"
+        android:layout_marginBottom="10dp">
+
+        <EditText
+            android:id="@+id/et_review_title"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:background="@drawable/btn_style_border_line_white_background"
+            android:fontFamily="@font/nanumsquarebold"
+            android:gravity="center_vertical"
+            android:hint="제목"
+            android:paddingLeft="7dp"
+            android:inputType="text"
+            android:textColor="@color/basic_color_3A7AFF"
+            android:textColorHint="@color/basic_color_3A7AFF"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn_image_upload"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/et_review_title"
+            android:layout_marginTop="5dp"
+            android:background="@color/basic_color_3A7AFF"
+            android:fontFamily="@font/nanumsquarebold"
+            android:text="사진 올리기"
+            android:textSize="17sp"
+            android:textColor="@color/colorWhite" />
+
+        <RelativeLayout
+            android:id="@+id/rl_image_container"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="5dp"
+            android:layout_below="@+id/btn_image_upload"
+            android:visibility="gone" >
+
+            <ImageView
+                android:id="@+id/iv_review_image"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:scaleType="centerCrop" />
+
+            <ImageButton
+                android:id="@+id/ib_image_remove"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="5dp"
+                android:background="@null"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/rv_delete_100" />
+
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/et_review_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rl_image_container"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/btn_style_border_line_white_background"
+            android:fontFamily="@font/nanumsquareregular"
+            android:gravity="top|left"
+            android:hint="내용"
+            android:textColorHint="@color/basic_color_3A7AFF"
+            android:inputType="textMultiLine"
+            android:lines="20"
+            android:padding="7dp"
+            android:scrollHorizontally="false"
+            android:textColor="@color/basic_color_3A7AFF"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_review_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/rl_review_container"
+        android:background="@drawable/btn_style_common"
+        android:fontFamily="@font/nanumsquare"
+        android:text="취소"
+        android:layout_toLeftOf="@+id/btn_review_update"
+        android:textColor="@color/basic_color_3A7AFF"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btn_review_update"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/rl_review_container"
+        android:background="@drawable/btn_style_common"
+        android:layout_alignParentRight="true"
+        android:fontFamily="@font/nanumsquare"
+        android:text="저장"
+        android:textColor="@color/basic_color_3A7AFF"
+        android:textSize="18sp" />
+
+</RelativeLayout>
