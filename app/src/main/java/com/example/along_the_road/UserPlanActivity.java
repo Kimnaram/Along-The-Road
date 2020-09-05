@@ -28,6 +28,9 @@ import com.google.firebase.database.ValueEventListener;
 import org.apmem.tools.layouts.FlowLayout;
 
 import java.io.ByteArrayInputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class UserPlanActivity extends AppCompatActivity {
 
@@ -36,6 +39,8 @@ public class UserPlanActivity extends AppCompatActivity {
     private RelativeLayout rl_plan_container;
     private FlowLayout fl_course_list;
 
+    private TextView tv_info_my_plan_area;
+    private TextView tv_info_my_plan_day;
     private ImageView iv_hotel_image;
     private TextView tv_area_name;
     private TextView tv_start_date;
@@ -70,10 +75,13 @@ public class UserPlanActivity extends AppCompatActivity {
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         if (dataSnapshot.getKey().equals("city")) {
                             tv_area_name.setText(dataSnapshot.getValue().toString());
+                            tv_info_my_plan_area.setText(dataSnapshot.getValue().toString() + "  에서의");
                         } else if (dataSnapshot.getKey().equals("startDate")) {
                             tv_start_date.setText(dataSnapshot.getValue().toString());
                         } else if (dataSnapshot.getKey().equals("endDate")) {
                             tv_end_date.setText(dataSnapshot.getValue().toString());
+                        } else if(dataSnapshot.getKey().equals("stay")) {
+                            tv_info_my_plan_day.setText(dataSnapshot.getValue().toString());
                         } else if (dataSnapshot.getKey().equals("hotelName")) {
                             tv_hotel_name.setText(dataSnapshot.getValue().toString());
                         } else if (dataSnapshot.getKey().equals("hotelImage")) {
@@ -94,7 +102,7 @@ public class UserPlanActivity extends AppCompatActivity {
                                 }
                                 Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
                                 tv_course_name.setTypeface(typeface);
-                                tv_course_name.setTextSize(21);
+                                tv_course_name.setTextSize(17);
                                 fl_course_list.addView(tv_course_name);
                             }
                             tv_course_x.setVisibility(View.GONE);
@@ -107,6 +115,7 @@ public class UserPlanActivity extends AppCompatActivity {
 
                 }
             });
+
         } else {
             rl_plan_container.setVisibility(View.GONE);
             tv_popup_msg.setText("로그인이 필요한 기능입니다.");
@@ -129,6 +138,9 @@ public class UserPlanActivity extends AppCompatActivity {
         rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
         rl_plan_container = findViewById(R.id.rl_plan_container);
         fl_course_list = findViewById(R.id.fl_course_list);
+        
+        tv_info_my_plan_area = findViewById(R.id.tv_info_my_plan_area);
+        tv_info_my_plan_day = findViewById(R.id.tv_info_my_plan_day);
 
         iv_hotel_image = findViewById(R.id.iv_hotel_image);
         tv_area_name = findViewById(R.id.tv_area_name);

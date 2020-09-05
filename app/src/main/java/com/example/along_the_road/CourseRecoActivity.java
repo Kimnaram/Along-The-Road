@@ -53,8 +53,7 @@ import static com.example.along_the_road.localselectActivity.Detail_Code;
 
 public class CourseRecoActivity extends AppCompatActivity {
 
-    private final String COURSE_API_KEY = "c%2BrEUarPSYgJ%2FND6wKCRcSn1oSTDp1R8LM7EanqslnUCnQlIffN8q%2BIyuDljYHdOLwTD67w0LccbXpw0%2BFUJkA%3D%3D";
-    private final String MAP_API_KEY = "AIzaSyBEFfmlGQNbUyZpc8Iaf9V27tECiiQ0lgg";
+    private final static String TAG = "CourseRecoActivity";
 
     private String[][] Polyline;
     private LatLng end_LatLng;
@@ -715,7 +714,10 @@ public class CourseRecoActivity extends AppCompatActivity {
                                 HashMap<Object, String> hashMap = new HashMap<>();
 
                                 for(int k = 0; k < subname[no].length; k++) {
-                                    hashMap.put(Integer.toString(k), subname[no][k]);
+                                    String course = subname[no][k].split("\\(")[0];
+                                    course = course.split("\\[")[0];
+                                    Log.d(TAG, "course : " + course);
+                                    hashMap.put(Integer.toString(k), course);
                                 }
 
                                 firebaseDatabase = FirebaseDatabase.getInstance();
