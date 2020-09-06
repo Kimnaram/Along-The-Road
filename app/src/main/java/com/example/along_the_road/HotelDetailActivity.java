@@ -47,6 +47,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -74,6 +77,7 @@ public class HotelDetailActivity extends AppCompatActivity {
     private String City;
     private String Start_Date;
     private String End_Date;
+    private String Stay;
     private String URL;
     private String CheckIn;
     private String CheckOut;
@@ -180,6 +184,8 @@ public class HotelDetailActivity extends AppCompatActivity {
             String s_locationDetail = intent.getStringExtra("locationDetail");
             Start_Date = intent.getStringExtra("startDate");
             End_Date = intent.getStringExtra("endDate");
+            Stay(Start_Date, End_Date);
+            
             URL = intent.getStringExtra("URL");
             CheckIn = intent.getStringExtra("checkIn");
             CheckOut = intent.getStringExtra("checkOut");
@@ -567,6 +573,7 @@ public class HotelDetailActivity extends AppCompatActivity {
                     hashMap.put("city", City);
                     hashMap.put("startDate", Start_Date);
                     hashMap.put("endDate", End_Date);
+                    hashMap.put("stay", Stay);
                     hashMap.put("hotelName", HotelName);
                     hashMap.put("hotelImage", image);
                     if(URL != null) {
@@ -627,6 +634,34 @@ public class HotelDetailActivity extends AppCompatActivity {
         btn_reservation = findViewById(R.id.btn_reservation);
         btn_plus_plan = findViewById(R.id.btn_plus_myplan);
 
+    }
+    
+    public void Stay(String start_Date, String end_Date) {
+        try {
+
+            SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+            Date FirstDate = transFormat.parse(start_Date);
+            Date SecondDate = transFormat.parse(end_Date);
+
+            // Date로 변환된 두 날짜를 계산한 뒤 그 리턴값으로 long type 변수를 초기화 하고 있다.
+            // 연산결과 -950400000. long type 으로 return 된다.
+            long calDate = FirstDate.getTime() - SecondDate.getTime();
+
+            // Date.getTime() 은 해당날짜를 기준으로1970년 00:00:00 부터 몇 초가 흘렀는지를 반환해준다.
+            // 이제 24*60*60*1000(각 시간값에 따른 차이점) 을 나눠주면 일수가 나온다.
+            long calDateDays = calDate / ( 24*60*60*1000 );
+
+            calDateDays = Math.abs(calDateDays);
+            String days = Long.toString(calDateDays);
+            int nights = Integer.parseInt(days) - 1;
+
+            Stay = nights + "박" + days + "일";
+
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     // 바이너리 바이트 배열을 스트링으로
