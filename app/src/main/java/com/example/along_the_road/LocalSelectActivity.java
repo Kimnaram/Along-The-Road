@@ -22,7 +22,7 @@ import com.yongbeom.aircalendar.core.AirCalendarIntent;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class localselectActivity extends AppCompatActivity {
+public class LocalSelectActivity extends AppCompatActivity {
 
     private boolean state = false;
     public static int Code = 0;
@@ -83,10 +83,12 @@ public class localselectActivity extends AppCompatActivity {
                     } else if (extras != null) {
 
                         int REQUEST_CODE = extras.getInt("REQUEST");
+                        String fbareaName = extras.getString("fbareaName");
 
                         if (state == true && REQUEST_CODE == 1001) {
                             if (Code != 0) {
                                 Intent local_to_course = new Intent(getApplicationContext(), CourseRecoActivity.class);
+                                local_to_course.putExtra("fbareaName", fbareaName);
 
                                 finish();
                                 startActivity(local_to_course);
@@ -377,14 +379,14 @@ public class localselectActivity extends AppCompatActivity {
             case R.id.menu_logout:
                 FirebaseAuth.getInstance().signOut();
 
-                final ProgressDialog mDialog = new ProgressDialog(localselectActivity.this);
+                final ProgressDialog mDialog = new ProgressDialog(LocalSelectActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
 
                 finish();
                 mDialog.dismiss();
 
-                startActivity(new Intent(getApplicationContext(), localselectActivity.class));
+                startActivity(new Intent(getApplicationContext(), LocalSelectActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

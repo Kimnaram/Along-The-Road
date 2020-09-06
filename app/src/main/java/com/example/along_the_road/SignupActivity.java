@@ -79,12 +79,14 @@ public class SignupActivity extends AppCompatActivity {
                                             String email = user.getEmail();
                                             String uid = user.getUid();
                                             String name = ed_username_field.getText().toString();
+                                            String pwd = ed_pw_field.getText().toString();
 
                                             //해쉬맵 테이블을 파이어베이스 데이터베이스에 저장
                                             HashMap<Object, String> hashMap = new HashMap<>();
                                             hashMap.put("email", email);
                                             hashMap.put("uid", uid);
                                             hashMap.put("name", name);
+                                            hashMap.put("pwd", pwd);
 
                                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                                             DatabaseReference reference = database.getReference("users");

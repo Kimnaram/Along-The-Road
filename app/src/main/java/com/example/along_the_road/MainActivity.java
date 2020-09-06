@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton review_btn; // 페이지 전환 버튼 (리뷰 작성)
 
     private String username = "비회원";
+    private String area = "";
 
     @SuppressLint("WrongConstant")
     @Override
@@ -129,6 +130,12 @@ public class MainActivity extends AppCompatActivity {
                         if(dataSnapshot.getKey().equals("name")) {
                             username = dataSnapshot.getValue().toString();
                             tv_username.setText(username + " 님");
+                        } else if (dataSnapshot.getKey().equals("plan")) {
+                            for(DataSnapshot Snapshot : dataSnapshot.getChildren()) {
+                                if(Snapshot.getKey().equals("city")) {
+                                    area = Snapshot.getValue().toString();
+                                }
+                            }
                         }
                 }
 
@@ -209,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         local_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), localselectActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LocalSelectActivity.class);
 
                 startActivity(intent);
             }
@@ -228,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), CourseRecoActivity.class);
+                intent.putExtra("fbareaName", area);
 
                 startActivity(intent);
             }

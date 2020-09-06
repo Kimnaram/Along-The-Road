@@ -15,10 +15,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,6 +50,7 @@ public class UserPlanActivity extends AppCompatActivity {
     private TextView tv_hotel_name;
     private TextView tv_course_x;
     private TextView tv_popup_msg;
+    private Button btn_reservation;
 
     private FirebaseAuth firebaseAuth;
 
@@ -66,9 +69,9 @@ public class UserPlanActivity extends AppCompatActivity {
         initAllComponent();
 
         if(firebaseAuth.getCurrentUser() != null) {
-            String uid = firebaseAuth.getCurrentUser().getUid();
+            final String uid = firebaseAuth.getCurrentUser().getUid();
 
-            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+            final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
             firebaseDatabase.getReference("users/" + uid + "/plan").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -116,6 +119,25 @@ public class UserPlanActivity extends AppCompatActivity {
                 }
             });
 
+            btn_reservation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    firebaseDatabase.getReference("users/" + uid + "/plan").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            tv_popup_msg.setText("삭제되었습니다.\n새로운 일정을 만들 수 있습니다!");
+                            rl_info_popup.setVisibility(View.VISIBLE);
+                            rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    finish();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
         } else {
             rl_plan_container.setVisibility(View.GONE);
             tv_popup_msg.setText("로그인이 필요한 기능입니다.");
@@ -149,6 +171,8 @@ public class UserPlanActivity extends AppCompatActivity {
         tv_hotel_name = findViewById(R.id.tv_hotel_name);
         tv_course_x = findViewById(R.id.tv_course_x);
         tv_popup_msg = findViewById(R.id.tv_popup_msg);
+
+        btn_reservation = findViewById(R.id.btn_reservation);
 
     }
 

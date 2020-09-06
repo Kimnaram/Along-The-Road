@@ -66,8 +66,8 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
 import static android.view.View.GONE;
-import static com.example.along_the_road.localselectActivity.Code;
-import static com.example.along_the_road.localselectActivity.Detail_Code;
+import static com.example.along_the_road.LocalSelectActivity.Code;
+import static com.example.along_the_road.LocalSelectActivity.Detail_Code;
 
 public class HotelSelectActivity extends AppCompatActivity implements OnMapReadyCallback {
 

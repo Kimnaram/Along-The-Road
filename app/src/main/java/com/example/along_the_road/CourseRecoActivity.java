@@ -48,16 +48,14 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import static com.example.along_the_road.localselectActivity.Code;
-import static com.example.along_the_road.localselectActivity.Detail_Code;
+import static com.example.along_the_road.LocalSelectActivity.Code;
+import static com.example.along_the_road.LocalSelectActivity.Detail_Code;
 
 public class CourseRecoActivity extends AppCompatActivity {
 
     private final static String TAG = "CourseRecoActivity";
 
-    private String[][] Polyline;
-    private LatLng end_LatLng;
-
+    private final String API_KEY = "API KEY";
     private String area_Course = null; // URL
     private String detail_Course = null;
     private String time_and_distance = null;
@@ -66,9 +64,11 @@ public class CourseRecoActivity extends AppCompatActivity {
     private String selected_course_txt = null;
     private String d_and_t = null;
 
-    //    private int areaCode = 1; // 테스트를 위함
     private int areaCode = Code;
     private int detailCode = Detail_Code;
+    private String areaName = "";
+    private String fbareaName = "";
+    private String city = "";
     private String Theme = null;
     private String Total_Theme = null;
     private boolean bodycheck;
@@ -110,6 +110,7 @@ public class CourseRecoActivity extends AppCompatActivity {
     private RelativeLayout rl_top;
     private RelativeLayout rl_info_popup;
     private RelativeLayout rl_popup_info_ok;
+    private RelativeLayout rl_popup_info_cancel;
     private LinearLayout ll_course_list;
     private LinearLayout[] ll_course_text_box;
     private FlowLayout[] fl_course_text;
@@ -146,8 +147,15 @@ public class CourseRecoActivity extends AppCompatActivity {
 
         rl_info_popup = findViewById(R.id.rl_info_popup);
         rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
+        rl_popup_info_cancel = findViewById(R.id.rl_popup_info_cancel);
 
-        if (areaCode == 0) {
+        Intent intent = getIntent();
+        if (intent != null) {
+            fbareaName = intent.getStringExtra("fbareaName");
+            Log.d(TAG, "fbareaName : " + fbareaName);
+        }
+
+        if (areaCode == 0 && fbareaName.isEmpty()) {
             String popup_msg = "지역을 선택해야 합니다.";
             tv_popup_msg = findViewById(R.id.tv_popup_msg);
             tv_popup_msg.setText(popup_msg);
@@ -156,12 +164,14 @@ public class CourseRecoActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     rl_info_popup.setVisibility(View.GONE);
-                    Intent course_to_local = new Intent(getApplicationContext(), localselectActivity.class);
+                    Intent course_to_local = new Intent(getApplicationContext(), LocalSelectActivity.class);
                     course_to_local.putExtra("REQUEST", AreaCodeIsNull);
 
                     startActivity(course_to_local);
                 }
             });
+        } else if(areaCode == 0 && !fbareaName.isEmpty()) {
+            FixAreaCode(fbareaName);
         }
 
         initView();
@@ -267,6 +277,7 @@ public class CourseRecoActivity extends AppCompatActivity {
                         tv_popup_msg = findViewById(R.id.tv_popup_msg);
                         tv_popup_msg.setText(popup_msg);
                         rl_top.setVisibility(View.GONE);
+                        btn_plus_myplan.setVisibility(View.GONE);
                         rl_info_popup.setVisibility(View.VISIBLE); // 팝업을 띄움
 
                         rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
@@ -541,7 +552,6 @@ public class CourseRecoActivity extends AppCompatActivity {
                     rl_course.setVisibility(View.GONE);
                     rl_top.setVisibility(View.VISIBLE);
 
-                    String city = null;
                     String course = null;
 
                     switch (areaCode) {
@@ -635,7 +645,8 @@ public class CourseRecoActivity extends AppCompatActivity {
                         break;
                     case 1:
                         areaCode = 0;
-                        Intent course_to_local = new Intent(getApplicationContext(), localselectActivity.class);
+                        Intent course_to_local = new Intent(getApplicationContext(), LocalSelectActivity.class);
+                        course_to_local.putExtra("fbareaName", fbareaName);
                         course_to_local.putExtra("REQUEST", AreaCodeIsNull);
 
                         startActivity(course_to_local);
@@ -663,6 +674,42 @@ public class CourseRecoActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void FixAreaCode(String areaName) {
+        switch (fbareaName) {
+            case "서울":
+                areaCode = 1;
+                break;
+            case "대구":
+                areaCode = 4;
+                break;
+            case "부산":
+                areaCode = 6;
+                break;
+            case "강릉":
+                areaCode = 32;
+                detailCode = 1;
+                break;
+            case "속초":
+                areaCode = 32;
+                detailCode = 5;
+                break;
+            case "경주":
+                areaCode = 35;
+                break;
+            case "전주":
+                areaCode = 37;
+                break;
+            case "여수":
+                areaCode = 38;
+                break;
+            case "제주":
+                areaCode = 39;
+                break;
+            case "x":
+                break;
+        }
     }
 
     public void MakeListTextView(String t, int i) {
@@ -708,23 +755,72 @@ public class CourseRecoActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             if(firebaseAuth.getCurrentUser() != null) {
 
-                                FirebaseUser user = firebaseAuth.getCurrentUser();
-                                String uid = user.getUid();
+                                if(fbareaName == null || fbareaName.equals(city)) {
+                                    Log.d(TAG, "fbareaName : " + fbareaName);
 
-                                HashMap<Object, String> hashMap = new HashMap<>();
+                                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                                    String uid = user.getUid();
 
-                                for(int k = 0; k < subname[no].length; k++) {
-                                    String course = subname[no][k].split("\\(")[0];
-                                    course = course.split("\\[")[0];
-                                    Log.d(TAG, "course : " + course);
-                                    hashMap.put(Integer.toString(k), course);
+                                    HashMap<Object, String> hashMap = new HashMap<>();
+
+                                    for (int k = 0; k < subname[no].length; k++) {
+                                        String course = subname[no][k].split("\\(")[0];
+                                        course = course.split("\\[")[0];
+                                        Log.d(TAG, "course : " + course);
+                                        hashMap.put(Integer.toString(k), course);
+                                    }
+
+                                    HashMap<Object, String> CityMap = new HashMap<>();
+
+                                    CityMap.put("city", city);
+
+                                    firebaseDatabase = FirebaseDatabase.getInstance();
+                                    DatabaseReference reference = firebaseDatabase.getReference("users/" + uid + "/plan");
+                                    reference.setValue(CityMap);
+                                    reference.child("course").setValue(hashMap);
+
+                                    Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    String popup_msg = "초기의 여행 계획과 다른 지역입니다.\n그래도 저장하시겠습니까?";
+                                    tv_popup_msg = findViewById(R.id.tv_popup_msg);
+                                    tv_popup_msg.setText(popup_msg);
+                                    rl_top.setVisibility(View.GONE);
+                                    btn_plus_myplan.setVisibility(View.GONE);
+                                    rl_info_popup.setVisibility(View.VISIBLE); // 팝업을 띄움
+
+                                    rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            rl_info_popup.setVisibility(View.GONE);
+                                            rl_top.setVisibility(View.VISIBLE);
+
+                                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                                            String uid = user.getUid();
+
+                                            HashMap<Object, String> hashMap = new HashMap<>();
+
+                                            for (int k = 0; k < subname[no].length; k++) {
+                                                String course = subname[no][k].split("\\(")[0];
+                                                course = course.split("\\[")[0];
+                                                Log.d(TAG, "course : " + course);
+                                                hashMap.put(Integer.toString(k), course);
+                                            }
+
+                                            firebaseDatabase = FirebaseDatabase.getInstance();
+                                            DatabaseReference reference = firebaseDatabase.getReference("users/" + uid + "/plan");
+                                            reference.child("course").setValue(hashMap);
+
+                                            Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    rl_popup_info_cancel.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            rl_info_popup.setVisibility(View.GONE);
+                                            rl_top.setVisibility(View.VISIBLE);
+                                        }
+                                    });
                                 }
-
-                                firebaseDatabase = FirebaseDatabase.getInstance();
-                                DatabaseReference reference = firebaseDatabase.getReference("users/" + uid + "/plan");
-                                reference.child("course").setValue(hashMap);
-
-                                Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(getApplicationContext(), "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
                             }

@@ -223,6 +223,20 @@
 
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/btn_reservation"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/btn_style_common"
+        android:fontFamily="@font/nanumsquare"
+        android:text="계획 삭제"
+        android:textColor="@color/basic_color_3A7AFF"
+        android:textSize="25sp" />
+
     <RelativeLayout
         android:id="@+id/rl_info_popup"
         android:layout_width="match_parent"

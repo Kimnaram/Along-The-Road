@@ -39,7 +39,7 @@
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".TrafficSearchActivity" />
         <activity android:name=".HotelSelectActivity" />
-        <activity android:name=".localselectActivity">
+        <activity android:name=".LocalSelectActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
