@@ -85,7 +85,7 @@ public class managebudgetActivity extends AppCompatActivity {
             thedate.setText(date);
             Log.d(TAG, "string is not empty");
         } else{
-            //date = getToday_date();
+            date = getToday_date();
             thedate.setText(View_DATE);
         }
 
@@ -145,12 +145,13 @@ public class managebudgetActivity extends AppCompatActivity {
         eContext.setText( "" );
         ePrice.setText( "" );
 
-        // 저장 버튼 누른 후 키보드 안보이게 하기
+        // 추가 버튼 누른 후 키보드 안보이게 하기
         InputMethodManager imm =
                 (InputMethodManager) getSystemService( Context.INPUT_METHOD_SERVICE );
         imm.hideSoftInputFromWindow( ePrice.getWindowToken(), 0 );
     }
 
+    //날짜 불러오기
     static public String getToday_date(){
         SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("yyyy/M/d", Locale.KOREA);
         Date currentTime = new Date();
@@ -158,6 +159,7 @@ public class managebudgetActivity extends AppCompatActivity {
         return Today_day;
     }
 
+    //시간 불러오기
     static public String getThis_time(){
         SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("HHMMSS", Locale.KOREA);
         Date currentTime = new Date();
@@ -173,6 +175,7 @@ public class managebudgetActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finish();
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
     }
 }
