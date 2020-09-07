@@ -6,6 +6,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -30,9 +32,11 @@ import com.google.firebase.database.ValueEventListener;
 import org.apmem.tools.layouts.FlowLayout;
 
 import java.io.ByteArrayInputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class UserPlanActivity extends AppCompatActivity {
 
@@ -51,6 +55,10 @@ public class UserPlanActivity extends AppCompatActivity {
     private TextView tv_course_x;
     private TextView tv_popup_msg;
     private Button btn_reservation;
+
+    private Bitmap[] bitmap;
+
+    private int img_no = 0;
 
     private FirebaseAuth firebaseAuth;
 
@@ -75,16 +83,18 @@ public class UserPlanActivity extends AppCompatActivity {
             firebaseDatabase.getReference("users/" + uid + "/plan").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    for(final DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         if (dataSnapshot.getKey().equals("city")) {
                             tv_area_name.setText(dataSnapshot.getValue().toString());
                             tv_info_my_plan_area.setText(dataSnapshot.getValue().toString() + "  에서의");
+                            tv_info_my_plan_area.setVisibility(View.VISIBLE);
                         } else if (dataSnapshot.getKey().equals("startDate")) {
                             tv_start_date.setText(dataSnapshot.getValue().toString());
                         } else if (dataSnapshot.getKey().equals("endDate")) {
                             tv_end_date.setText(dataSnapshot.getValue().toString());
                         } else if(dataSnapshot.getKey().equals("stay")) {
                             tv_info_my_plan_day.setText(dataSnapshot.getValue().toString());
+                            tv_info_my_plan_day.setVisibility(View.VISIBLE);
                         } else if (dataSnapshot.getKey().equals("hotelName")) {
                             tv_hotel_name.setText(dataSnapshot.getValue().toString());
                         } else if (dataSnapshot.getKey().equals("hotelImage")) {
@@ -100,7 +110,7 @@ public class UserPlanActivity extends AppCompatActivity {
                                 TextView tv_course_name = new TextView(UserPlanActivity.this);
                                 if(i < length - 1) {
                                     tv_course_name.setText(dataSnapshot.child(Integer.toString(i)).getValue().toString() + " > ");
-                                } else {
+                                } else if (i == length - 1) {
                                     tv_course_name.setText(dataSnapshot.child(Integer.toString(i)).getValue().toString());
                                 }
                                 Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
@@ -109,6 +119,46 @@ public class UserPlanActivity extends AppCompatActivity {
                                 fl_course_list.addView(tv_course_name);
                             }
                             tv_course_x.setVisibility(View.GONE);
+                        } else if (dataSnapshot.getKey().equals("courseImage")) {
+                            int length = Integer.parseInt(Long.toString(dataSnapshot.getChildrenCount()));
+                            for(int i = 0; i < length; i++) {
+                                bitmap = new Bitmap[length];
+                                final int no = i;
+                                if(iv_hotel_image.getDrawable() == null) {
+                                    Thread thread = new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // TODO Auto-generated method stub
+                                            try {
+                                                URL url = new URL(dataSnapshot.child(Integer.toString(no)).getValue().toString());
+                                                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                                conn.setDoInput(true);
+                                                conn.connect();
+
+                                                InputStream is = conn.getInputStream();
+                                                bitmap[no] = BitmapFactory.decodeStream(is);
+                                            } catch (MalformedURLException e) {
+                                                e.printStackTrace();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+
+                                    thread.start();
+
+                                    try {
+                                        thread.join();
+
+                                        iv_hotel_image.setImageBitmap(bitmap[0]);
+                                        img_no = 0;
+//                                        hotelImg = new BitmapDrawable(bitmap);
+
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -118,6 +168,10 @@ public class UserPlanActivity extends AppCompatActivity {
 
                 }
             });
+
+            if(!tv_info_my_plan_area.getText().toString().isEmpty() && tv_info_my_plan_day.getText().toString().isEmpty()) {
+                tv_info_my_plan_day.setText("당일치기");
+            }
 
             btn_reservation.setOnClickListener(new View.OnClickListener() {
                 @Override

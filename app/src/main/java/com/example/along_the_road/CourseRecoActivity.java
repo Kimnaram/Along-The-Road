@@ -7,6 +7,8 @@ import androidx.core.content.res.ResourcesCompat;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -14,6 +16,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -41,6 +45,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -55,7 +60,7 @@ public class CourseRecoActivity extends AppCompatActivity {
 
     private final static String TAG = "CourseRecoActivity";
 
-    private final String API_KEY = "API KEY";
+    private final String API_KEY = "9KtaLf7bgKpGhll9Cuxu92gdUoYDBjscVuDYFx4Pw%2B28j0UlsFrx2HKJxLzpYCrcNicyaFtMCzHIlt7tKohoVg%3D%3D";
     private String area_Course = null; // URL
     private String detail_Course = null;
     private String time_and_distance = null;
@@ -77,7 +82,7 @@ public class CourseRecoActivity extends AppCompatActivity {
     private String[] CourseImg;
     private String[] Title;
     private String[][] subname;
-    private String[] subdetailimg;
+    private String[][] subdetailimg;
 
     private String from = null;
     private String to = null;
@@ -126,6 +131,7 @@ public class CourseRecoActivity extends AppCompatActivity {
     private Spinner spinner;
     private String[] spinnerArr;
     private String selected_spinner = null;
+    private Bitmap bitmap;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
@@ -483,6 +489,7 @@ public class CourseRecoActivity extends AppCompatActivity {
                 if (ContentID != null) {
 
                     subname = new String[ContentID.length][];
+                    subdetailimg = new String[ContentID.length][];
 
                     for (int k = 0; k < ContentID.length; k++) {
 
@@ -518,7 +525,7 @@ public class CourseRecoActivity extends AppCompatActivity {
                             d_list_len = itemArray.length();
 
                             subname[k] = new String[d_list_len];
-                            subdetailimg = new String[d_list_len];
+                            subdetailimg[k] = new String[d_list_len];
 
                             for (int i = 0; i < d_list_len; i++) {
 
@@ -526,17 +533,14 @@ public class CourseRecoActivity extends AppCompatActivity {
 
                                 subname[k][i] = CourseObject.getString("subname");
 
-                                //subdetailimg[i] = CourseObject.getString("subdetailimg");
+                                boolean imgcheck = CourseObject.isNull("subdetailimg");
+                                if(imgcheck == false) {
+                                    subdetailimg[k][i] = CourseObject.getString("subdetailimg");
+                                }
 
                                 MakeCourseDetail(subname[k][i], i, k);
 
                             }
-
-                            for (int i = 0; i < d_list_len; i++) {
-
-                                System.out.println(subname[k][i]);
-                            }
-
 
                         } catch (NullPointerException e) {
                             e.printStackTrace();
@@ -761,23 +765,27 @@ public class CourseRecoActivity extends AppCompatActivity {
                                     FirebaseUser user = firebaseAuth.getCurrentUser();
                                     String uid = user.getUid();
 
-                                    HashMap<Object, String> hashMap = new HashMap<>();
+                                    HashMap<Object, String> CourseMap = new HashMap<>();
 
                                     for (int k = 0; k < subname[no].length; k++) {
                                         String course = subname[no][k].split("\\(")[0];
                                         course = course.split("\\[")[0];
                                         Log.d(TAG, "course : " + course);
-                                        hashMap.put(Integer.toString(k), course);
+                                        CourseMap.put(Integer.toString(k), course);
                                     }
 
-                                    HashMap<Object, String> CityMap = new HashMap<>();
+                                    HashMap<Object, String> ImageMap = new HashMap<>();
 
-                                    CityMap.put("city", city);
+                                    for(int k = 0; k < subdetailimg[no].length; k++) {
+                                        Log.d(TAG, "image : " + subdetailimg[no][k]);
+                                        ImageMap.put(Integer.toString(k), subdetailimg[no][k]);
+                                    }
 
                                     firebaseDatabase = FirebaseDatabase.getInstance();
                                     DatabaseReference reference = firebaseDatabase.getReference("users/" + uid + "/plan");
-                                    reference.setValue(CityMap);
-                                    reference.child("course").setValue(hashMap);
+                                    reference.child("city").setValue(city);
+                                    reference.child("course").setValue(CourseMap);
+                                    reference.child("courseImage").setValue(ImageMap);
 
                                     Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
                                 } else {
@@ -797,18 +805,27 @@ public class CourseRecoActivity extends AppCompatActivity {
                                             FirebaseUser user = firebaseAuth.getCurrentUser();
                                             String uid = user.getUid();
 
-                                            HashMap<Object, String> hashMap = new HashMap<>();
+                                            HashMap<Object, String> CourseMap = new HashMap<>();
 
                                             for (int k = 0; k < subname[no].length; k++) {
                                                 String course = subname[no][k].split("\\(")[0];
                                                 course = course.split("\\[")[0];
                                                 Log.d(TAG, "course : " + course);
-                                                hashMap.put(Integer.toString(k), course);
+                                                CourseMap.put(Integer.toString(k), course);
+                                            }
+
+                                            HashMap<Object, String> ImageMap = new HashMap<>();
+
+                                            for(int k = 0; k < subdetailimg[no].length; k++) {
+                                                Log.d(TAG, "image : " + subdetailimg[no][k]);
+                                                ImageMap.put(Integer.toString(k), subdetailimg[no][k]);
                                             }
 
                                             firebaseDatabase = FirebaseDatabase.getInstance();
                                             DatabaseReference reference = firebaseDatabase.getReference("users/" + uid + "/plan");
-                                            reference.child("course").setValue(hashMap);
+                                            reference.child("city").setValue(city);
+                                            reference.child("course").setValue(CourseMap);
+                                            reference.child("courseImage").setValue(ImageMap);
 
                                             Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
                                         }

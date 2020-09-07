@@ -569,20 +569,17 @@ public class HotelDetailActivity extends AppCompatActivity {
                         image = null;
                     }
 
-                    HashMap<Object, String> hashMap = new HashMap<>();
-                    hashMap.put("city", City);
-                    hashMap.put("startDate", Start_Date);
-                    hashMap.put("endDate", End_Date);
-                    hashMap.put("stay", Stay);
-                    hashMap.put("hotelName", HotelName);
-                    hashMap.put("hotelImage", image);
-                    if(URL != null) {
-                        hashMap.put("hotelWeb", URL.split("\"")[1]);
-                    }
-
                     firebaseDatabase = FirebaseDatabase.getInstance();
-                    DatabaseReference reference = firebaseDatabase.getReference("users");
-                    reference.child(uid).child("plan").setValue(hashMap);
+                    DatabaseReference reference = firebaseDatabase.getReference("users/" + uid);
+                    reference.child("plan").child("city").setValue(City);
+                    reference.child("plan").child("startDate").setValue(Start_Date);
+                    reference.child("plan").child("endDate").setValue(End_Date);
+                    reference.child("plan").child("stay").setValue(Stay);
+                    reference.child("plan").child("hotelName").setValue(HotelName);
+                    reference.child("plan").child("hotelImage").setValue(image);
+                    if(URL != null) {
+                        reference.child("plan").child("hotelWeb").setValue(URL.split("\"")[1]);
+                    }
 
                     Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
                 } else {
