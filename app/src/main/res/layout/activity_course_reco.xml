@@ -119,18 +119,29 @@
     <RelativeLayout
         android:id="@+id/rl_course_map"
         android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_height="280dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
         android:visibility="gone">
 
+        <ImageButton
+            android:id="@+id/ib_map_remove"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_above="@+id/fr_hotel_map"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/rv_delete_100"
+            android:background="@null"
+            android:gravity="center" />
+
         <fragment
             android:id="@+id/fr_course_map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_alignParentBottom="true"
             tools:context=".CourseRecoActivity" />
 
     </RelativeLayout>
@@ -266,7 +277,7 @@
             </RadioGroup>
 
             <Button
-                android:id="@+id/course_select"
+                android:id="@+id/btn_course_select"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
@@ -328,7 +339,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:background="@drawable/popup_btn_style"
-                android:layout_alignParentLeft="true">
+                android:layout_toLeftOf="@+id/rl_popup_info_cancel">
 
                 <TextView
                     android:id="@+id/click_btn"
@@ -351,7 +362,8 @@
                 android:gravity="center"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_toRightOf="@+id/rl_popup_info_ok">
+                android:layout_alignParentRight="true"
+                android:visibility="gone">
 
                 <TextView
                     android:fontFamily="@font/robotolight"

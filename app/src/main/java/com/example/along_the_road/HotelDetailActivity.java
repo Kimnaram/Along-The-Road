@@ -22,6 +22,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -614,6 +615,24 @@ public class HotelDetailActivity extends AppCompatActivity {
                     String msg = "웹페이지로 이동할 수 없습니다.";
                     Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        btn_reservation.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN :
+                        btn_reservation.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
+                        btn_reservation.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                        return false;
+
+                    case MotionEvent.ACTION_UP :
+                        btn_reservation.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
+                        btn_reservation.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                        return false;
+                }
+                return false;
             }
         });
     }

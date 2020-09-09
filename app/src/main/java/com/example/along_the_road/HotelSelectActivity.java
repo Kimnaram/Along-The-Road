@@ -93,7 +93,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     private static final int Yeosu = 38;
     private static final int Jeju = 39;
 
-    public static final int AreaCodeIsNull = 1002;
+    public static final int AreaCodeIsNull = 1003;
 
     private int areaCode = Code;
     private int detailCode = Detail_Code;
@@ -141,7 +141,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     // component
     private ClearEditText et_search_text;
     private TextView tv_popup_msg;
-    private TextView ith_hotel;
     private Button btn_map_remove;
     private ImageView hotelimg;
     private Drawable ea_img;
@@ -259,7 +258,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 intent.putExtra("checkIn", adapter.getItem(position).getCheckIn());
                 intent.putExtra("checkOut", adapter.getItem(position).getCheckOut());
                 intent.putExtra("hotelImage", hotelImage);
-                Log.d(TAG, "hotelImage : " + hotelImage);
 
                 adapter.notifyDataSetChanged();
 
@@ -460,7 +458,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                             google_url = "https://www.google.com/search?q=" + HotelName[i] + "&tbm=isch";
 
                             final String google_img = new ImageTask().execute().get();
-                            Log.d(TAG, "google_img : " + google_img);
 
 //                            Thread thread = new Thread(new Runnable() {
 //                                @Override
@@ -558,8 +555,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                     listHotel = new ListHotel(ContentID[i], hotelImg, HotelName[i], checkintime[i], checkouttime[i], parkinglodging[i], i);
                                 }
 
-                                Log.d(TAG, "listHotel : " + listHotel.getHotelname());
-
                                 adapter.addItem(listHotel);
 
                                 hotelImg = null;
@@ -623,7 +618,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                     } else if (imagecheck == true) {
 
                         google_url = "https://www.google.com/search?q=" + HotelName[0] + "&tbm=isch";
-                        Log.d(TAG, "google_url : " + google_url);
 
                         String google_img = new ImageTask().execute().get();
 
@@ -646,9 +640,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                     } else {
                         listHotel = new ListHotel(ContentID[0], hotelImg, HotelName[0], checkintime[0], checkouttime[0], parkinglodging[0], 0);
                     }
-
-                    Log.d(TAG, "listHotel : " + listHotel.getHotelname());
-                    Log.d(TAG, "hotelImg : " + hotelImg.getAlpha());
 
                     adapter.addItem(listHotel);
 
@@ -863,7 +854,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
             URL url = null;
             try {
                 Document doc = Jsoup.connect(google_url).get();
-                Log.d(TAG, "url : " + google_url);
                 final Elements hotel_image = doc.body().select("div#islrg div.islrc div.isv-r a.wXeWr div.bRMDJf img");
                 Handler handler = new Handler(Looper.getMainLooper()); // 객체생성
                 handler.post(new Runnable() {
@@ -873,7 +863,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                         for(Element element : hotel_image) {
                             receiveMsg = element.absUrl("src");
                         }
-                        Log.d(TAG, "google_image : " + receiveMsg);
                     }
                 });
 

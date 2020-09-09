@@ -20,8 +20,8 @@
     </style>
 
     <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog">
-        <item name="colorAccent">@color/colorBlack</item>
-        <item name="android:textColorPrimary">@color/colorBlack</item>
+        <item name="colorAccent">@color/basic_color_3A7AFF</item>
+        <item name="android:textColorPrimary">@color/basic_color_3A7AFF</item>
         <item name="android:fontFamily">@font/nanumsquareregular</item>
         <item name="android:textSize">@dimen/dialog_min_textSize</item>
         <item name="android:windowMinWidthMajor">@dimen/dialog_min_width_major</item>

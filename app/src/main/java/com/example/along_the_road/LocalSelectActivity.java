@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,8 +30,8 @@ public class LocalSelectActivity extends AppCompatActivity {
     public static int Detail_Code = 0;
 
     public static final int CALENDAR_REQUEST_CODE = 1001;
-    public static final int COURSE_REQUEST_CODE = 1001;
-    public static final int HOTEL_REQUEST_CODE = 1002;
+    public static final int COURSE_REQUEST_CODE = 1002;
+    public static final int HOTEL_REQUEST_CODE = 1003;
 
     private FirebaseAuth firebaseAuth;
 
@@ -85,17 +86,19 @@ public class LocalSelectActivity extends AppCompatActivity {
                         int REQUEST_CODE = extras.getInt("REQUEST");
                         String fbareaName = extras.getString("fbareaName");
 
-                        if (state == true && REQUEST_CODE == 1001) {
+                        if (state == true && REQUEST_CODE == COURSE_REQUEST_CODE) {
                             if (Code != 0) {
                                 Intent local_to_course = new Intent(getApplicationContext(), CourseRecoActivity.class);
                                 local_to_course.putExtra("fbareaName", fbareaName);
+                                Log.d("LocalSelectActivity", "area : " + Code);
+                                Log.d("LocalSelectActivity", "detail area : " + Detail_Code);
 
                                 finish();
                                 startActivity(local_to_course);
                             } else {
                                 Toast.makeText(getApplicationContext(), "지역을 선택하셔야 합니다.", Toast.LENGTH_SHORT).show();
                             }
-                        } else if(state == true && REQUEST_CODE == 1002) {
+                        } else if(state == true && REQUEST_CODE == HOTEL_REQUEST_CODE) {
                             if (Code != 0) {
                                 Intent local_to_hotel = new Intent(getApplicationContext(), HotelSelectActivity.class);
 
