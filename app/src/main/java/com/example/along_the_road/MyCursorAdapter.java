@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.CursorAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,6 +21,8 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static com.example.along_the_road.managebudgetActivity.TABLE_NAME;
 
 
 public class MyCursorAdapter extends CursorAdapter {
@@ -66,6 +70,16 @@ public class MyCursorAdapter extends CursorAdapter {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+
+                                MyDBHelper dbHelper;
+                                SQLiteDatabase db = null;
+
+                                dbHelper = new MyDBHelper(context);
+                                db = dbHelper.getWritableDatabase();
+
+                                db.delete(TABLE_NAME, null, null);
+                                db.close();
+
                                 Toast.makeText(context,"삭제가 왜 안되지..",Toast.LENGTH_LONG).show();
                             }
                         });
