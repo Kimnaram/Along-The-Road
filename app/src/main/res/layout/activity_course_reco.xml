@@ -90,10 +90,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/rl_top"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:orientation="vertical"
                 android:padding="10dp"
                 android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_info_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/nanumsquarebold"
+                    android:text="코스를 클릭하면 상세 코스를 볼 수 있습니다.\n상세 코스에서 장소 두 곳을 클릭하면 길 찾기로 넘어갑니다."
+                    android:textSize="15dp"
+                    android:gravity="right"
+                    android:layout_marginBottom="10dp"
+                    android:padding="5dp"/>
 
             </LinearLayout>
 

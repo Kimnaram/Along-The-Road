@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class TrafficSearchActivity extends AppCompatActivity
         implements OnMapReadyCallback {
@@ -187,7 +188,7 @@ public class TrafficSearchActivity extends AppCompatActivity
                 r_list_len = 0;
                 list_len = null; // 다시 값 초기화
 
-                rl_container.setVisibility(View.VISIBLE);
+                rl_container.setVisibility(VISIBLE);
 
                 String depart = dep_loc.getText().toString();
                 String arrival = arr_loc.getText().toString();
@@ -244,7 +245,6 @@ public class TrafficSearchActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 ll_detail_course_container.setVisibility(GONE);
-                btn_reservation.setVisibility(View.VISIBLE);
             }
         });
 
@@ -657,7 +657,7 @@ public class TrafficSearchActivity extends AppCompatActivity
         String t_str = step[j][i].split(" ")[0];
         if(t_str.equals("KTX경부선") || t_str.equals("KTX호남선")
             || t_str.equals("SRT경부선") || t_str.equals("SRT호남선")) {
-            btn_reservation.setVisibility(View.VISIBLE);
+            btn_reservation.setVisibility(VISIBLE);
             final String reservation_url = "http://www.letskorail.com/";
             btn_reservation.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -701,7 +701,7 @@ public class TrafficSearchActivity extends AppCompatActivity
             R_fl_count += 1;
             fl_route.addView(ith_route);
             fl_route.setPadding(15, 20, 15, 20);
-            rl_route_view.setVisibility(View.VISIBLE);
+            rl_route_view.setVisibility(VISIBLE);
 
         } else if (j > 0) { // j가 0보다 크다면 다른 경로이므로
 
@@ -722,7 +722,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
             fl_count += 1;
             fl_another_route.addView(ith_route);
-            rl_another_view.setVisibility(View.VISIBLE);
+            rl_another_view.setVisibility(VISIBLE);
             rl_another_view.setPadding(15, 20, 15, 20);
         }
 
@@ -733,7 +733,7 @@ public class TrafficSearchActivity extends AppCompatActivity
             public void onClick(View v) {
 
                 ll_traffic_detail_route_container.removeAllViews();
-                ll_detail_course_container.setVisibility(View.VISIBLE);
+                ll_detail_course_container.setVisibility(VISIBLE);
                 btn_reservation.setVisibility(View.GONE);
 
                 mMap.clear();

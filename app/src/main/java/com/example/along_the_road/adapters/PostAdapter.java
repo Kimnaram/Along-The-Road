@@ -3,11 +3,13 @@ package com.example.along_the_road.adapters;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.along_the_road.ListHotel;
 import com.example.along_the_road.ListReview;
 import com.example.along_the_road.R;
 
@@ -15,8 +17,11 @@ import java.util.ArrayList;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemViewHolder> {
 
+    private final static String TAG = "PostAdapter";
+
     // adapter에 들어갈 list 입니다.
     private ArrayList<ListReview> listReviewArrayList = new ArrayList<>(); // 커스텀 리스너 인터페이스
+    private ArrayList<ListReview> displayItemList = new ArrayList<ListReview>();
 
     // 리스너 객체 참조를 저장하는 변수
     private OnItemClickListener mListener = null;
@@ -34,32 +39,49 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemViewHolder
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         // Item을 하나, 하나 보여주는(bind 되는) 함수입니다.
-        holder.onBind(listReviewArrayList.get(position));
+        holder.onBind(displayItemList.get(position));
+
     }
 
     @Override
     public int getItemCount() {
         // RecyclerView의 총 개수 입니다.
-        return listReviewArrayList.size();
+        return displayItemList.size();
     }
 
     public void addItem(ListReview listReview) {
         // 외부에서 item을 추가시킬 함수입니다.
+
         listReviewArrayList.add(listReview);
+        displayItemList.add(listReview);
+        Log.d(TAG, "Whyrano... " + listReview.getTitle());
+
+    }
+
+    public void fillter(String search) {
+
+        displayItemList.clear();
+
+        if(search.length() == 0) {
+            displayItemList.addAll(listReviewArrayList);
+        } else {
+            for(ListReview item : listReviewArrayList) {
+                if(item.getTitle().toLowerCase().contains(search)
+                        || item.getTitle().toUpperCase().contains(search)
+                        || item.getName().toLowerCase().contains(search)
+                        || item.getName().toUpperCase().contains(search)) {
+
+                    displayItemList.add(item);
+                }
+            }
+        }
 
         notifyDataSetChanged();
+
     }
 
     public ListReview getItem(int position) {
         return listReviewArrayList.get(position) ;
-    }
-
-    public void clearAllItem() {
-
-        for(int i = 0; i < listReviewArrayList.size(); i++)
-            listReviewArrayList.remove(i);
-
-        notifyDataSetChanged();
     }
 
     // RecyclerView의 핵심인 ViewHolder 입니다.

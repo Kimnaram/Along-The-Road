@@ -11,10 +11,16 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -24,6 +30,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import static android.view.View.GONE;
 
 public class PostListActivity extends AppCompatActivity {
 
@@ -35,14 +43,19 @@ public class PostListActivity extends AppCompatActivity {
     private ListReview listReview;
 
     // Other component
+    private EditText et_search_text;
     private ImageButton ib_write_review;
 
     // Firebase
     private String username = "";
     private int reviewlist = 0;
+    private boolean state = false;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
+
+    private ProgressDialog progressDialog;
+    private Handler handler;
 
 
     @Override
@@ -65,7 +78,7 @@ public class PostListActivity extends AppCompatActivity {
             username = intent.getStringExtra("username");
         }
 
-//        recyclerviewSetting();
+        recyclerviewSetting();
 
         adapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
             @Override
@@ -74,10 +87,39 @@ public class PostListActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(getApplicationContext(), PostDetailActivity.class);
                 intent.putExtra("PostId", Integer.toString(_id));
+                // 수정, 삭제 시에 어떻게 할건지
 
                 startActivity(intent);
             }
         });
+
+        et_search_text.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == event.KEYCODE_ENTER) {
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        et_search_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String search = et_search_text.getText().toString();
+                adapter.fillter(search);
+            }
+        });
+
 
         ib_write_review.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +127,7 @@ public class PostListActivity extends AppCompatActivity {
                 if (firebaseAuth.getCurrentUser() != null) {
                     Intent list_to_create = new Intent(getApplicationContext(), InPostActivity.class);
                     list_to_create.putExtra("username", username);
+                    adapter.notifyDataSetChanged();
 
                     startActivity(list_to_create);
 
@@ -97,47 +140,47 @@ public class PostListActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onStart() {
-
-        recyclerviewSetting();
-
-        super.onStart();
-
-    }
-
-    @Override
-    protected void onPause() {
-
-        super.onPause();
-
-    }
-
-    @Override
-    protected void onResume() {
-
-        super.onResume();
-
-    }
-
-    @Override
-    protected void onDestroy() {
-
-        super.onDestroy();
-
-    }
+//    @Override
+//    protected void onStart() {
+//
+//        super.onStart();
+//
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//
+//        super.onPause();
+//
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//
+//        super.onResume();
+//
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//
+//        super.onDestroy();
+//
+//    }
 
     public void initAllComponent() {
 
         firebaseDatabase = FirebaseDatabase.getInstance();
 
         rv_review_container = findViewById(R.id.rv_review_container);
+        rv_review_container.setHasFixedSize(true);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rv_review_container.setLayoutManager(linearLayoutManager);
 
         adapter = new PostAdapter();
 
+        et_search_text = findViewById(R.id.et_search_text);
         ib_write_review = findViewById(R.id.ib_write_review);
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -170,9 +213,18 @@ public class PostListActivity extends AppCompatActivity {
 
                             }
 
-                            Log.d(TAG, "id : " + id + ", title : " + title + " and like : " + like);
-                            listReview = new ListReview(id, title, name, like);
-                            adapter.addItem(listReview);
+                            for (int i = 0; i < adapter.getItemCount(); i++) {
+                                if (id == adapter.getItem(i).get_id()) {
+                                    state = true;
+                                }
+                            }
+
+                            if (state == false) {
+                                listReview = new ListReview(id, title, name, like);
+                                adapter.addItem(listReview);
+                                adapter.notifyDataSetChanged();
+                            }
+
                         }
 
                         @Override
@@ -182,7 +234,12 @@ public class PostListActivity extends AppCompatActivity {
 
                     });
 
+
+                    state = false;
+
                 }
+
+                rv_review_container.setAdapter(adapter);
             }
 
             @Override
@@ -190,8 +247,6 @@ public class PostListActivity extends AppCompatActivity {
 
             }
         });
-
-        rv_review_container.setAdapter(adapter);
 
     }
 

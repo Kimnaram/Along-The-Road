@@ -155,7 +155,12 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         }
         DatabaseReference reference = firebaseDatabase.getReference("reviews");
         reference.child(postId).setValue(hashMap);
+
+        Intent create_to_detail = new Intent(getApplicationContext(), PostDetailActivity.class);
+        create_to_detail.putExtra("PostId", postId);
+
         finish();
+        startActivity(create_to_detail);
 
     }
 
