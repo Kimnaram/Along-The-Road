@@ -18,6 +18,12 @@ public class ListReview {
         image = null;
     }
 
+    public ListReview(int _id, String title, String name) {
+        this._id = _id;
+        this.title = title;
+        this.name = name;
+    }
+
     public ListReview(int _id, String title, String name, int like) {
         this._id = _id;
         this.title = title;

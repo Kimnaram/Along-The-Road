@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -32,14 +33,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 
 public class InPostActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "InPostActivity";
     private static final int REQUEST_CODE = 1001;
+    private static String IP_ADDRESS = "";
 
     private RelativeLayout rl_image_container;
     private FirebaseAuth firebaseAuth;
@@ -49,7 +56,7 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView iv_review_image;
     private ImageButton ib_image_remove;
 
-    private int reviewCount = 0;
+    private String PostId = "";
     private String username = "";
 
     @Override
@@ -98,20 +105,20 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         ib_image_remove = findViewById(R.id.ib_image_remove);
         findViewById(R.id.post_save_button).setOnClickListener(this);
 
-        firebaseDatabase.getReference("reviews").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    reviewCount = Integer.parseInt(dataSnapshot.getKey());
-                    Log.d(TAG, "reviewCount : " + reviewCount);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//        firebaseDatabase.getReference("reviews").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                    reviewCount = Integer.parseInt(dataSnapshot.getKey());
+//                    Log.d(TAG, "reviewCount : " + reviewCount);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
     }
 
@@ -130,37 +137,45 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
             image = byteArrayToBinaryString(reviewImage);
 
         }
-
-        int tempId = reviewCount + 1;
-        String postId = Integer.toString(tempId);
-        Log.d(TAG, "PostId : " + postId);
-
+//
+//        int tempId = reviewCount + 1;
+//        String postId = Integer.toString(tempId);
+//        Log.d(TAG, "PostId : " + postId);
+//
         final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         String uid = firebaseUser.getUid();
 
         Intent intent = getIntent();
         if(intent != null) {
             username = intent.getStringExtra("username");
-            Log.d(TAG, "name : " + username);
+            PostId = intent.getStringExtra("PostId");
         }
+//
+//        HashMap<String,Object> hashMap = new HashMap<>();
+//        hashMap.put("uid", uid);
+//        hashMap.put("name", username);
+//        hashMap.put("title", mTitle.getText().toString());
+//        hashMap.put("content", mContents.getText().toString());
+//        hashMap.put("like", Integer.toString(0));
+//        if(iv_review_image != null) {
+//            hashMap.put("image", image);
+//        }
+//        DatabaseReference reference = firebaseDatabase.getReference("reviews");
+//        reference.child(postId).setValue(hashMap);
 
-        HashMap<String,Object> hashMap = new HashMap<>();
-        hashMap.put("uid", uid);
-        hashMap.put("name", username);
-        hashMap.put("title", mTitle.getText().toString());
-        hashMap.put("content", mContents.getText().toString());
-        hashMap.put("like", Integer.toString(0));
-        if(iv_review_image != null) {
-            hashMap.put("image", image);
-        }
-        DatabaseReference reference = firebaseDatabase.getReference("reviews");
-        reference.child(postId).setValue(hashMap);
+        String title = mTitle.getText().toString();
+        String content = mContents.getText().toString();
+        String name = username;
+        Log.d(TAG, "name : " + name);
 
-        Intent create_to_detail = new Intent(getApplicationContext(), PostDetailActivity.class);
-        create_to_detail.putExtra("PostId", postId);
+        InsertData task = new InsertData();
+        task.execute("http://" + IP_ADDRESS + "/insertReviews.php", title, content, name, uid);
 
-        finish();
-        startActivity(create_to_detail);
+//        Intent create_to_detail = new Intent(getApplicationContext(), PostDetailActivity.class);
+//        create_to_detail.putExtra("PostId", postId);
+//
+//        finish();
+//        startActivity(create_to_detail);
 
     }
 
@@ -247,5 +262,103 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+    class InsertData extends AsyncTask<String, Void, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(InPostActivity.this,
+                    "로딩중입니다.", null, true, true);
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Intent create_to_detail = new Intent(getApplicationContext(), PostDetailActivity.class);
+            create_to_detail.putExtra("PostId", PostId);
+
+            finish();
+            startActivity(create_to_detail);
+            Log.d(TAG, "POST response  - " + result);
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String title = (String)params[1];
+            String content = (String)params[2];
+            String name = (String)params[3];
+            String uid = (String)params[4];
+
+            String serverURL = (String)params[0];
+            String postParameters = "title=" + title + "&content=" + content + "&name=" + name + "&uid=" + uid;
+
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "POST response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+
+                bufferedReader.close();
+
+
+                return sb.toString();
+
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+
+                return new String("Error: " + e.getMessage());
+            }
+
+        }
+    }
+
+
 
 }

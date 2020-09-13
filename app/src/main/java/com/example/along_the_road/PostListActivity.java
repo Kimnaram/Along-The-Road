@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -31,16 +32,33 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import static android.view.View.GONE;
 
 public class PostListActivity extends AppCompatActivity {
 
-    private final static String TAG = "PostListActivity";
+    private static final String TAG = "PostListActivity";
+    private static final String TAG_RESULTS = "result";
+    private static final String TAG_ID = "postId";
+    private static final String TAG_NAME = "name";
+    private static final String TAG_TITLE = "title";
+    private static String IP_ADDRESS = "";
 
     // Review list
     private RecyclerView rv_review_container;
     private PostAdapter adapter;
     private ListReview listReview;
+
+    private String JSONString;
+    private JSONArray reviews = null;
 
     // Other component
     private EditText et_search_text;
@@ -48,7 +66,7 @@ public class PostListActivity extends AppCompatActivity {
 
     // Firebase
     private String username = "";
-    private int reviewlist = 0;
+    private int PostId = 0;
     private boolean state = false;
 
     private FirebaseAuth firebaseAuth;
@@ -78,7 +96,9 @@ public class PostListActivity extends AppCompatActivity {
             username = intent.getStringExtra("username");
         }
 
-        recyclerviewSetting();
+        getData("http://" + IP_ADDRESS + "/connection.php");
+
+//        recyclerviewSetting();
 
         adapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
             @Override
@@ -127,7 +147,7 @@ public class PostListActivity extends AppCompatActivity {
                 if (firebaseAuth.getCurrentUser() != null) {
                     Intent list_to_create = new Intent(getApplicationContext(), InPostActivity.class);
                     list_to_create.putExtra("username", username);
-                    adapter.notifyDataSetChanged();
+                    list_to_create.putExtra("PostId", Integer.toString(PostId + 1));
 
                     startActivity(list_to_create);
 
@@ -140,33 +160,34 @@ public class PostListActivity extends AppCompatActivity {
         });
     }
 
-//    @Override
-//    protected void onStart() {
-//
-//        super.onStart();
-//
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//
-//        super.onPause();
-//
-//    }
-//
-//    @Override
-//    protected void onResume() {
-//
-//        super.onResume();
-//
-//    }
-//
-//    @Override
-//    protected void onDestroy() {
-//
-//        super.onDestroy();
-//
-//    }
+    @Override
+    protected void onStart() {
+
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onPause() {
+
+        adapter.notifyDataSetChanged();
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
 
     public void initAllComponent() {
 
@@ -187,66 +208,91 @@ public class PostListActivity extends AppCompatActivity {
 
     }
 
-    public void recyclerviewSetting() {
+//    public void recyclerviewSetting() {
+//
+//        firebaseDatabase.getReference("reviews").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                reviewlist = Integer.parseInt(Long.toString(snapshot.getChildrenCount()));
+//                for (final DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                    firebaseDatabase.getReference("reviews/" + dataSnapshot.getKey()).addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                            int id = Integer.parseInt(dataSnapshot.getKey());
+//                            String title = "";
+//                            String name = "";
+//                            int like = 0;
+//
+//                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                                if (dataSnapshot.getKey().equals("title")) {
+//                                    title = dataSnapshot.getValue().toString();
+//                                } else if (dataSnapshot.getKey().equals("name")) {
+//                                    name = dataSnapshot.getValue().toString();
+//                                } else if (dataSnapshot.getKey().equals("like")) {
+//                                    like = Integer.parseInt(dataSnapshot.getValue().toString());
+//                                }
+//
+//                            }
+//
+//                            for (int i = 0; i < adapter.getItemCount(); i++) {
+//                                if (id == adapter.getItem(i).get_id()) {
+//                                    state = true;
+//                                }
+//                            }
+//
+//                            if (state == false) {
+//                                listReview = new ListReview(id, title, name, like);
+//                                adapter.addItem(listReview);
+//                                adapter.notifyDataSetChanged();
+//                            }
+//
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError error) {
+//                            Log.d(TAG, error.getMessage());
+//                        }
+//
+//                    });
+//
+//
+//                    state = false;
+//
+//                }
+//
+//                rv_review_container.setAdapter(adapter);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//
+//    }
 
-        firebaseDatabase.getReference("reviews").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                reviewlist = Integer.parseInt(Long.toString(snapshot.getChildrenCount()));
-                for (final DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    firebaseDatabase.getReference("reviews/" + dataSnapshot.getKey()).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            int id = Integer.parseInt(dataSnapshot.getKey());
-                            String title = "";
-                            String name = "";
-                            int like = 0;
+    protected void showList() {
+        try {
+            JSONObject jsonObj = new JSONObject(JSONString);
+            reviews = jsonObj.getJSONArray(TAG_RESULTS);
 
-                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                if (dataSnapshot.getKey().equals("title")) {
-                                    title = dataSnapshot.getValue().toString();
-                                } else if (dataSnapshot.getKey().equals("name")) {
-                                    name = dataSnapshot.getValue().toString();
-                                } else if (dataSnapshot.getKey().equals("like")) {
-                                    like = Integer.parseInt(dataSnapshot.getValue().toString());
-                                }
+            for (int i = 0; i < reviews.length(); i++) {
+                JSONObject c = reviews.getJSONObject(i);
+                String id = c.getString(TAG_ID);
+                int postId = Integer.parseInt(id);
+                PostId = postId;
+                String name = c.getString(TAG_NAME);
+                String title = c.getString(TAG_TITLE);
 
-                            }
-
-                            for (int i = 0; i < adapter.getItemCount(); i++) {
-                                if (id == adapter.getItem(i).get_id()) {
-                                    state = true;
-                                }
-                            }
-
-                            if (state == false) {
-                                listReview = new ListReview(id, title, name, like);
-                                adapter.addItem(listReview);
-                                adapter.notifyDataSetChanged();
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            Log.d(TAG, error.getMessage());
-                        }
-
-                    });
-
-
-                    state = false;
-
-                }
-
-                rv_review_container.setAdapter(adapter);
+                listReview = new ListReview(postId, title, name);
+                adapter.addItem(listReview);
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            rv_review_container.setAdapter(adapter);
 
-            }
-        });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -294,4 +340,60 @@ public class PostListActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void getData(String url) {
+        class GetDataJSON extends AsyncTask<String, Void, String> {
+
+            ProgressDialog progressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+                progressDialog = ProgressDialog.show(PostListActivity.this,
+                        "로딩중입니다.", null, true, true);
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                String uri = params[0];
+
+                BufferedReader bufferedReader = null;
+                try {
+                    URL url = new URL(uri);
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    StringBuilder sb = new StringBuilder();
+
+                    bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+                    String json;
+                    while ((json = bufferedReader.readLine()) != null) {
+                        sb.append(json + "\n");
+                    }
+
+                    return sb.toString().trim();
+
+                } catch (Exception e) {
+                    return null;
+                }
+
+
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+
+                progressDialog.dismiss();
+
+                JSONString = result;
+                Log.d(TAG, result);
+                showList();
+
+            }
+        }
+        GetDataJSON g = new GetDataJSON();
+        g.execute(url);
+    }
+
 }
