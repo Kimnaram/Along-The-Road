@@ -160,34 +160,34 @@ public class PostListActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onStart() {
-
-        super.onStart();
-
-    }
-
-    @Override
-    protected void onPause() {
-
-        adapter.notifyDataSetChanged();
-        super.onPause();
-
-    }
-
-    @Override
-    protected void onResume() {
-
-        super.onResume();
-
-    }
-
-    @Override
-    protected void onDestroy() {
-
-        super.onDestroy();
-
-    }
+//    @Override
+//    protected void onStart() {
+//
+//        super.onStart();
+//
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//
+//        adapter.notifyDataSetChanged();
+//        super.onPause();
+//
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//
+//        super.onResume();
+//
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//
+//        super.onDestroy();
+//
+//    }
 
     public void initAllComponent() {
 
@@ -200,6 +200,7 @@ public class PostListActivity extends AppCompatActivity {
         rv_review_container.setLayoutManager(linearLayoutManager);
 
         adapter = new PostAdapter();
+        rv_review_container.setAdapter(adapter);
 
         et_search_text = findViewById(R.id.et_search_text);
         ib_write_review = findViewById(R.id.ib_write_review);
@@ -287,8 +288,6 @@ public class PostListActivity extends AppCompatActivity {
                 listReview = new ListReview(postId, title, name);
                 adapter.addItem(listReview);
             }
-
-            rv_review_container.setAdapter(adapter);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -387,7 +386,8 @@ public class PostListActivity extends AppCompatActivity {
                 progressDialog.dismiss();
 
                 JSONString = result;
-                Log.d(TAG, result);
+
+                Log.d(TAG, "response - " + result);
                 showList();
 
             }

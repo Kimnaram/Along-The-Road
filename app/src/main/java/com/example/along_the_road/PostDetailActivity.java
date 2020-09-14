@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -29,11 +30,29 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class PostDetailActivity extends AppCompatActivity {
 
     private final static String TAG = "PostDetailActivity";
+    private static final String TAG_RESULTS = "result";
+    private static final String TAG_ID = "postId";
+    private static final String TAG_NAME = "name";
+    private static final String TAG_UID = "uid";
+    private static final String TAG_TITLE = "title";
+    private static final String TAG_CONTNET = "content";
+    private static final String TAG_IMAGE = "image";
+    private static String IP_ADDRESS = "";
 
     // Other component
     private ImageView iv_review_image;
@@ -46,6 +65,9 @@ public class PostDetailActivity extends AppCompatActivity {
 
     private int PostId;
     private int PostLike;
+
+    private String JSONString;
+    private JSONArray reviews = null;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
@@ -69,8 +91,10 @@ public class PostDetailActivity extends AppCompatActivity {
         if (intent != null) {
             String TempID = intent.getStringExtra("PostId");
             PostId = Integer.parseInt(TempID);
-            selectFirebase(PostId);
+            GetData task = new GetData();
+            task.execute(Integer.toString(PostId));
         }
+
 
 
         btn_review_update.setOnClickListener(new View.OnClickListener() {
@@ -160,61 +184,60 @@ public class PostDetailActivity extends AppCompatActivity {
 
     }
 
-
-    public void selectFirebase(int index) {
-
-        final int id = index;
-
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.getReference("reviews/" + index).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    if(dataSnapshot.getKey().equals("title"))
-                        tv_review_title.setText(dataSnapshot.getValue().toString());
-                    else if(dataSnapshot.getKey().equals("name"))
-                        tv_review_user.setText(dataSnapshot.getValue().toString());
-                    else if(dataSnapshot.getKey().equals("content"))
-                        tv_review_content.setText(dataSnapshot.getValue().toString());
-                    else if(dataSnapshot.getKey().equals("image")) {
-                        String image = dataSnapshot.getValue().toString();
-                        byte[] b = binaryStringToByteArray(image);
-                        Log.d(TAG, "b : " + b);
-                        ByteArrayInputStream is = new ByteArrayInputStream(b);
-                        Drawable reviewImage = Drawable.createFromStream(is, "reviewImage");
-                        iv_review_image.setImageDrawable(reviewImage);
-                        iv_review_image.setVisibility(View.VISIBLE);
-                    } else if(dataSnapshot.getKey().equals("like")) {
-                        String like = dataSnapshot.getValue().toString();
-                        PostLike = Integer.parseInt(like);
-                        btn_review_like.setText("추천 " + PostLike);
-                    } else if(dataSnapshot.getKey().equals("uid")) {
-                        if (firebaseAuth.getCurrentUser() != null) {
-                            if (firebaseAuth.getCurrentUser().getUid().equals(dataSnapshot.getValue().toString())) {
-                                btn_review_update.setVisibility(View.VISIBLE);
-                                btn_review_delete.setVisibility(View.VISIBLE);
-                                btn_review_like.setVisibility(View.GONE);
-                            } else {
-                                btn_review_update.setVisibility(View.GONE);
-                                btn_review_delete.setVisibility(View.GONE);
-                                btn_review_like.setVisibility(View.VISIBLE);
-                            }
-                        } else if (firebaseAuth.getCurrentUser() == null) {
-                            btn_review_update.setVisibility(View.GONE);
-                            btn_review_delete.setVisibility(View.GONE);
-                            btn_review_like.setVisibility(View.VISIBLE);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-    }
+//    public void selectFirebase(int index) {
+////
+////        final int id = index;
+////
+////        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+////        firebaseDatabase.getReference("reviews/" + index).addValueEventListener(new ValueEventListener() {
+////            @Override
+////            public void onDataChange(@NonNull DataSnapshot snapshot) {
+////                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+////                    if(dataSnapshot.getKey().equals("title"))
+////                        tv_review_title.setText(dataSnapshot.getValue().toString());
+////                    else if(dataSnapshot.getKey().equals("name"))
+////                        tv_review_user.setText(dataSnapshot.getValue().toString());
+////                    else if(dataSnapshot.getKey().equals("content"))
+////                        tv_review_content.setText(dataSnapshot.getValue().toString());
+////                    else if(dataSnapshot.getKey().equals("image")) {
+////                        String image = dataSnapshot.getValue().toString();
+////                        byte[] b = binaryStringToByteArray(image);
+////                        Log.d(TAG, "b : " + b);
+////                        ByteArrayInputStream is = new ByteArrayInputStream(b);
+////                        Drawable reviewImage = Drawable.createFromStream(is, "reviewImage");
+////                        iv_review_image.setImageDrawable(reviewImage);
+////                        iv_review_image.setVisibility(View.VISIBLE);
+////                    } else if(dataSnapshot.getKey().equals("like")) {
+////                        String like = dataSnapshot.getValue().toString();
+////                        PostLike = Integer.parseInt(like);
+////                        btn_review_like.setText("추천 " + PostLike);
+////                    } else if(dataSnapshot.getKey().equals("uid")) {
+////                        if (firebaseAuth.getCurrentUser() != null) {
+////                            if (firebaseAuth.getCurrentUser().getUid().equals(dataSnapshot.getValue().toString())) {
+////                                btn_review_update.setVisibility(View.VISIBLE);
+////                                btn_review_delete.setVisibility(View.VISIBLE);
+////                                btn_review_like.setVisibility(View.GONE);
+////                            } else {
+////                                btn_review_update.setVisibility(View.GONE);
+////                                btn_review_delete.setVisibility(View.GONE);
+////                                btn_review_like.setVisibility(View.VISIBLE);
+////                            }
+////                        } else if (firebaseAuth.getCurrentUser() == null) {
+////                            btn_review_update.setVisibility(View.GONE);
+////                            btn_review_delete.setVisibility(View.GONE);
+////                            btn_review_like.setVisibility(View.VISIBLE);
+////                        }
+////                    }
+////                }
+////            }
+////
+////            @Override
+////            public void onCancelled(@NonNull DatabaseError error) {
+////
+////            }
+////        });
+////
+////    }
 
     public static byte[] binaryStringToByteArray(String s) {
         int count = s.length() / 8;
@@ -278,6 +301,150 @@ public class PostDetailActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class GetData extends AsyncTask<String, Void, String>{
+
+        ProgressDialog progressDialog;
+        String errorString = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(PostDetailActivity.this,
+                    "로딩중입니다.", null, true, true);
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Log.d(TAG, "response - " + result);
+
+            if (result == null){
+                // 오류 시
+            }
+            else {
+
+                JSONString = result;
+                showResult();
+            }
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String postId = params[0];
+
+            String serverURL = "http://" + IP_ADDRESS + "/selectReviews.php";
+            String postParameters = "postId=" + postId;
+
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.connect();
+
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+
+                bufferedReader.close();
+
+
+                return sb.toString().trim();
+
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
+
+        }
+    }
+
+    private void showResult(){
+        try {
+            JSONObject jsonObject = new JSONObject(JSONString);
+            JSONArray jsonArray = jsonObject.getJSONArray(TAG_RESULTS);
+
+            for(int i = 0; i < jsonArray.length(); i++){
+
+                JSONObject item = jsonArray.getJSONObject(i);
+
+                String id = item.getString(TAG_ID);
+                String uid = item.getString(TAG_UID);
+                String name = item.getString(TAG_NAME);
+                String title = item.getString(TAG_TITLE);
+                String content = item.getString(TAG_CONTNET);
+
+                if (firebaseAuth.getCurrentUser() != null) {
+                    if (firebaseAuth.getCurrentUser().getUid().equals(uid)) {
+                        btn_review_update.setVisibility(View.VISIBLE);
+                        btn_review_delete.setVisibility(View.VISIBLE);
+                        btn_review_like.setVisibility(View.GONE);
+                    } else {
+                        btn_review_update.setVisibility(View.GONE);
+                        btn_review_delete.setVisibility(View.GONE);
+                        btn_review_like.setVisibility(View.VISIBLE);
+                    }
+                } else if (firebaseAuth.getCurrentUser() == null) {
+                    btn_review_update.setVisibility(View.GONE);
+                    btn_review_delete.setVisibility(View.GONE);
+                    btn_review_like.setVisibility(View.VISIBLE);
+                }
+
+                tv_review_title.setText(title);
+                tv_review_content.setText(content);
+                tv_review_user.setText(name);
+
+            }
+
+        } catch (JSONException e) {
+
+            Log.d(TAG, "showResult : ", e);
+        }
+
     }
 
 }
