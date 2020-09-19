@@ -160,6 +160,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_reco);
 

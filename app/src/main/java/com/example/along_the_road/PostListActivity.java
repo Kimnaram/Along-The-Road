@@ -41,8 +41,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static android.view.View.GONE;
-
 public class PostListActivity extends AppCompatActivity {
 
     private static final String TAG = "PostListActivity";
@@ -96,9 +94,7 @@ public class PostListActivity extends AppCompatActivity {
             username = intent.getStringExtra("username");
         }
 
-        getData("http://" + IP_ADDRESS + "/connection.php");
-
-//        recyclerviewSetting();
+//        getData("http://" + IP_ADDRESS + "/connection.php");
 
         adapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
             @Override
@@ -109,6 +105,7 @@ public class PostListActivity extends AppCompatActivity {
                 intent.putExtra("PostId", Integer.toString(_id));
                 // 수정, 삭제 시에 어떻게 할건지
 
+                onPause();
                 startActivity(intent);
             }
         });
@@ -140,7 +137,6 @@ public class PostListActivity extends AppCompatActivity {
             }
         });
 
-
         ib_write_review.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,34 +156,36 @@ public class PostListActivity extends AppCompatActivity {
         });
     }
 
-//    @Override
-//    protected void onStart() {
-//
-//        super.onStart();
-//
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//
-//        adapter.notifyDataSetChanged();
-//        super.onPause();
-//
-//    }
-//
-//    @Override
-//    protected void onResume() {
-//
-//        super.onResume();
-//
-//    }
-//
-//    @Override
-//    protected void onDestroy() {
-//
-//        super.onDestroy();
-//
-//    }
+    @Override
+    protected void onStart() {
+
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        adapter.clearAllItem();
+        getData("http://" + IP_ADDRESS + "/connection.php");
+
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
 
     public void initAllComponent() {
 
@@ -271,6 +269,13 @@ public class PostListActivity extends AppCompatActivity {
 //        });
 //
 //    }
+
+    @Override
+    public void onBackPressed() {
+
+        finish();
+
+    }
 
     protected void showList() {
         try {

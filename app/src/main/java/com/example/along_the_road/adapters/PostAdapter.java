@@ -58,6 +58,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemViewHolder
 
     }
 
+    public void clearAllItem() {
+
+        listReviewArrayList.clear();
+        displayItemList.clear();
+        Log.d(TAG, "삭제");
+
+    }
+
     public void fillter(String search) {
 
         displayItemList.clear();

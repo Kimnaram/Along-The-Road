@@ -58,7 +58,7 @@ public class HotelDetailActivity extends AppCompatActivity {
 
     private static final String TAG = "HotelDetailActivity";
 
-    private static final String API_KEY = "c%2BrEUarPSYgJ%2FND6wKCRcSn1oSTDp1R8LM7EanqslnUCnQlIffN8q%2BIyuDljYHdOLwTD67w0LccbXpw0%2BFUJkA%3D%3D";
+    private static final String API_KEY = "API KEY";
 
     private static final int Seoul = 1;
     private static final int Daegu = 4;

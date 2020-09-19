@@ -73,7 +73,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     private static final String TAG = "HotelSelectActivity";
 
-    private final String API_KEY = "c%2BrEUarPSYgJ%2FND6wKCRcSn1oSTDp1R8LM7EanqslnUCnQlIffN8q%2BIyuDljYHdOLwTD67w0LccbXpw0%2BFUJkA%3D%3D";
+    private final String API_KEY = "API KEY";
 
     // hotel theme code
     private final static String Hotel_t = "B02010100";
@@ -317,10 +317,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     }
 
-    private void listviewSetting() {
-
-        String resultText = "값이 없음";
-
+    public void listviewSetting() {
         Hotel_theme = Hotel_f;
 
         if (areaCode == 32 || areaCode == 35 || areaCode == 37 || areaCode == 38) {
@@ -339,327 +336,23 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
         }
         // areaCode : 여기서 contentId를 파싱
 
-        try {
-
-            search_url = area_Hotel;
-            resultText = new Task().execute().get();
-
-            search_url = null;
-
-            JSONObject Object = new JSONObject(resultText);
-
-            String response = Object.getString("response");
-            JSONObject responseObject = new JSONObject(response);
-
-            String body = responseObject.getString("body");
-            JSONObject bodyObject = new JSONObject(body);
-
-            boolean itemscheck = bodyObject.isNull("items");
-            if (itemscheck == true || bodyObject.getString("items").equals("")) { // 호텔이 존재하지 않는다면
-                String popup_msg = "조건에 해당되는 호텔이 존재하지 않습니다.";
-                tv_popup_msg = findViewById(R.id.tv_popup_msg);
-                tv_popup_msg.setText(popup_msg);
-                rl_info_popup.setVisibility(View.VISIBLE); // 팝업을 띄움
-
-                rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        rl_info_popup.setVisibility(GONE);
-                    }
-                });
-
-            } else {
-
-                String items = bodyObject.getString("items");
-                JSONObject itemsObject = new JSONObject(items);
-
-                String item = itemsObject.getString("item");
-                String ItemIsWhat = item.split("\"")[0];
-
-                JSONObject itemObject = null;
-                JSONArray itemArray = null;
-
-                if (ItemIsWhat.equals("{")) { // 호텔이 하나라면
-
-                    itemObject = new JSONObject(item);
-                    list_len = 1;
-
-                } else { // 호텔이 여러개라면
-
-                    itemArray = new JSONArray(item);
-                    list_len = itemArray.length();
-
-                }
-
-                ContentID = new int[list_len];
-                HotelName = new String[list_len];
-                HotelImage = new String[list_len];
-                HotelLocation = new LatLng[list_len];
-                state = new int[list_len];
-
-                checkintime = new String[list_len];
-                checkouttime = new String[list_len];
-                parkinglodging = new String[list_len];
-                roomtype = new String[list_len];
-                foodplace = new String[list_len];
-                reservationurl = new String[list_len];
-                subfacility = new String[list_len];
-
-                if (ItemIsWhat.equals("[{")) {
-
-                    for (int i = 0; i < list_len; i++) {
-
-                        JSONObject HotelObject = itemArray.getJSONObject(i);
-
-                        String contentId = HotelObject.getString("contentid");
-                        ContentID[i] = Integer.parseInt(contentId);
-                        HotelName[i] = HotelObject.getString("title");
-                        HotelName[i] = HotelName[i].split("\\[")[0];
-
-                        boolean imagecheck = HotelObject.isNull("firstimage");
-                        if (imagecheck == false) {
-                            HotelImage[i] = HotelObject.getString("firstimage");
-
-                            final String img_url = HotelImage[i];
-                            final int no = i;
-
-                            Thread thread = new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // TODO Auto-generated method stub
-                                    try {
-                                        URL url = new URL(img_url);
-                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                                        conn.setDoInput(true);
-                                        conn.connect();
-
-                                        InputStream is = conn.getInputStream();
-                                        bitmap = BitmapFactory.decodeStream(is);
-                                    } catch (MalformedURLException e) {
-                                        e.printStackTrace();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-
-                            thread.start();
-
-                            try {
-                                thread.join();
-
-                                hotelImg = new BitmapDrawable(bitmap);
-
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-
-                        } else if (imagecheck == true) {
-                            google_url = "https://www.google.com/search?q=" + HotelName[i] + "&tbm=isch";
-
-                            final String google_img = new ImageTask().execute().get();
-
-//                            Thread thread = new Thread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    // TODO Auto-generated method stub
-//                                    try {
-//                                        URL url = new URL(google_img);
-//                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//                                        conn.setDoInput(true);
-//                                        conn.connect();
-//
-//                                        InputStream is = conn.getInputStream();
-//                                        bitmap = BitmapFactory.decodeStream(is);
-//                                    } catch (MalformedURLException e) {
-//                                        e.printStackTrace();
-//                                    } catch (IOException e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                }
-//                            });
-//
-//                            thread.start();
-//
-//                            try {
-//                                thread.join();
-//
-//                                hotelImg = new BitmapDrawable(bitmap);
-//
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-
-                        }
-
-                        final int no = i;
-
-                        Double Hotelmapx = Double.parseDouble(HotelObject.getString("mapx"));
-                        Double Hotelmapy = Double.parseDouble(HotelObject.getString("mapy"));
-
-                        HotelLocation[i] = new LatLng(Hotelmapy, Hotelmapx);
-
-                        detail_Hotel = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailIntro?" +
-                                "ServiceKey=" + API_KEY + "&contentId=" + ContentID[i] + "&contentTypeId=32" +
-                                "&MobileOS=ETC&MobileApp=AppTest&_type=json";
-
-                        System.out.println(detail_Hotel);
-
-                        String resultText2 = "값이 없음";
-
-                        try {
-
-                            search_url = detail_Hotel;
-                            resultText2 = new Task().execute().get(); // URL에 있는 내용을 받아옴
-
-                            search_url = null;
-
-                            JSONObject Object2 = new JSONObject(resultText2);
-
-                            String response2 = Object2.getString("response");
-                            JSONObject responseObject2 = new JSONObject(response2);
-
-                            boolean bodycheck = responseObject2.isNull("body");
-                            if (bodycheck == true) {
-                                String errmsg = "LIMITED NUMBER OF SERVICE REQUESTS EXCEEDS ERROR\n" +
-                                        "다음날 다시 시도해주세요.";
-                            } else if (bodycheck == false) {
-                                String body2 = responseObject2.getString("body");
-
-                                JSONObject bodyObject2 = new JSONObject(body2);
-
-                                String items2 = bodyObject2.getString("items");
-                                JSONObject itemsObject2 = new JSONObject(items2);
-
-                                String item2 = itemsObject2.getString("item");
-
-                                itemArray = new JSONArray(item);
-                                list_len = itemArray.length();
-
-                                JSONObject itemObject2 = new JSONObject(item2);
-
-                                checkintime[i] = itemObject2.getString("checkintime");
-                                checkouttime[i] = itemObject2.getString("checkouttime");
-                                parkinglodging[i] = itemObject2.getString("parkinglodging");
-                                roomtype[i] = itemObject2.getString("roomtype");
-                                foodplace[i] = itemObject2.getString("foodplace");
-                                boolean urlcheck = itemObject2.isNull("reservationurl");
-                                if (urlcheck == false) {
-                                    reservationurl[i] = itemObject2.getString("reservationurl");
-                                }
-                                subfacility[i] = itemObject2.getString("subfacility");
-
-                                if (hotelImg == null) {
-                                    listHotel = new ListHotel(ContentID[i], HotelName[i], checkintime[i], checkouttime[i], parkinglodging[i], i);
-                                } else {
-                                    listHotel = new ListHotel(ContentID[i], hotelImg, HotelName[i], checkintime[i], checkouttime[i], parkinglodging[i], i);
-                                }
-
-                                adapter.addItem(listHotel);
-
-                                hotelImg = null;
-
-                            }
-
-                        } catch (NullPointerException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                } else if (ItemIsWhat.equals("{")) {
-
-                    String contentId = itemObject.getString("contentid");
-                    ContentID[0] = Integer.parseInt(contentId);
-                    boolean imagecheck = itemObject.isNull("firstimage");
-                    if (imagecheck == false) {
-                        HotelImage[0] = itemObject.getString("firstimage");
-
-                        final String img_url = HotelImage[0];
-
-                        Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // TODO Auto-generated method stub
-                                try {
-                                    URL url = new URL(img_url);
-                                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                                    conn.setDoInput(true);
-                                    conn.connect();
-
-                                    InputStream is = conn.getInputStream();
-                                    bitmap = BitmapFactory.decodeStream(is);
-                                } catch (MalformedURLException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-
-                        thread.start();
-
-                        try {
-                            thread.join();
-
-                            hotelImg = new BitmapDrawable(bitmap);
-                            bitmap = null;
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else if (imagecheck == true) {
-
-                        google_url = "https://www.google.com/search?q=" + HotelName[0] + "&tbm=isch";
-
-                        String google_img = new ImageTask().execute().get();
-
-                    }
-
-                    final int no = 0;
-
-                    HotelName[0] = itemObject.getString("title");
-                    Double Hotelmapx = Double.parseDouble(itemObject.getString("mapx"));
-                    Double Hotelmapy = Double.parseDouble(itemObject.getString("mapy"));
-
-                    HotelLocation[0] = new LatLng(Hotelmapy, Hotelmapx);
-
-                    checkintime[0] = "14:00";
-                    checkouttime[0] = "11:00";
-                    parkinglodging[0] = "52대";
-
-                    if (hotelImg == null) {
-                        listHotel = new ListHotel(ContentID[0], HotelName[0], checkintime[0], checkouttime[0], parkinglodging[0], 0);
-                    } else {
-                        listHotel = new ListHotel(ContentID[0], hotelImg, HotelName[0], checkintime[0], checkouttime[0], parkinglodging[0], 0);
-                    }
-
-                    adapter.addItem(listHotel);
-
-                    hotelImg = null;
-
-                }
-
-                lv_hotel_list.setAdapter(adapter);
-
+        GetData task = new GetData();
+        task.execute();
+    }
+
+    public void setPopupMsg() {
+
+        String popup_msg = "조건에 해당되는 호텔이 존재하지 않습니다.";
+        tv_popup_msg = findViewById(R.id.tv_popup_msg);
+        tv_popup_msg.setText(popup_msg);
+        rl_info_popup.setVisibility(View.VISIBLE); // 팝업을 띄움
+
+        rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rl_info_popup.setVisibility(GONE);
             }
-
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        });
 
     }
 
@@ -797,54 +490,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
         }
     }
 
-    public class Task extends AsyncTask<String, Void, String> {
-
-        private String str, receiveMsg;
-
-//        private ProgressDialog mDialog = new ProgressDialog(HotelSelectActivity.this);
-//
-//        @Override
-//        protected void onPreExecute() {
-//
-//            mDialog.setMessage("로딩중입니다.");
-//
-//            mDialog.show();
-//            super.onPreExecute();
-//
-//        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            URL url = null;
-            try {
-                url = new URL(search_url);
-
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-                if (conn.getResponseCode() == conn.HTTP_OK) {
-                    InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
-                    BufferedReader reader = new BufferedReader(tmp);
-                    StringBuffer buffer = new StringBuffer();
-                    while ((str = reader.readLine()) != null) {
-                        buffer.append(str);
-                    }
-                    receiveMsg = buffer.toString();
-
-                    reader.close();
-                } else {
-                    Log.i("통신 결과", conn.getResponseCode() + "에러");
-                }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return receiveMsg;
-        }
-
-    }
-
     public class ImageTask extends AsyncTask<String, Void, String> {
 
         private String str = "", receiveMsg = "";
@@ -860,7 +505,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                     @Override
                     public void run() {
                         // 이미지정보
-                        for(Element element : hotel_image) {
+                        for (Element element : hotel_image) {
                             receiveMsg = element.absUrl("src");
                         }
                     }
@@ -875,4 +520,383 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
             return receiveMsg;
         }
     }
+
+    public class GetData extends AsyncTask<String, Void, String> {
+
+        private String str, resultText1 = "값이 없음", resultText2 = "값이 없음";
+        String result;
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(HotelSelectActivity.this,
+                    "로딩중입니다.", null, true, true);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+
+                search_url = area_Hotel;
+
+                URL url = null;
+
+                try {
+                    url = new URL(search_url);
+
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                    if (conn.getResponseCode() == conn.HTTP_OK) {
+                        InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                        BufferedReader reader = new BufferedReader(tmp);
+                        StringBuffer buffer = new StringBuffer();
+                        while ((str = reader.readLine()) != null) {
+                            buffer.append(str);
+                        }
+                        resultText1 = buffer.toString();
+
+                        reader.close();
+                    } else {
+                        Log.i("통신 결과", conn.getResponseCode() + "에러");
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                search_url = null;
+
+                JSONObject Object = new JSONObject(resultText1);
+
+                String response = Object.getString("response");
+                JSONObject responseObject = new JSONObject(response);
+
+                String body = responseObject.getString("body");
+                JSONObject bodyObject = new JSONObject(body);
+
+                boolean itemscheck = bodyObject.isNull("items");
+                if (itemscheck == true || bodyObject.getString("items").equals("")) { // 호텔이 존재하지 않는다면
+                    setPopupMsg();
+                } else {
+
+                    result = "성공";
+
+                    String items = bodyObject.getString("items");
+                    JSONObject itemsObject = new JSONObject(items);
+
+                    String item = itemsObject.getString("item");
+                    String ItemIsWhat = item.split("\"")[0];
+
+                    JSONObject itemObject = null;
+                    JSONArray itemArray = null;
+
+                    if (ItemIsWhat.equals("{")) { // 호텔이 하나라면
+
+                        itemObject = new JSONObject(item);
+                        list_len = 1;
+
+                    } else { // 호텔이 여러개라면
+
+                        itemArray = new JSONArray(item);
+                        list_len = itemArray.length();
+
+                    }
+
+                    ContentID = new int[list_len];
+                    HotelName = new String[list_len];
+                    HotelImage = new String[list_len];
+                    HotelLocation = new LatLng[list_len];
+                    state = new int[list_len];
+
+                    checkintime = new String[list_len];
+                    checkouttime = new String[list_len];
+                    parkinglodging = new String[list_len];
+                    roomtype = new String[list_len];
+                    foodplace = new String[list_len];
+                    reservationurl = new String[list_len];
+                    subfacility = new String[list_len];
+
+                    if (ItemIsWhat.equals("[{")) {
+
+                        for (int i = 0; i < list_len; i++) {
+
+                            JSONObject HotelObject = itemArray.getJSONObject(i);
+
+                            String contentId = HotelObject.getString("contentid");
+                            ContentID[i] = Integer.parseInt(contentId);
+                            HotelName[i] = HotelObject.getString("title");
+                            HotelName[i] = HotelName[i].split("\\[")[0];
+
+                            boolean imagecheck = HotelObject.isNull("firstimage");
+                            if (imagecheck == false) {
+                                HotelImage[i] = HotelObject.getString("firstimage");
+
+                                final String img_url = HotelImage[i];
+                                final int no = i;
+
+                                Thread thread = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // TODO Auto-generated method stub
+                                        try {
+                                            URL url = new URL(img_url);
+                                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                            conn.setDoInput(true);
+                                            conn.connect();
+
+                                            InputStream is = conn.getInputStream();
+                                            bitmap = BitmapFactory.decodeStream(is);
+                                        } catch (MalformedURLException e) {
+                                            e.printStackTrace();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+
+                                thread.start();
+
+                                try {
+                                    thread.join();
+
+                                    hotelImg = new BitmapDrawable(bitmap);
+
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                            } else if (imagecheck == true) {
+                                google_url = "https://www.google.com/search?q=" + HotelName[i] + "&tbm=isch";
+
+//                            Thread thread = new Thread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    // TODO Auto-generated method stub
+//                                    try {
+//                                        URL url = new URL(google_img);
+//                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                                        conn.setDoInput(true);
+//                                        conn.connect();
+//
+//                                        InputStream is = conn.getInputStream();
+//                                        bitmap = BitmapFactory.decodeStream(is);
+//                                    } catch (MalformedURLException e) {
+//                                        e.printStackTrace();
+//                                    } catch (IOException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            });
+//
+//                            thread.start();
+//
+//                            try {
+//                                thread.join();
+//
+//                                hotelImg = new BitmapDrawable(bitmap);
+//
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+
+                            }
+
+                            final int no = i;
+
+                            Double Hotelmapx = Double.parseDouble(HotelObject.getString("mapx"));
+                            Double Hotelmapy = Double.parseDouble(HotelObject.getString("mapy"));
+
+                            HotelLocation[i] = new LatLng(Hotelmapy, Hotelmapx);
+
+                            detail_Hotel = "http://api.visitkorea.or.kr/openapi/service/rest/KorService/detailIntro?" +
+                                    "ServiceKey=" + API_KEY + "&contentId=" + ContentID[i] + "&contentTypeId=32" +
+                                    "&MobileOS=ETC&MobileApp=AppTest&_type=json";
+
+                            search_url = detail_Hotel;
+
+                            try {
+
+                                try {
+                                    url = new URL(search_url);
+
+                                    search_url = null;
+
+                                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                                    if (conn.getResponseCode() == conn.HTTP_OK) {
+                                        InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                                        BufferedReader reader = new BufferedReader(tmp);
+                                        StringBuffer buffer = new StringBuffer();
+                                        while ((str = reader.readLine()) != null) {
+                                            buffer.append(str);
+                                        }
+                                        resultText2 = buffer.toString();
+
+                                        reader.close();
+                                    } else {
+                                        Log.i("통신 결과", conn.getResponseCode() + "에러");
+                                    }
+                                } catch (MalformedURLException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                JSONObject Object2 = new JSONObject(resultText2);
+
+                                String response2 = Object2.getString("response");
+                                JSONObject responseObject2 = new JSONObject(response2);
+
+                                boolean bodycheck = responseObject2.isNull("body");
+                                if (bodycheck == true) {
+                                    String errmsg = "LIMITED NUMBER OF SERVICE REQUESTS EXCEEDS ERROR\n" +
+                                            "다음날 다시 시도해주세요.";
+                                } else if (bodycheck == false) {
+
+                                    result = "성공";
+
+                                    String body2 = responseObject2.getString("body");
+
+                                    JSONObject bodyObject2 = new JSONObject(body2);
+
+                                    String items2 = bodyObject2.getString("items");
+                                    JSONObject itemsObject2 = new JSONObject(items2);
+
+                                    String item2 = itemsObject2.getString("item");
+
+                                    itemArray = new JSONArray(item);
+                                    list_len = itemArray.length();
+
+                                    JSONObject itemObject2 = new JSONObject(item2);
+
+                                    checkintime[i] = itemObject2.getString("checkintime");
+                                    checkouttime[i] = itemObject2.getString("checkouttime");
+                                    parkinglodging[i] = itemObject2.getString("parkinglodging");
+                                    roomtype[i] = itemObject2.getString("roomtype");
+                                    foodplace[i] = itemObject2.getString("foodplace");
+                                    boolean urlcheck = itemObject2.isNull("reservationurl");
+                                    if (urlcheck == false) {
+                                        reservationurl[i] = itemObject2.getString("reservationurl");
+                                    }
+                                    subfacility[i] = itemObject2.getString("subfacility");
+
+                                    if (hotelImg == null) {
+                                        listHotel = new ListHotel(ContentID[i], HotelName[i], checkintime[i], checkouttime[i], parkinglodging[i], i);
+                                    } else {
+                                        listHotel = new ListHotel(ContentID[i], hotelImg, HotelName[i], checkintime[i], checkouttime[i], parkinglodging[i], i);
+                                    }
+
+                                    adapter.addItem(listHotel);
+
+                                    hotelImg = null;
+
+                                }
+
+                            } catch (NullPointerException e) {
+                                return new String("Error: " + e.getMessage());
+                            } catch (JSONException e) {
+                                return new String("Error: " + e.getMessage());
+                            }
+
+                        }
+
+                    } else if (ItemIsWhat.equals("{")) {
+
+                        String contentId = itemObject.getString("contentid");
+                        ContentID[0] = Integer.parseInt(contentId);
+                        boolean imagecheck = itemObject.isNull("firstimage");
+                        if (imagecheck == false) {
+                            HotelImage[0] = itemObject.getString("firstimage");
+
+                            final String img_url = HotelImage[0];
+
+                            Thread thread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // TODO Auto-generated method stub
+                                    try {
+                                        URL url = new URL(img_url);
+                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                        conn.setDoInput(true);
+                                        conn.connect();
+
+                                        InputStream is = conn.getInputStream();
+                                        bitmap = BitmapFactory.decodeStream(is);
+                                    } catch (MalformedURLException e) {
+                                        e.printStackTrace();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+
+                            thread.start();
+
+                            try {
+                                thread.join();
+
+                                hotelImg = new BitmapDrawable(bitmap);
+                                bitmap = null;
+
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else if (imagecheck == true) {
+
+                            google_url = "https://www.google.com/search?q=" + HotelName[0] + "&tbm=isch";
+
+                        }
+
+                        final int no = 0;
+
+                        HotelName[0] = itemObject.getString("title");
+                        Double Hotelmapx = Double.parseDouble(itemObject.getString("mapx"));
+                        Double Hotelmapy = Double.parseDouble(itemObject.getString("mapy"));
+
+                        HotelLocation[0] = new LatLng(Hotelmapy, Hotelmapx);
+
+                        checkintime[0] = "14:00";
+                        checkouttime[0] = "11:00";
+                        parkinglodging[0] = "52대";
+
+                        if (hotelImg == null) {
+                            listHotel = new ListHotel(ContentID[0], HotelName[0], checkintime[0], checkouttime[0], parkinglodging[0], 0);
+                        } else {
+                            listHotel = new ListHotel(ContentID[0], hotelImg, HotelName[0], checkintime[0], checkouttime[0], parkinglodging[0], 0);
+                        }
+
+                        adapter.addItem(listHotel);
+
+                        hotelImg = null;
+
+                    }
+
+                }
+
+            } catch (NullPointerException e) {
+                return new String("Error: " + e.getMessage());
+            } catch (JSONException e) {
+                return new String("Error: " + e.getMessage());
+            }
+
+            return result;
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            lv_hotel_list.setAdapter(adapter);
+
+            progressDialog.dismiss();
+
+
+        }
+    }
+
 }
