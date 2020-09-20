@@ -143,7 +143,6 @@ public class PostListActivity extends AppCompatActivity {
                 if (firebaseAuth.getCurrentUser() != null) {
                     Intent list_to_create = new Intent(getApplicationContext(), InPostActivity.class);
                     list_to_create.putExtra("username", username);
-                    list_to_create.putExtra("PostId", Integer.toString(PostId + 1));
 
                     startActivity(list_to_create);
 
@@ -177,6 +176,7 @@ public class PostListActivity extends AppCompatActivity {
 
         adapter.clearAllItem();
         getData("http://" + IP_ADDRESS + "/connection.php");
+        adapter.notifyDataSetChanged();
 
     }
 

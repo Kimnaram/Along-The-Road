@@ -359,6 +359,4 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-
-
 }

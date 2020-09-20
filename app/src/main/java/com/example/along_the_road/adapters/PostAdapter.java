@@ -54,6 +54,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemViewHolder
 
         listReviewArrayList.add(listReview);
         displayItemList.add(listReview);
+        notifyDataSetChanged();
         Log.d(TAG, "Whyrano... " + listReview.getTitle());
 
     }
@@ -62,6 +63,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemViewHolder
 
         listReviewArrayList.clear();
         displayItemList.clear();
+        notifyDataSetChanged();
         Log.d(TAG, "삭제");
 
     }

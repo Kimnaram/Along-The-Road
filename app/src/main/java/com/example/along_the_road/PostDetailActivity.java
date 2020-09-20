@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -51,6 +52,7 @@ public class PostDetailActivity extends AppCompatActivity {
     private static final String TAG_UID = "uid";
     private static final String TAG_TITLE = "title";
     private static final String TAG_CONTNET = "content";
+    private static final String TAG_LIKE = "count(*)";
     private static final String TAG_IMAGE = "image";
     private static String IP_ADDRESS = "";
 
@@ -90,12 +92,15 @@ public class PostDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             String TempID = intent.getStringExtra("PostId");
+            String uid = firebaseAuth.getCurrentUser().getUid();
+
             PostId = Integer.parseInt(TempID);
             GetData task = new GetData();
             task.execute(Integer.toString(PostId));
+
+            selectLikeData sltask = new selectLikeData();
+            sltask.execute(TempID, uid);
         }
-
-
 
         btn_review_update.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +110,24 @@ public class PostDetailActivity extends AppCompatActivity {
                 detail_to_update.putExtra("PostId", Long.toString(PostId));
 
                 startActivity(detail_to_update);
+            }
+        });
+
+        btn_review_update.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN :
+                        btn_review_update.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
+                        btn_review_update.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                        return false;
+
+                    case MotionEvent.ACTION_UP :
+                        btn_review_update.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
+                        btn_review_update.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                        return false;
+                }
+                return false;
             }
         });
 
@@ -122,18 +145,21 @@ public class PostDetailActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         // 파이어베이스에서 삭제하는 코드 필요
-                        firebaseDatabase.getReference("reviews").child(PostId + "").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(getApplicationContext(), "삭제에 실패했습니다.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+//                        firebaseDatabase.getReference("reviews").child(PostId + "").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+//                                finish();
+//                            }
+//                        }).addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                Toast.makeText(getApplicationContext(), "삭제에 실패했습니다.", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+
+                        deleteData task = new deleteData();
+                        task.execute(Integer.toString(PostId));
 
                         finish();
 
@@ -152,19 +178,86 @@ public class PostDetailActivity extends AppCompatActivity {
             }
         });
 
-        btn_review_like.setOnClickListener(new View.OnClickListener() {
+        btn_review_delete.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                if(firebaseAuth.getCurrentUser() != null) {
-                    PostLike += 1;
-                    firebaseDatabase.getReference("reviews/" + PostId + "/like").setValue(PostLike);
-                    // 좋아요 누르는거 어떻게 컨트롤할지가 필요!
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN :
+                        btn_review_delete.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
+                        btn_review_delete.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                        return false;
 
-                    Toast.makeText(getApplicationContext(), "해당 글을 추천하셨습니다!", Toast.LENGTH_SHORT).show();
-
+                    case MotionEvent.ACTION_UP :
+                        btn_review_delete.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
+                        btn_review_delete.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                        return false;
                 }
+                return false;
             }
         });
+
+        if(firebaseAuth.getCurrentUser() != null) {
+            btn_review_like.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (firebaseAuth.getCurrentUser() != null) {
+//                    PostLike += 1;
+//                    firebaseDatabase.getReference("reviews/" + PostId + "/like").setValue(PostLike);
+//                    // 좋아요 누르는거 어떻게 컨트롤할지가 필요!
+
+                        String postId = Integer.toString(PostId);
+                        String uid = firebaseAuth.getCurrentUser().getUid();
+
+                        selectLikeData sltask = new selectLikeData();
+                        sltask.execute(postId, uid);
+
+                        if (PostLike == 0) {
+                            // 아직 추천을 하지 않았다면
+
+                            InsertData task = new InsertData();
+                            task.execute("http://" + IP_ADDRESS + "/insertRecommendPost.php", postId, uid);
+                            PostLike += 1;
+
+                            Toast.makeText(getApplicationContext(), "해당 글을 추천하셨습니다!", Toast.LENGTH_SHORT).show();
+
+                            GetLikeData ltask = new GetLikeData();
+                            ltask.execute(Integer.toString(PostId));
+
+                        } else {
+                            // 추천을 했다면
+
+                            deleteLikeData task = new deleteLikeData();
+                            task.execute(postId, uid);
+                            PostLike = 0;
+
+                            GetLikeData ltask = new GetLikeData();
+                            ltask.execute(Integer.toString(PostId));
+
+                        }
+
+                    }
+                }
+            });
+        }
+
+        btn_review_like.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN :
+                        btn_review_like.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
+                        btn_review_like.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                        return false;
+
+                    case MotionEvent.ACTION_UP :
+                        btn_review_like.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
+                        btn_review_like.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                        return false;
+                }
+                return false;
+            }
+        });
+
     }
 
     public void initAllComponent() {
@@ -181,6 +274,18 @@ public class PostDetailActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        GetData task = new GetData();
+        task.execute(Integer.toString(PostId));
+
+        GetLikeData ltask = new GetLikeData();
+        ltask.execute(Integer.toString(PostId));
 
     }
 
@@ -303,7 +408,7 @@ public class PostDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class GetData extends AsyncTask<String, Void, String>{
+    private class GetLikeData extends AsyncTask<String, Void, String>{
 
         ProgressDialog progressDialog;
         String errorString = null;
@@ -316,6 +421,208 @@ public class PostDetailActivity extends AppCompatActivity {
                     "로딩중입니다.", null, true, true);
         }
 
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Log.d(TAG, "response - " + result);
+
+            if (result == null){
+                // 오류 시
+            }
+            else {
+
+                JSONString = result;
+                showLikeResult();
+            }
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String postId = params[0];
+
+            String serverURL = "http://" + IP_ADDRESS + "/selectAllRecommendPost.php";
+            String postParameters = "postId=" + postId;
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.connect();
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+                bufferedReader.close();
+
+                return sb.toString().trim();
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
+
+        }
+    }
+
+    private class selectLikeData extends AsyncTask<String, Void, String>{
+
+        ProgressDialog progressDialog;
+        String errorString = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(PostDetailActivity.this,
+                    "로딩중입니다.", null, true, true);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Log.d(TAG, "response - " + result);
+
+            if (result == null){
+                // 오류 시
+            }
+            else {
+
+                JSONString = result;
+                selectLikeResult();
+            }
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String postId = params[0];
+            String uid = params[1];
+
+            String serverURL = "http://" + IP_ADDRESS + "/selectRecommendPost.php";
+            String postParameters = "postId=" + postId + "&uid=" + uid;
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.connect();
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+                bufferedReader.close();
+
+                return sb.toString().trim();
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
+
+        }
+    }
+
+    private void showLikeResult(){
+        try {
+            JSONObject jsonObject = new JSONObject(JSONString);
+            JSONArray jsonArray = jsonObject.getJSONArray(TAG_RESULTS);
+
+            for(int i = 0; i < jsonArray.length(); i++){
+
+                JSONObject item = jsonArray.getJSONObject(i);
+
+                String like = item.getString(TAG_LIKE);
+
+                btn_review_like.setText("추천  " + like);
+
+            }
+
+        } catch (JSONException e) {
+
+            Log.d(TAG, "showLikeResult : ", e);
+        }
+
+    }
+
+    private class GetData extends AsyncTask<String, Void, String>{
+
+        ProgressDialog progressDialog;
+        String errorString = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(PostDetailActivity.this,
+                    "로딩중입니다.", null, true, true);
+        }
 
         @Override
         protected void onPostExecute(String result) {
@@ -334,7 +641,6 @@ public class PostDetailActivity extends AppCompatActivity {
             }
         }
 
-
         @Override
         protected String doInBackground(String... params) {
 
@@ -343,12 +649,10 @@ public class PostDetailActivity extends AppCompatActivity {
             String serverURL = "http://" + IP_ADDRESS + "/selectReviews.php";
             String postParameters = "postId=" + postId;
 
-
             try {
 
                 URL url = new URL(serverURL);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-
 
                 httpURLConnection.setReadTimeout(5000);
                 httpURLConnection.setConnectTimeout(5000);
@@ -356,12 +660,10 @@ public class PostDetailActivity extends AppCompatActivity {
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.connect();
 
-
                 OutputStream outputStream = httpURLConnection.getOutputStream();
                 outputStream.write(postParameters.getBytes("UTF-8"));
                 outputStream.flush();
                 outputStream.close();
-
 
                 int responseStatusCode = httpURLConnection.getResponseCode();
                 Log.d(TAG, "response code - " + responseStatusCode);
@@ -374,7 +676,6 @@ public class PostDetailActivity extends AppCompatActivity {
                     inputStream = httpURLConnection.getErrorStream();
                 }
 
-
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
@@ -385,12 +686,9 @@ public class PostDetailActivity extends AppCompatActivity {
                     sb.append(line);
                 }
 
-
                 bufferedReader.close();
 
-
                 return sb.toString().trim();
-
 
             } catch (Exception e) {
 
@@ -403,6 +701,27 @@ public class PostDetailActivity extends AppCompatActivity {
         }
     }
 
+    private void selectLikeResult(){
+        try {
+            JSONObject jsonObject = new JSONObject(JSONString);
+            JSONArray jsonArray = jsonObject.getJSONArray(TAG_RESULTS);
+
+            for(int i = 0; i < jsonArray.length(); i++){
+
+                JSONObject item = jsonArray.getJSONObject(i);
+
+                String like = item.getString(TAG_LIKE);
+                PostLike = Integer.parseInt(like);
+
+            }
+
+        } catch (JSONException e) {
+
+            Log.d(TAG, "selectLikeResult : ", e);
+        }
+
+    }
+
     private void showResult(){
         try {
             JSONObject jsonObject = new JSONObject(JSONString);
@@ -412,7 +731,6 @@ public class PostDetailActivity extends AppCompatActivity {
 
                 JSONObject item = jsonArray.getJSONObject(i);
 
-                String id = item.getString(TAG_ID);
                 String uid = item.getString(TAG_UID);
                 String name = item.getString(TAG_NAME);
                 String title = item.getString(TAG_TITLE);
@@ -445,6 +763,250 @@ public class PostDetailActivity extends AppCompatActivity {
             Log.d(TAG, "showResult : ", e);
         }
 
+    }
+
+    private class deleteData extends AsyncTask<String, Void, String>{
+
+        ProgressDialog progressDialog;
+        String errorString = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(PostDetailActivity.this,
+                    "로딩중입니다.", null, true, true);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Log.d(TAG, "response - " + result);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String postId = params[0];
+
+            String serverURL = "http://" + IP_ADDRESS + "/deleteReviews.php";
+            String postParameters = "postId=" + postId;
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.connect();
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+                bufferedReader.close();
+
+                return sb.toString().trim();
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "DeleteData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
+
+        }
+    }
+
+    class InsertData extends AsyncTask<String, Void, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(PostDetailActivity.this,
+                    "로딩중입니다.", null, true, true);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+
+            Log.d(TAG, "POST response  - " + result);
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String postId = (String)params[1];
+            String uid = (String)params[2];
+
+            String serverURL = (String)params[0];
+            String postParameters = "postId=" + postId + "&uid=" + uid;
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "POST response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+                bufferedReader.close();
+
+                return sb.toString();
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+
+                return new String("Error: " + e.getMessage());
+            }
+
+        }
+    }
+
+    private class deleteLikeData extends AsyncTask<String, Void, String>{
+
+        ProgressDialog progressDialog;
+        String errorString = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(PostDetailActivity.this,
+                    "로딩중입니다.", null, true, true);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Log.d(TAG, "response - " + result);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String postId = params[0];
+            String uid = params[1];
+
+            String serverURL = "http://" + IP_ADDRESS + "/deleteRecommendPost.php";
+            String postParameters = "postId=" + postId + "&uid=" + uid;
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.connect();
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+                bufferedReader.close();
+
+                return sb.toString().trim();
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "DeleteLikeData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
+
+        }
     }
 
 }

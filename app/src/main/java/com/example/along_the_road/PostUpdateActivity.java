@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -137,10 +138,46 @@ public class PostUpdateActivity extends AppCompatActivity {
             }
         });
 
+        btn_review_update.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN :
+                        btn_review_update.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
+                        btn_review_update.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                        return false;
+
+                    case MotionEvent.ACTION_UP :
+                        btn_review_update.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
+                        btn_review_update.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                        return false;
+                }
+                return false;
+            }
+        });
+
         btn_review_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+
+        btn_review_cancel.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN :
+                        btn_review_cancel.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
+                        btn_review_cancel.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                        return false;
+
+                    case MotionEvent.ACTION_UP :
+                        btn_review_cancel.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
+                        btn_review_cancel.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                        return false;
+                }
+                return false;
             }
         });
 
@@ -277,7 +314,6 @@ public class PostUpdateActivity extends AppCompatActivity {
 
             String serverURL = "http://" + IP_ADDRESS + "/selectReviews.php";
             String postParameters = "postId=" + postId;
-
 
             try {
 
