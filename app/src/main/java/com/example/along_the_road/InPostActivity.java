@@ -15,6 +15,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,6 +55,7 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
     private FirebaseDatabase firebaseDatabase;
     private EditText mTitle, mContents;
     private TextView tv_image_upload;
+    private TextView tv_post_content_length;
     private ImageView iv_review_image;
     private ImageButton ib_image_remove;
 
@@ -90,6 +93,45 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
                 rl_image_container.setVisibility(View.GONE);
             }
         });
+
+        mTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() >= 100) {
+                    s.delete(99, 100);
+                    Log.d(TAG, "s : " + s.length());
+                }
+            }
+        });
+
+        mContents.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() >= 5000) {
+                    s.delete(4999, 5000);
+                }
+                tv_post_content_length.setText("(" + s.length()  + " / 5000)");
+            }
+        });
     }
 
     public void initAllComponent() {
@@ -101,6 +143,7 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         mTitle = findViewById(R.id.post_title_edit);
         mContents = findViewById(R.id.post_contents_edit);
         tv_image_upload = findViewById(R.id.tv_image_upload);
+        tv_post_content_length = findViewById(R.id.tv_post_content_length);
         iv_review_image = findViewById(R.id.iv_review_image);
         ib_image_remove = findViewById(R.id.ib_image_remove);
         findViewById(R.id.post_save_button).setOnClickListener(this);
@@ -281,11 +324,10 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
             super.onPostExecute(result);
 
             progressDialog.dismiss();
-            Intent create_to_detail = new Intent(getApplicationContext(), PostDetailActivity.class);
-            create_to_detail.putExtra("PostId", PostId);
+            Intent create_to_list = new Intent(getApplicationContext(), PostDetailActivity.class);
 
             finish();
-            startActivity(create_to_detail);
+            startActivity(create_to_list);
             Log.d(TAG, "POST response  - " + result);
         }
 

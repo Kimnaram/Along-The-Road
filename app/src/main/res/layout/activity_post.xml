@@ -30,7 +30,7 @@
         android:padding="5dp"
         android:layout_marginBottom="10dp" >
 
-        <com.example.along_the_road.ClearEditText
+        <EditText
             android:id="@+id/post_title_edit"
             android:layout_width="300dp"
             android:layout_height="40dp"
@@ -41,7 +41,7 @@
             android:inputType="text"
             android:textColor="@color/basic_color_3A7AFF"
             android:textColorHint="@color/basic_color_3A7AFF"
-            android:textSize="18sp"
+            android:textSize="19dp"
             tools:ignore="HardcodedText" />
 
         <Button
@@ -103,13 +103,25 @@
             android:layout_below="@+id/rl_image_container"
             android:layout_marginTop="10dp"
             android:gravity="top|left"
-            android:textSize="19dp"
-            android:padding="5dp"
+            android:textSize="18dp"
+            android:padding="8dp"
             android:fontFamily="@font/nanumsquareregular"
             android:background="@drawable/btn_style_border_line_white_background"
             android:textColor="@color/basic_color_3A7AFF"
             android:textColorHint="@color/basic_color_3A7AFF"
             android:hint="내용" />
+
+        <TextView
+            android:id="@+id/tv_post_content_length"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="(0 / 5000)"
+            android:textSize="18dp"
+            android:fontFamily="@font/nanumsquarebold"
+            android:textColor="@color/basic_color_3A7AFF"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/post_contents_edit"/>
 
     </RelativeLayout>
 

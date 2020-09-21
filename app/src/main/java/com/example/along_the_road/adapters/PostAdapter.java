@@ -49,6 +49,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemViewHolder
         return displayItemList.size();
     }
 
+    public int getItemPosition(int postId) {
+        for(int i = 0; i < listReviewArrayList.size(); i++) {
+            if(listReviewArrayList.get(i).get_id() == postId) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public void addItem(ListReview listReview) {
         // 외부에서 item을 추가시킬 함수입니다.
 
@@ -56,6 +65,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemViewHolder
         displayItemList.add(listReview);
         notifyDataSetChanged();
         Log.d(TAG, "Whyrano... " + listReview.getTitle());
+
+    }
+
+    public void addItemLocation(int position, int like) {
+
+        listReviewArrayList.get(position).setLike(like);
+        notifyDataSetChanged();
 
     }
 

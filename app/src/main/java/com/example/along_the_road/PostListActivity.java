@@ -37,7 +37,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -48,6 +50,7 @@ public class PostListActivity extends AppCompatActivity {
     private static final String TAG_ID = "postId";
     private static final String TAG_NAME = "name";
     private static final String TAG_TITLE = "title";
+    private static final String TAG_LIKE = "count(*)";
     private static String IP_ADDRESS = "";
 
     // Review list
@@ -65,14 +68,13 @@ public class PostListActivity extends AppCompatActivity {
     // Firebase
     private String username = "";
     private int PostId = 0;
+    private int PostLike = 0;
     private boolean state = false;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
 
     private ProgressDialog progressDialog;
-    private Handler handler;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +178,7 @@ public class PostListActivity extends AppCompatActivity {
 
         adapter.clearAllItem();
         getData("http://" + IP_ADDRESS + "/connection.php");
+        getLikeData("http://" + IP_ADDRESS + "/selectAllRecommendPost.php");
         adapter.notifyDataSetChanged();
 
     }
@@ -290,8 +293,32 @@ public class PostListActivity extends AppCompatActivity {
                 String name = c.getString(TAG_NAME);
                 String title = c.getString(TAG_TITLE);
 
-                listReview = new ListReview(postId, title, name);
+                listReview = new ListReview(postId, title, name, 0);
                 adapter.addItem(listReview);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    protected void showResult() {
+        try {
+            JSONObject jsonObj = new JSONObject(JSONString);
+            reviews = jsonObj.getJSONArray(TAG_RESULTS);
+
+            for (int i = 0; i < reviews.length(); i++) {
+                JSONObject c = reviews.getJSONObject(i);
+                String id = c.getString(TAG_ID);
+                int postId = Integer.parseInt(id);
+                String like = c.getString(TAG_LIKE);
+                PostLike = Integer.parseInt(like);
+
+                int position = adapter.getItemPosition(postId);
+                if(position != -1) {
+                    adapter.addItemLocation(position, PostLike);
+                }
             }
 
         } catch (JSONException e) {
@@ -348,14 +375,13 @@ public class PostListActivity extends AppCompatActivity {
     public void getData(String url) {
         class GetDataJSON extends AsyncTask<String, Void, String> {
 
-            ProgressDialog progressDialog;
-
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
 
                 progressDialog = ProgressDialog.show(PostListActivity.this,
                         "로딩중입니다.", null, true, true);
+
             }
 
             @Override
@@ -382,7 +408,6 @@ public class PostListActivity extends AppCompatActivity {
                     return null;
                 }
 
-
             }
 
             @Override
@@ -394,6 +419,60 @@ public class PostListActivity extends AppCompatActivity {
 
                 Log.d(TAG, "response - " + result);
                 showList();
+
+            }
+        }
+        GetDataJSON g = new GetDataJSON();
+        g.execute(url);
+    }
+
+    public void getLikeData(String url) {
+        class GetDataJSON extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+//                progressDialog = ProgressDialog.show(PostListActivity.this,
+//                        "로딩중입니다.", null, true, true);
+
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                String uri = params[0];
+
+                BufferedReader bufferedReader = null;
+                try {
+                    URL url = new URL(uri);
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    StringBuilder sb = new StringBuilder();
+
+                    bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+                    String json;
+                    while ((json = bufferedReader.readLine()) != null) {
+                        sb.append(json + "\n");
+                    }
+
+                    return sb.toString().trim();
+
+                } catch (Exception e) {
+                    return null;
+                }
+
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+
+//                progressDialog.dismiss();
+
+                JSONString = result;
+
+                Log.d(TAG, "response - " + result);
+                showResult();
 
             }
         }

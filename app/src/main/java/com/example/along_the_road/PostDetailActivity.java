@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -19,10 +20,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.along_the_road.models.Post;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -65,8 +68,8 @@ public class PostDetailActivity extends AppCompatActivity {
     private Button btn_review_update;
     private Button btn_review_like;
 
-    private int PostId;
-    private int PostLike;
+    private int PostId = -1;
+    private int PostLike = -1;
 
     private String JSONString;
     private JSONArray reviews = null;
@@ -92,14 +95,17 @@ public class PostDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             String TempID = intent.getStringExtra("PostId");
-            String uid = firebaseAuth.getCurrentUser().getUid();
 
             PostId = Integer.parseInt(TempID);
             GetData task = new GetData();
             task.execute(Integer.toString(PostId));
 
-            selectLikeData sltask = new selectLikeData();
-            sltask.execute(TempID, uid);
+            if(firebaseAuth.getCurrentUser() != null) {
+                String uid = firebaseAuth.getCurrentUser().getUid();
+
+                selectLikeData sltask = new selectLikeData();
+                sltask.execute(TempID, uid);
+            }
         }
 
         btn_review_update.setOnClickListener(new View.OnClickListener() {
@@ -208,9 +214,6 @@ public class PostDetailActivity extends AppCompatActivity {
                         String postId = Integer.toString(PostId);
                         String uid = firebaseAuth.getCurrentUser().getUid();
 
-                        selectLikeData sltask = new selectLikeData();
-                        sltask.execute(postId, uid);
-
                         if (PostLike == 0) {
                             // 아직 추천을 하지 않았다면
 
@@ -223,7 +226,7 @@ public class PostDetailActivity extends AppCompatActivity {
                             GetLikeData ltask = new GetLikeData();
                             ltask.execute(Integer.toString(PostId));
 
-                        } else {
+                        } else if (PostLike > 0) {
                             // 추천을 했다면
 
                             deleteLikeData task = new deleteLikeData();
@@ -235,6 +238,8 @@ public class PostDetailActivity extends AppCompatActivity {
 
                         }
 
+                    } else {
+                        Toast.makeText(getApplicationContext(), "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -246,11 +251,19 @@ public class PostDetailActivity extends AppCompatActivity {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN :
                         btn_review_like.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
+                        Drawable r_like_button = ResourcesCompat.getDrawable(getResources(), R.drawable.rv_like_reversal_100, null);
+                        r_like_button.setBounds(0, 0, 80, 80);
+                        btn_review_like.setCompoundDrawables(r_like_button, null, null, null);
+                        btn_review_like.setPadding(50, 0, 60, 0);
                         btn_review_like.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
                         return false;
 
                     case MotionEvent.ACTION_UP :
                         btn_review_like.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
+                        Drawable like_button = ResourcesCompat.getDrawable(getResources(), R.drawable.rv_like_100, null);
+                        like_button.setBounds(0, 0, 80, 80);
+                        btn_review_like.setCompoundDrawables(like_button, null, null, null);
+                        btn_review_like.setPadding(50, 0, 60, 0);
                         btn_review_like.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
                         return false;
                 }
@@ -311,7 +324,7 @@ public class PostDetailActivity extends AppCompatActivity {
 ////                        ByteArrayInputStream is = new ByteArrayInputStream(b);
 ////                        Drawable reviewImage = Drawable.createFromStream(is, "reviewImage");
 ////                        iv_review_image.setImageDrawable(reviewImage);
-////                        iv_review_image.setVisibility(View.VISIBLE);
+////                        iv_review_image.setVisbtnility(View.VISIBLE);
 ////                    } else if(dataSnapshot.getKey().equals("like")) {
 ////                        String like = dataSnapshot.getValue().toString();
 ////                        PostLike = Integer.parseInt(like);
@@ -319,18 +332,18 @@ public class PostDetailActivity extends AppCompatActivity {
 ////                    } else if(dataSnapshot.getKey().equals("uid")) {
 ////                        if (firebaseAuth.getCurrentUser() != null) {
 ////                            if (firebaseAuth.getCurrentUser().getUid().equals(dataSnapshot.getValue().toString())) {
-////                                btn_review_update.setVisibility(View.VISIBLE);
-////                                btn_review_delete.setVisibility(View.VISIBLE);
-////                                btn_review_like.setVisibility(View.GONE);
+////                                btn_review_update.setVisbtnility(View.VISIBLE);
+////                                btn_review_delete.setVisbtnility(View.VISIBLE);
+////                                btn_review_like.setVisbtnility(View.GONE);
 ////                            } else {
-////                                btn_review_update.setVisibility(View.GONE);
-////                                btn_review_delete.setVisibility(View.GONE);
-////                                btn_review_like.setVisibility(View.VISIBLE);
+////                                btn_review_update.setVisbtnility(View.GONE);
+////                                btn_review_delete.setVisbtnility(View.GONE);
+////                                btn_review_like.setVisbtnility(View.VISIBLE);
 ////                            }
 ////                        } else if (firebaseAuth.getCurrentUser() == null) {
-////                            btn_review_update.setVisibility(View.GONE);
-////                            btn_review_delete.setVisibility(View.GONE);
-////                            btn_review_like.setVisibility(View.VISIBLE);
+////                            btn_review_update.setVisbtnility(View.GONE);
+////                            btn_review_delete.setVisbtnility(View.GONE);
+////                            btn_review_like.setVisbtnility(View.VISIBLE);
 ////                        }
 ////                    }
 ////                }
@@ -443,7 +456,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
             String postId = params[0];
 
-            String serverURL = "http://" + IP_ADDRESS + "/selectAllRecommendPost.php";
+            String serverURL = "http://" + IP_ADDRESS + "/selectSomeRecommendPost.php";
             String postParameters = "postId=" + postId;
 
             try {
@@ -599,8 +612,13 @@ public class PostDetailActivity extends AppCompatActivity {
                 JSONObject item = jsonArray.getJSONObject(i);
 
                 String like = item.getString(TAG_LIKE);
+                PostLike = Integer.parseInt(like);
 
-                btn_review_like.setText("추천  " + like);
+                Drawable like_button = ResourcesCompat.getDrawable(getResources(), R.drawable.rv_like_100, null);
+                like_button.setBounds(0, 0, 80, 80);
+                btn_review_like.setCompoundDrawables(like_button, null, null, null);
+                btn_review_like.setPadding(50, 0, 60, 0);
+                btn_review_like.setText(like);
 
             }
 
@@ -711,7 +729,6 @@ public class PostDetailActivity extends AppCompatActivity {
                 JSONObject item = jsonArray.getJSONObject(i);
 
                 String like = item.getString(TAG_LIKE);
-                PostLike = Integer.parseInt(like);
 
             }
 

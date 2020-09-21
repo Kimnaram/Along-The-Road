@@ -10,14 +10,6 @@ public class ListReview {
     private int like;
     private Drawable image;
 
-    public ListReview() {
-        _id = 0;
-        title = "";
-        name = "";
-        like = 0;
-        image = null;
-    }
-
     public ListReview(int _id, String title, String name) {
         this._id = _id;
         this.title = title;

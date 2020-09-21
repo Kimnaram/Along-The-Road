@@ -1,23 +1,19 @@
 package com.example.along_the_road;
 
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,29 +25,20 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.Blob;
-import java.util.HashMap;
 
 public class PostUpdateActivity extends AppCompatActivity {
 
@@ -67,6 +54,7 @@ public class PostUpdateActivity extends AppCompatActivity {
 
     private RelativeLayout rl_image_container;
 
+    private TextView tv_post_content_length;
     private EditText et_review_title;
     private EditText et_review_content;
     private ImageView iv_review_image;
@@ -111,6 +99,45 @@ public class PostUpdateActivity extends AppCompatActivity {
                     return true;
                 }
                 return false;
+            }
+        });
+
+        et_review_title.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() >= 100) {
+                    s.delete(99,100);
+                }
+            }
+        });
+
+        et_review_content.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                tv_post_content_length.setText("(" + s.length() + " / 5000)");
+                if(s.length() >= 5000) {
+                    s.delete(4999, 5000);
+                }
             }
         });
 
@@ -197,6 +224,7 @@ public class PostUpdateActivity extends AppCompatActivity {
 
         rl_image_container = findViewById(R.id.rl_image_container);
 
+        tv_post_content_length = findViewById(R.id.tv_post_content_length);
         et_review_title = findViewById(R.id.et_review_title);
         et_review_content = findViewById(R.id.et_review_content);
         iv_review_image = findViewById(R.id.iv_review_image);

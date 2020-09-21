@@ -44,7 +44,7 @@
             android:inputType="text"
             android:textColor="@color/basic_color_3A7AFF"
             android:textColorHint="@color/basic_color_3A7AFF"
-            android:textSize="18sp" />
+            android:textSize="19dp" />
 
         <Button
             android:id="@+id/btn_image_upload"
@@ -87,7 +87,7 @@
         <EditText
             android:id="@+id/et_review_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:layout_below="@+id/rl_image_container"
             android:layout_marginTop="10dp"
             android:background="@drawable/btn_style_border_line_white_background"
@@ -100,7 +100,19 @@
             android:padding="7dp"
             android:scrollHorizontally="false"
             android:textColor="@color/basic_color_3A7AFF"
-            android:textSize="16sp" />
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/tv_post_content_length"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="(0 / 5000)"
+            android:textSize="18dp"
+            android:fontFamily="@font/nanumsquarebold"
+            android:textColor="@color/basic_color_3A7AFF"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/et_review_content"/>
 
     </RelativeLayout>
 
