@@ -4,13 +4,9 @@ ini_set('display_errors',1);
 
 include('dbcon.php');
 
-//POST 값을 읽어온다.
-$postId=isset($_POST['postId']) ? $_POST['postId'] : '';
 $android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
 
-if ($postId != ""){
-
-  $sql="select count(*) from recommend_review where postId=$postId";
+  $sql="select postId, count(*) from recommend_review group by postId";
   $stmt = $con->prepare($sql);
   $stmt->execute();
 
@@ -29,7 +25,8 @@ if ($postId != ""){
         	extract($row);
 
             array_push($result,
-                array("count(*)"=>$row["count(*)"]
+                array("postId"=>$row["postId"],
+                "count(*)"=>$row["count(*)"]
             ));
         }
 
@@ -43,33 +40,4 @@ if ($postId != ""){
             echo $json;
         }
     }
-}
-else {
-    echo "Reivew : ";
-}
-?>
-
-
-
-<?php
-
-$android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
-
-if (!$android){
-?>
-
-<html>
-   <body>
-
-      <form action="<?php $_PHP_SELF ?>" method="POST">
-         postId: <input type = "text" name = "postId" />
-         <input type = "submit" />
-      </form>
-
-   </body>
-</html>
-<?php
-}
-
-
 ?>
