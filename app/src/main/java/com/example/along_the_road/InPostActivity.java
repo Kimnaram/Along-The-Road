@@ -1,12 +1,11 @@
 package com.example.along_the_road;
 
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -17,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,11 +29,6 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -42,7 +37,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
+import java.net.URLEncoder;
 
 public class InPostActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -52,7 +47,6 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
 
     private RelativeLayout rl_image_container;
     private FirebaseAuth firebaseAuth;
-    private FirebaseDatabase firebaseDatabase;
     private EditText mTitle, mContents;
     private TextView tv_image_upload;
     private TextView tv_post_content_length;
@@ -137,7 +131,6 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
     public void initAllComponent() {
 
         firebaseAuth = FirebaseAuth.getInstance();
-        firebaseDatabase = FirebaseDatabase.getInstance();
 
         rl_image_container = findViewById(R.id.rl_image_container);
         mTitle = findViewById(R.id.post_title_edit);
@@ -170,14 +163,20 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
 
         Drawable rimage = iv_review_image.getDrawable();
         String image = "";
-        byte[] reviewImage = null;
+        String temp = "";
         if (iv_review_image.getDrawable() != null) {
 
             Bitmap bitmap = ((BitmapDrawable) rimage).getBitmap();
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            reviewImage = stream.toByteArray();
-            image = byteArrayToBinaryString(reviewImage);
+            ByteArrayOutputStream baos=new  ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+            byte [] arr=baos.toByteArray();
+//            image = byteArrayToBinaryString(reviewImage);
+            image = Base64.encodeToString(arr, Base64.DEFAULT);
+            try {
+                temp = "&image=" + URLEncoder.encode(image, "utf-8");
+            } catch (Exception e) {
+                Log.e(TAG, "exception : " + e.toString());
+            }
 
         }
 //
@@ -212,7 +211,7 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         Log.d(TAG, "name : " + name);
 
         InsertData task = new InsertData();
-        task.execute("http://" + IP_ADDRESS + "/insertReviews.php", title, content, name, uid);
+        task.execute("http://" + IP_ADDRESS + "/insertReviews.php", title, content, name, uid, temp);
 
 //        Intent create_to_detail = new Intent(getApplicationContext(), PostDetailActivity.class);
 //        create_to_detail.putExtra("PostId", postId);
@@ -234,6 +233,7 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
                     // 선택한 이미지에서 비트맵 생성
                     InputStream in = getContentResolver().openInputStream(data.getData());
                     Bitmap img = BitmapFactory.decodeStream(in);
+                    img = resize(img);
                     in.close();
                     // 이미지 표시
                     rl_image_container.setVisibility(View.VISIBLE);
@@ -263,6 +263,21 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
         return sb.toString();
+    }
+
+    private Bitmap resize(Bitmap bm){
+        Configuration config=getResources().getConfiguration();
+        if(config.smallestScreenWidthDp>=800)
+            bm = Bitmap.createScaledBitmap(bm, 400, 240, true);
+        else if(config.smallestScreenWidthDp>=600)
+            bm = Bitmap.createScaledBitmap(bm, 300, 180, true);
+        else if(config.smallestScreenWidthDp>=400)
+            bm = Bitmap.createScaledBitmap(bm, 200, 120, true);
+        else if(config.smallestScreenWidthDp>=360)
+            bm = Bitmap.createScaledBitmap(bm, 180, 108, true);
+        else
+            bm = Bitmap.createScaledBitmap(bm, 160, 96, true);
+        return bm;
     }
 
     @Override
@@ -324,10 +339,7 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
             super.onPostExecute(result);
 
             progressDialog.dismiss();
-            Intent create_to_list = new Intent(getApplicationContext(), PostDetailActivity.class);
-
             finish();
-            startActivity(create_to_list);
             Log.d(TAG, "POST response  - " + result);
         }
 
@@ -339,10 +351,10 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
             String content = (String)params[2];
             String name = (String)params[3];
             String uid = (String)params[4];
+            String image = (String)params[5];
 
             String serverURL = (String)params[0];
-            String postParameters = "title=" + title + "&content=" + content + "&name=" + name + "&uid=" + uid;
-
+            String postParameters = "title=" + title + "&content=" + content + "&name=" + name + "&uid=" + uid + image;
 
             try {
 
