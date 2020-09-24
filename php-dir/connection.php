@@ -1,9 +1,9 @@
 <?php
 
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$dbname = 'alongtheroad';
+$host = '3.92.65.36';
+$username = 'naram'; # MySQL 계정 아이디
+$password = 'kimnaram'; # MySQL 계정 패스워드
+$dbname = 'alongtheroad';  # DATABASE 이름
 
 $con = mysqli_connect($host, $username, $password, $dbname);
 
@@ -27,3 +27,4 @@ echo json_encode(array("result"=>$result), JSON_UNESCAPED_UNICODE);
 mysqli_close($con);
 
 ?>
+
