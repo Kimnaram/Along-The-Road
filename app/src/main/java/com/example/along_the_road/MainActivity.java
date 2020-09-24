@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton festival_btn; // 페이지 전환 버튼 (지역 축제)
     private ImageButton review_btn; // 페이지 전환 버튼 (리뷰 작성)
 
-    private String username = "비회원";
+    private String username = "";
     private String area = "";
 
     @SuppressLint("WrongConstant")
@@ -123,20 +123,21 @@ public class MainActivity extends AppCompatActivity {
         if(firebaseUser != null) {
             String uid = firebaseUser.getUid();
             FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-            firebaseDatabase.getReference("users").child(uid).addValueEventListener(new ValueEventListener() {
+            firebaseDatabase.getReference("users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
-                        if(dataSnapshot.getKey().equals("name")) {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        if (dataSnapshot.getKey().equals("name")) {
                             username = dataSnapshot.getValue().toString();
                             tv_username.setText(username + " 님");
                         } else if (dataSnapshot.getKey().equals("plan")) {
-                            for(DataSnapshot Snapshot : dataSnapshot.getChildren()) {
-                                if(Snapshot.getKey().equals("city")) {
+                            for (DataSnapshot Snapshot : dataSnapshot.getChildren()) {
+                                if (Snapshot.getKey().equals("city")) {
                                     area = Snapshot.getValue().toString();
                                 }
                             }
                         }
+                    }
                 }
 
                 @Override

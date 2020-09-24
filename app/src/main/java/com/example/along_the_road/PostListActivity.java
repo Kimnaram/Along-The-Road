@@ -67,8 +67,8 @@ public class PostListActivity extends AppCompatActivity {
 
     // Firebase
     private String username = "";
-    private int PostId = 0;
-    private int PostLike = 0;
+    private int PostId = -1;
+    private int PostLike = -1;
     private boolean state = false;
 
     private FirebaseAuth firebaseAuth;

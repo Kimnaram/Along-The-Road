@@ -9,11 +9,14 @@ import androidx.core.content.res.ResourcesCompat;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -374,6 +377,37 @@ public class PostDetailActivity extends AppCompatActivity {
             total = (byte) (ret | total);
         }
         return total;
+    }
+
+    // 바이너리 바이트 배열을 스트링으로
+    public static String byteArrayToBinaryString(byte[] b) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < b.length; ++i) {
+            sb.append(byteToBinaryString(b[i]));
+        }
+        return sb.toString();
+    }
+
+    // 바이너리 바이트를 스트링으로
+    public static String byteToBinaryString(byte n) {
+        StringBuilder sb = new StringBuilder("00000000");
+        for (int bit = 0; bit < 8; bit++) {
+            if (((n >> bit) & 1) > 0) {
+                sb.setCharAt(7 - bit, '1');
+            }
+        }
+        return sb.toString();
+    }
+
+    public static Bitmap StringToBitmap(String encodedString) {
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
     }
 
     @Override
@@ -752,6 +786,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 String name = item.getString(TAG_NAME);
                 String title = item.getString(TAG_TITLE);
                 String content = item.getString(TAG_CONTNET);
+                String image = item.getString(TAG_IMAGE);
 
                 if (firebaseAuth.getCurrentUser() != null) {
                     if (firebaseAuth.getCurrentUser().getUid().equals(uid)) {
@@ -769,6 +804,16 @@ public class PostDetailActivity extends AppCompatActivity {
                     btn_review_like.setVisibility(View.VISIBLE);
                 }
 
+                if(image != null) {
+//                    byte[] b = binaryStringToByteArray(image);
+//                    ByteArrayInputStream is = new ByteArrayInputStream(b);
+//                    Drawable reviewImage = Drawable.createFromStream(is, "reviewImage");
+                    byte[] bytes = Base64.decode(image, Base64.DEFAULT);
+                    String imageString = byteArrayToBinaryString(bytes);
+                    Bitmap bitmap = StringToBitmap(imageString);
+                    iv_review_image.setImageBitmap(bitmap);
+                    iv_review_image.setVisibility(View.VISIBLE);
+                }
                 tv_review_title.setText(title);
                 tv_review_content.setText(content);
                 tv_review_user.setText(name);
