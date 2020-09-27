@@ -16,9 +16,10 @@
 	$content = $_POST['content'];
         $name = $_POST['name'];
         $uid = $_POST['uid'];
-        $image = $_POST['image'];
-	$data = base64_decode($image);
-	$escaped_values=mysqli_real_escape_string($link, $data);
+	$image = $_POST['image'];
+#	$data = base64_decode($image);
+#	$escaped_values = mysqli_real_escape_string($link, $data);
+#	echo "escaped_value : ", $escaped_values;
 
         if(empty($title)){
             $errMSG = "제목을 입력하세요.";
@@ -41,7 +42,7 @@
 		$stmt->bindParam(':content', $content);
 		$stmt->bindParam(':name', $name);
 		$stmt->bindParam(':uid', $uid);
-		$stmt->bindParam(':image', $escaped_values);
+		$stmt->bindParam(':image', $image);
 
                 if($stmt->execute())
                 {
