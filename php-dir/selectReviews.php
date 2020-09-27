@@ -8,7 +8,6 @@ include('dbcon.php');
 $postId=isset($_POST['postId']) ? $_POST['postId'] : '';
 $android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
 
-
 if ($postId != ""){
 
   $sql="select * from reviews where postId=$postId";
@@ -21,21 +20,22 @@ if ($postId != ""){
         echo $postId;
         echo "은 찾을 수 없습니다.";
   }
-	else{
+  else{
 
-   		$result = array();
+	$result = array();
 
         while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
 
-        	extract($row);
+            extract($row);
 
             array_push($result,
                 array("postId"=>$row["postId"],
                 "title"=>$row["title"],
                 "content"=>$row["content"],
                 "name"=>$row["name"],
-                "uid"=>$row["uid"]
-            ));
+		"uid"=>$row["uid"],
+		"image"=>base64_encode($row["image"])
+		));
         }
 
 
@@ -80,4 +80,3 @@ if (!$android){
 
 
 ?>
-

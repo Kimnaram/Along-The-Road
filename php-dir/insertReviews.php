@@ -5,24 +5,20 @@
 
     include('dbcon.php');
 
+    $link = mysqli_connect("3.92.65.36","naram","kimnaram","alongtheroad");
 
     $android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
 
 
     if( (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['submit'])) || $android )
     {
-
-        // 안드로이드 코드의 postParameters 변수에 적어준 이름을 가지고 값을 전달 받습니다.
         $title = $_POST['title'];
-	      $content = $_POST['content'];
+	$content = $_POST['content'];
         $name = $_POST['name'];
         $uid = $_POST['uid'];
         $image = $_POST['image'];
-
-        $data = base64_decode($image);
-
-        $escaped_value = mysqli_real_escape_string($con, $data);
-        echo $escaped_value;
+	$data = base64_decode($image);
+	$escaped_values=mysqli_real_escape_string($link, $data);
 
         if(empty($title)){
             $errMSG = "제목을 입력하세요.";
@@ -42,10 +38,10 @@
             try{
                 $stmt = $con->prepare('INSERT INTO reviews(title, content, name, uid, image) VALUES(:title, :content, :name, :uid, :image)');
                 $stmt->bindParam(':title', $title);
-		            $stmt->bindParam(':content', $content);
-		            $stmt->bindParam(':name', $name);
-		            $stmt->bindParam(':uid', $uid);
-                $stmt->bindParam(':image', $escaped_value);
+		$stmt->bindParam(':content', $content);
+		$stmt->bindParam(':name', $name);
+		$stmt->bindParam(':uid', $uid);
+		$stmt->bindParam(':image', $escaped_values);
 
                 if($stmt->execute())
                 {
