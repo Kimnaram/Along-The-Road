@@ -1,6 +1,5 @@
 package com.example.along_the_road;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -23,19 +22,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.along_the_road.models.Post;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +40,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 
 public class PostDetailActivity extends AppCompatActivity {
 
@@ -401,8 +394,11 @@ public class PostDetailActivity extends AppCompatActivity {
 
     public static Bitmap StringToBitmap(String encodedString) {
         try {
-            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            String decodedString = URLDecoder.decode(encodedString, "utf-8");
+            Log.d(TAG, "decodedString : " + decodedString);
+            byte[] encodeByte = Base64.decode(decodedString, Base64.DEFAULT);
+            ByteArrayInputStream bais = new ByteArrayInputStream(encodeByte);
+            Bitmap bitmap = BitmapFactory.decodeStream(bais);
             return bitmap;
         } catch (Exception e) {
             e.getMessage();
@@ -805,15 +801,11 @@ public class PostDetailActivity extends AppCompatActivity {
                 }
 
                 if(image != null) {
-//                    byte[] b = binaryStringToByteArray(image);
-//                    ByteArrayInputStream is = new ByteArrayInputStream(b);
-//                    Drawable reviewImage = Drawable.createFromStream(is, "reviewImage");
-                    byte[] bytes = Base64.decode(image, Base64.DEFAULT);
-                    String imageString = byteArrayToBinaryString(bytes);
-                    Bitmap bitmap = StringToBitmap(imageString);
+                    Bitmap bitmap = StringToBitmap(image);
                     iv_review_image.setImageBitmap(bitmap);
                     iv_review_image.setVisibility(View.VISIBLE);
                 }
+
                 tv_review_title.setText(title);
                 tv_review_content.setText(content);
                 tv_review_user.setText(name);

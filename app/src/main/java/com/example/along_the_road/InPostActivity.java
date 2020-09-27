@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -55,6 +56,8 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
 
     private String PostId = "";
     private String username = "";
+
+    private Bitmap img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,21 +164,19 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
 
-        Drawable rimage = iv_review_image.getDrawable();
         String image = "";
         String temp = "";
         if (iv_review_image.getDrawable() != null) {
 
-            Bitmap bitmap = ((BitmapDrawable) rimage).getBitmap();
-            ByteArrayOutputStream baos=new  ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
-            byte [] arr=baos.toByteArray();
-//            image = byteArrayToBinaryString(reviewImage);
-            image = Base64.encodeToString(arr, Base64.DEFAULT);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            img.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] bytes = baos.toByteArray();
+            image = Base64.encodeToString(bytes, Base64.DEFAULT);
+            Log.d(TAG, "realImage : " + image);
             try {
                 temp = "&image=" + URLEncoder.encode(image, "utf-8");
-            } catch (Exception e) {
-                Log.e(TAG, "exception : " + e.toString());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
 
         }
@@ -232,7 +233,7 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
                 try {
                     // 선택한 이미지에서 비트맵 생성
                     InputStream in = getContentResolver().openInputStream(data.getData());
-                    Bitmap img = BitmapFactory.decodeStream(in);
+                    img = BitmapFactory.decodeStream(in);
                     img = resize(img);
                     in.close();
                     // 이미지 표시
