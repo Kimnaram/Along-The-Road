@@ -66,6 +66,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
     private int PostId = -1;
     private int PostLike = -1;
+    private String PostUid = "";
 
     private String JSONString;
     private JSONArray reviews = null;
@@ -96,11 +97,14 @@ public class PostDetailActivity extends AppCompatActivity {
             GetData task = new GetData();
             task.execute(Integer.toString(PostId));
 
-            if(firebaseAuth.getCurrentUser() != null) {
+            if (firebaseAuth.getCurrentUser() != null) {
                 String uid = firebaseAuth.getCurrentUser().getUid();
 
-                selectLikeData sltask = new selectLikeData();
-                sltask.execute(TempID, uid);
+                if (!uid.equals(PostUid)) {
+
+                    selectLikeData sltask = new selectLikeData();
+                    sltask.execute(TempID, uid);
+                }
             }
         }
 
@@ -119,12 +123,12 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN :
+                    case MotionEvent.ACTION_DOWN:
                         btn_review_update.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
                         btn_review_update.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
                         return false;
 
-                    case MotionEvent.ACTION_UP :
+                    case MotionEvent.ACTION_UP:
                         btn_review_update.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
                         btn_review_update.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
                         return false;
@@ -184,12 +188,12 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN :
+                    case MotionEvent.ACTION_DOWN:
                         btn_review_delete.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
                         btn_review_delete.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
                         return false;
 
-                    case MotionEvent.ACTION_UP :
+                    case MotionEvent.ACTION_UP:
                         btn_review_delete.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
                         btn_review_delete.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
                         return false;
@@ -198,7 +202,7 @@ public class PostDetailActivity extends AppCompatActivity {
             }
         });
 
-        if(firebaseAuth.getCurrentUser() != null) {
+        if (firebaseAuth.getCurrentUser() != null) {
             btn_review_like.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -245,7 +249,7 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN :
+                    case MotionEvent.ACTION_DOWN:
                         btn_review_like.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
                         Drawable r_like_button = ResourcesCompat.getDrawable(getResources(), R.drawable.rv_like_reversal_100, null);
                         r_like_button.setBounds(0, 0, 80, 80);
@@ -254,7 +258,7 @@ public class PostDetailActivity extends AppCompatActivity {
                         btn_review_like.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
                         return false;
 
-                    case MotionEvent.ACTION_UP :
+                    case MotionEvent.ACTION_UP:
                         btn_review_like.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
                         Drawable like_button = ResourcesCompat.getDrawable(getResources(), R.drawable.rv_like_100, null);
                         like_button.setBounds(0, 0, 80, 80);
@@ -293,8 +297,13 @@ public class PostDetailActivity extends AppCompatActivity {
         GetData task = new GetData();
         task.execute(Integer.toString(PostId));
 
-        GetLikeData ltask = new GetLikeData();
-        ltask.execute(Integer.toString(PostId));
+        if (firebaseAuth.getCurrentUser() != null) {
+            String uid = firebaseAuth.getCurrentUser().getUid();
+            if (!uid.equals(PostUid)) {
+                GetLikeData ltask = new GetLikeData();
+                ltask.execute(Integer.toString(PostId));
+            }
+        }
 
     }
 
@@ -372,32 +381,13 @@ public class PostDetailActivity extends AppCompatActivity {
         return total;
     }
 
-    // 바이너리 바이트 배열을 스트링으로
-    public static String byteArrayToBinaryString(byte[] b) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < b.length; ++i) {
-            sb.append(byteToBinaryString(b[i]));
-        }
-        return sb.toString();
-    }
-
-    // 바이너리 바이트를 스트링으로
-    public static String byteToBinaryString(byte n) {
-        StringBuilder sb = new StringBuilder("00000000");
-        for (int bit = 0; bit < 8; bit++) {
-            if (((n >> bit) & 1) > 0) {
-                sb.setCharAt(7 - bit, '1');
-            }
-        }
-        return sb.toString();
-    }
-
-    public static Bitmap StringToBitmap(String encodedString) {
+    public static Bitmap StringToBitmap(String ImageString) {
         try {
-            String decodedString = URLDecoder.decode(encodedString, "utf-8");
-            Log.d(TAG, "decodedString : " + decodedString);
-            byte[] encodeByte = Base64.decode(decodedString, Base64.DEFAULT);
-            ByteArrayInputStream bais = new ByteArrayInputStream(encodeByte);
+//            String decodedString = URLDecoder.decode(encodedString, "utf-8");
+//            Log.d(TAG, "decodedString : " + decodedString);
+//            byte[] encodeByte = Base64.decode(decodedString, Base64.DEFAULT);
+            byte[] bytes = binaryStringToByteArray(ImageString);
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             Bitmap bitmap = BitmapFactory.decodeStream(bais);
             return bitmap;
         } catch (Exception e) {
@@ -408,9 +398,9 @@ public class PostDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(firebaseAuth.getCurrentUser() == null) {
+        if (firebaseAuth.getCurrentUser() == null) {
             getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
-        } else if(firebaseAuth.getCurrentUser() != null) {
+        } else if (firebaseAuth.getCurrentUser() != null) {
             getMenuInflater().inflate(R.menu.toolbar_al_menu, menu);
         }
 
@@ -419,22 +409,22 @@ public class PostDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:{ //툴바 뒤로가기 동작
+        switch (item.getItemId()) {
+            case android.R.id.home: { //툴바 뒤로가기 동작
                 finish();
                 return true;
             }
-            case R.id.menu_login :
+            case R.id.menu_login:
                 Intent revdetail_to_login = new Intent(getApplicationContext(), LoginActivity.class);
 
                 startActivity(revdetail_to_login);
                 return true;
-            case R.id.menu_signup :
+            case R.id.menu_signup:
                 Intent revdetail_to_signup = new Intent(getApplicationContext(), SignupActivity.class);
 
                 startActivity(revdetail_to_signup);
                 return true;
-            case R.id.menu_logout :
+            case R.id.menu_logout:
 
                 FirebaseAuth.getInstance().signOut();
 
@@ -451,7 +441,7 @@ public class PostDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class GetLikeData extends AsyncTask<String, Void, String>{
+    private class GetLikeData extends AsyncTask<String, Void, String> {
 
         ProgressDialog progressDialog;
         String errorString = null;
@@ -471,10 +461,9 @@ public class PostDetailActivity extends AppCompatActivity {
             progressDialog.dismiss();
             Log.d(TAG, "response - " + result);
 
-            if (result == null){
+            if (result == null) {
                 // 오류 시
-            }
-            else {
+            } else {
 
                 JSONString = result;
                 showLikeResult();
@@ -509,10 +498,9 @@ public class PostDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "response code - " + responseStatusCode);
 
                 InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
                     inputStream = httpURLConnection.getInputStream();
-                }
-                else{
+                } else {
                     inputStream = httpURLConnection.getErrorStream();
                 }
 
@@ -522,7 +510,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 StringBuilder sb = new StringBuilder();
                 String line;
 
-                while((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
                 }
 
@@ -541,7 +529,7 @@ public class PostDetailActivity extends AppCompatActivity {
         }
     }
 
-    private class selectLikeData extends AsyncTask<String, Void, String>{
+    private class selectLikeData extends AsyncTask<String, Void, String> {
 
         ProgressDialog progressDialog;
         String errorString = null;
@@ -561,10 +549,9 @@ public class PostDetailActivity extends AppCompatActivity {
             progressDialog.dismiss();
             Log.d(TAG, "response - " + result);
 
-            if (result == null){
+            if (result == null) {
                 // 오류 시
-            }
-            else {
+            } else {
 
                 JSONString = result;
                 selectLikeResult();
@@ -600,10 +587,9 @@ public class PostDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "response code - " + responseStatusCode);
 
                 InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
                     inputStream = httpURLConnection.getInputStream();
-                }
-                else{
+                } else {
                     inputStream = httpURLConnection.getErrorStream();
                 }
 
@@ -613,7 +599,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 StringBuilder sb = new StringBuilder();
                 String line;
 
-                while((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
                 }
 
@@ -632,12 +618,12 @@ public class PostDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void showLikeResult(){
+    private void showLikeResult() {
         try {
             JSONObject jsonObject = new JSONObject(JSONString);
             JSONArray jsonArray = jsonObject.getJSONArray(TAG_RESULTS);
 
-            for(int i = 0; i < jsonArray.length(); i++){
+            for (int i = 0; i < jsonArray.length(); i++) {
 
                 JSONObject item = jsonArray.getJSONObject(i);
 
@@ -659,7 +645,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
     }
 
-    private class GetData extends AsyncTask<String, Void, String>{
+    private class GetData extends AsyncTask<String, Void, String> {
 
         ProgressDialog progressDialog;
         String errorString = null;
@@ -679,10 +665,9 @@ public class PostDetailActivity extends AppCompatActivity {
             progressDialog.dismiss();
             Log.d(TAG, "response - " + result);
 
-            if (result == null){
+            if (result == null) {
                 // 오류 시
-            }
-            else {
+            } else {
 
                 JSONString = result;
                 showResult();
@@ -717,10 +702,9 @@ public class PostDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "response code - " + responseStatusCode);
 
                 InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
                     inputStream = httpURLConnection.getInputStream();
-                }
-                else{
+                } else {
                     inputStream = httpURLConnection.getErrorStream();
                 }
 
@@ -730,7 +714,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 StringBuilder sb = new StringBuilder();
                 String line;
 
-                while((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
                 }
 
@@ -749,12 +733,12 @@ public class PostDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void selectLikeResult(){
+    private void selectLikeResult() {
         try {
             JSONObject jsonObject = new JSONObject(JSONString);
             JSONArray jsonArray = jsonObject.getJSONArray(TAG_RESULTS);
 
-            for(int i = 0; i < jsonArray.length(); i++){
+            for (int i = 0; i < jsonArray.length(); i++) {
 
                 JSONObject item = jsonArray.getJSONObject(i);
 
@@ -769,16 +753,17 @@ public class PostDetailActivity extends AppCompatActivity {
 
     }
 
-    private void showResult(){
+    private void showResult() {
         try {
             JSONObject jsonObject = new JSONObject(JSONString);
             JSONArray jsonArray = jsonObject.getJSONArray(TAG_RESULTS);
 
-            for(int i = 0; i < jsonArray.length(); i++){
+            for (int i = 0; i < jsonArray.length(); i++) {
 
                 JSONObject item = jsonArray.getJSONObject(i);
 
                 String uid = item.getString(TAG_UID);
+                PostUid = uid;
                 String name = item.getString(TAG_NAME);
                 String title = item.getString(TAG_TITLE);
                 String content = item.getString(TAG_CONTNET);
@@ -800,9 +785,12 @@ public class PostDetailActivity extends AppCompatActivity {
                     btn_review_like.setVisibility(View.VISIBLE);
                 }
 
-                if(image != null) {
+                Log.d(TAG, "image : " + image);
+
+                if (image != null) {
                     Bitmap bitmap = StringToBitmap(image);
                     iv_review_image.setImageBitmap(bitmap);
+                    iv_review_image.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     iv_review_image.setVisibility(View.VISIBLE);
                 }
 
@@ -819,7 +807,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
     }
 
-    private class deleteData extends AsyncTask<String, Void, String>{
+    private class deleteData extends AsyncTask<String, Void, String> {
 
         ProgressDialog progressDialog;
         String errorString = null;
@@ -868,10 +856,9 @@ public class PostDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "response code - " + responseStatusCode);
 
                 InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
                     inputStream = httpURLConnection.getInputStream();
-                }
-                else{
+                } else {
                     inputStream = httpURLConnection.getErrorStream();
                 }
 
@@ -881,7 +868,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 StringBuilder sb = new StringBuilder();
                 String line;
 
-                while((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
                 }
 
@@ -924,10 +911,10 @@ public class PostDetailActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-            String postId = (String)params[1];
-            String uid = (String)params[2];
+            String postId = (String) params[1];
+            String uid = (String) params[2];
 
-            String serverURL = (String)params[0];
+            String serverURL = (String) params[0];
             String postParameters = "postId=" + postId + "&uid=" + uid;
 
             try {
@@ -950,10 +937,9 @@ public class PostDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "POST response code - " + responseStatusCode);
 
                 InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
                     inputStream = httpURLConnection.getInputStream();
-                }
-                else{
+                } else {
                     inputStream = httpURLConnection.getErrorStream();
                 }
 
@@ -963,7 +949,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 StringBuilder sb = new StringBuilder();
                 String line = null;
 
-                while((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
                 }
 
@@ -981,7 +967,7 @@ public class PostDetailActivity extends AppCompatActivity {
         }
     }
 
-    private class deleteLikeData extends AsyncTask<String, Void, String>{
+    private class deleteLikeData extends AsyncTask<String, Void, String> {
 
         ProgressDialog progressDialog;
         String errorString = null;
@@ -1031,10 +1017,9 @@ public class PostDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "response code - " + responseStatusCode);
 
                 InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
                     inputStream = httpURLConnection.getInputStream();
-                }
-                else{
+                } else {
                     inputStream = httpURLConnection.getErrorStream();
                 }
 
@@ -1044,7 +1029,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 StringBuilder sb = new StringBuilder();
                 String line;
 
-                while((line = bufferedReader.readLine()) != null){
+                while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
                 }
 

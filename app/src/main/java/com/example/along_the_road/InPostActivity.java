@@ -20,12 +20,15 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -53,6 +56,7 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
     private TextView tv_post_content_length;
     private ImageView iv_review_image;
     private ImageButton ib_image_remove;
+    private Button btn_post_save;
 
     private String PostId = "";
     private String username = "";
@@ -88,6 +92,24 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
             public void onClick(View v) {
                 iv_review_image.setImageDrawable(null);
                 rl_image_container.setVisibility(View.GONE);
+            }
+        });
+
+        btn_post_save.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN :
+                        btn_post_save.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
+                        btn_post_save.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                        return false;
+
+                    case MotionEvent.ACTION_UP :
+                        btn_post_save.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
+                        btn_post_save.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                        return false;
+                }
+                return false;
             }
         });
 
@@ -142,7 +164,8 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         tv_post_content_length = findViewById(R.id.tv_post_content_length);
         iv_review_image = findViewById(R.id.iv_review_image);
         ib_image_remove = findViewById(R.id.ib_image_remove);
-        findViewById(R.id.post_save_button).setOnClickListener(this);
+        btn_post_save = findViewById(R.id.btn_post_save);
+        findViewById(R.id.btn_post_save).setOnClickListener(this);
 
 //        firebaseDatabase.getReference("reviews").addValueEventListener(new ValueEventListener() {
 //            @Override
@@ -164,35 +187,36 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
 
-        String image = "";
-        String temp = "";
-        if (iv_review_image.getDrawable() != null) {
+        if(!mTitle.getText().toString().isEmpty() && !mContents.getText().toString().isEmpty()) {
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            img.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] bytes = baos.toByteArray();
-            image = Base64.encodeToString(bytes, Base64.DEFAULT);
-            Log.d(TAG, "realImage : " + image);
-            try {
-                temp = "&image=" + URLEncoder.encode(image, "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+            String image = "";
+//        String temp = "";
+            if (iv_review_image.getDrawable() != null) {
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                img.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] bytes = baos.toByteArray();
+                image = "&image=" + byteArrayToBinaryString(bytes);
+//            try {
+//                temp = "&image=" + URLEncoder.encode(image, "utf-8");
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+
             }
-
-        }
 //
 //        int tempId = reviewCount + 1;
 //        String postId = Integer.toString(tempId);
 //        Log.d(TAG, "PostId : " + postId);
 //
-        final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        String uid = firebaseUser.getUid();
+            final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+            String uid = firebaseUser.getUid();
 
-        Intent intent = getIntent();
-        if(intent != null) {
-            username = intent.getStringExtra("username");
-            PostId = intent.getStringExtra("PostId");
-        }
+            Intent intent = getIntent();
+            if (intent != null) {
+                username = intent.getStringExtra("username");
+                PostId = intent.getStringExtra("PostId");
+            }
 //
 //        HashMap<String,Object> hashMap = new HashMap<>();
 //        hashMap.put("uid", uid);
@@ -206,19 +230,28 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
 //        DatabaseReference reference = firebaseDatabase.getReference("reviews");
 //        reference.child(postId).setValue(hashMap);
 
-        String title = mTitle.getText().toString();
-        String content = mContents.getText().toString();
-        String name = username;
-        Log.d(TAG, "name : " + name);
+            String title = mTitle.getText().toString();
+            String content = mContents.getText().toString();
+            String name = username;
+            Log.d(TAG, "name : " + name);
 
-        InsertData task = new InsertData();
-        task.execute("http://" + IP_ADDRESS + "/insertReviews.php", title, content, name, uid, temp);
+            InsertData task = new InsertData();
+            task.execute("http://" + IP_ADDRESS + "/insertReviews.php", title, content, name, uid, image);
 
 //        Intent create_to_detail = new Intent(getApplicationContext(), PostDetailActivity.class);
 //        create_to_detail.putExtra("PostId", postId);
 //
 //        finish();
 //        startActivity(create_to_detail);
+        } else {
+            if (mTitle.getText().toString().isEmpty() && mContents.getText().toString().isEmpty()) {
+                Toast.makeText(getApplicationContext(), "제목과 내용 모두 작성하셔야 합니다.", Toast.LENGTH_SHORT).show();
+            } else if (mTitle.getText().toString().isEmpty()) {
+                Toast.makeText(getApplicationContext(), "제목을 작성하셔야 합니다.", Toast.LENGTH_SHORT).show();
+            } else if (mContents.getText().toString().isEmpty()) {
+                Toast.makeText(getApplicationContext(), "내용을 작성하셔야 합니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
 
     }
 
@@ -269,13 +302,13 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
     private Bitmap resize(Bitmap bm){
         Configuration config=getResources().getConfiguration();
         if(config.smallestScreenWidthDp>=800)
-            bm = Bitmap.createScaledBitmap(bm, 400, 240, true);
+            bm = Bitmap.createScaledBitmap(bm, 500, 400, true);
         else if(config.smallestScreenWidthDp>=600)
-            bm = Bitmap.createScaledBitmap(bm, 300, 180, true);
+            bm = Bitmap.createScaledBitmap(bm, 400, 300, true);
         else if(config.smallestScreenWidthDp>=400)
-            bm = Bitmap.createScaledBitmap(bm, 200, 120, true);
+            bm = Bitmap.createScaledBitmap(bm, 300, 200, true);
         else if(config.smallestScreenWidthDp>=360)
-            bm = Bitmap.createScaledBitmap(bm, 180, 108, true);
+            bm = Bitmap.createScaledBitmap(bm, 200, 150, true);
         else
             bm = Bitmap.createScaledBitmap(bm, 160, 96, true);
         return bm;

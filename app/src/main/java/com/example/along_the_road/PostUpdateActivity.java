@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -34,6 +35,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -68,6 +71,8 @@ public class PostUpdateActivity extends AppCompatActivity {
     private int PostId;
     private String JSONString;
     private JSONArray reviews = null;
+
+    private Bitmap img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,9 +162,19 @@ public class PostUpdateActivity extends AppCompatActivity {
 //                updateFirebase(PostId);
                 String title = et_review_title.getText().toString();
                 String content = et_review_content.getText().toString();
+                String image = "";
+
+                if (iv_review_image.getDrawable() != null) {
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    img.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                    byte[] bytes = baos.toByteArray();
+                    image = "&image=" + byteArrayToBinaryString(bytes);
+
+                }
 
                 UpdateData task = new UpdateData();
-                task.execute(Integer.toString(PostId), title, content);
+                task.execute(Integer.toString(PostId), title, content, image);
 
                 finish();
             }
@@ -303,6 +318,76 @@ public class PostUpdateActivity extends AppCompatActivity {
 //
 //    }
 
+    public static byte[] binaryStringToByteArray(String s) {
+        int count = s.length() / 8;
+        byte[] b = new byte[count];
+        for (int i = 1; i < count; ++i) {
+            String t = s.substring((i - 1) * 8, i * 8);
+            b[i - 1] = binaryStringToByte(t);
+        }
+        return b;
+    }
+
+    public static byte binaryStringToByte(String s) {
+        byte ret = 0, total = 0;
+        for (int i = 0; i < 8; ++i) {
+            ret = (s.charAt(7 - i) == '1') ? (byte) (1 << i) : 0;
+            total = (byte) (ret | total);
+        }
+        return total;
+    }
+
+
+    // 바이너리 바이트 배열을 스트링으로
+    public static String byteArrayToBinaryString(byte[] b) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < b.length; ++i) {
+            sb.append(byteToBinaryString(b[i]));
+        }
+        return sb.toString();
+    }
+
+    // 바이너리 바이트를 스트링으로
+    public static String byteToBinaryString(byte n) {
+        StringBuilder sb = new StringBuilder("00000000");
+        for (int bit = 0; bit < 8; bit++) {
+            if (((n >> bit) & 1) > 0) {
+                sb.setCharAt(7 - bit, '1');
+            }
+        }
+        return sb.toString();
+    }
+
+    public static Bitmap StringToBitmap(String ImageString) {
+        try {
+//            String decodedString = URLDecoder.decode(encodedString, "utf-8");
+//            Log.d(TAG, "decodedString : " + decodedString);
+//            byte[] encodeByte = Base64.decode(decodedString, Base64.DEFAULT);
+            byte[] bytes = binaryStringToByteArray(ImageString);
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            Bitmap bitmap = BitmapFactory.decodeStream(bais);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
+    private Bitmap resize(Bitmap bm){
+        Configuration config=getResources().getConfiguration();
+        if(config.smallestScreenWidthDp>=800)
+            bm = Bitmap.createScaledBitmap(bm, 500, 400, true);
+        else if(config.smallestScreenWidthDp>=600)
+            bm = Bitmap.createScaledBitmap(bm, 400, 300, true);
+        else if(config.smallestScreenWidthDp>=400)
+            bm = Bitmap.createScaledBitmap(bm, 300, 200, true);
+        else if(config.smallestScreenWidthDp>=360)
+            bm = Bitmap.createScaledBitmap(bm, 200, 150, true);
+        else
+            bm = Bitmap.createScaledBitmap(bm, 160, 96, true);
+        return bm;
+    }
+
     private class GetData extends AsyncTask<String, Void, String>{
 
         ProgressDialog progressDialog;
@@ -413,7 +498,13 @@ public class PostUpdateActivity extends AppCompatActivity {
 
                 String title = item.getString(TAG_TITLE);
                 String content = item.getString(TAG_CONTNET);
+                String image = item.getString(TAG_IMAGE);
 
+                if(image != null) {
+                    Bitmap bitmap = StringToBitmap(image);
+                    iv_review_image.setImageBitmap(bitmap);
+                    rl_image_container.setVisibility(View.VISIBLE);
+                }
                 et_review_title.setText(title);
                 et_review_content.setText(content);
 
@@ -433,8 +524,8 @@ public class PostUpdateActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = ProgressDialog.show(PostUpdateActivity.this,
-                    "로딩중입니다.", null, true, true);
+//            progressDialog = ProgressDialog.show(PostUpdateActivity.this,
+//                    "수정 된 정보를 저장중입니다.", null, true, true);
         }
 
 
@@ -442,7 +533,7 @@ public class PostUpdateActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            progressDialog.dismiss();
+//            progressDialog.dismiss();
 
             Log.d(TAG, "POST response  - " + result);
         }
@@ -454,9 +545,10 @@ public class PostUpdateActivity extends AppCompatActivity {
             String postId = (String)params[0];
             String title = (String)params[1];
             String content = (String)params[2];
+            String image = (String)params[3];
 
             String serverURL = "http://" + IP_ADDRESS + "/updateReviews.php";
-            String postParameters = "postId=" + postId + "&title=" + title + "&content=" + content;
+            String postParameters = "postId=" + postId + "&title=" + title + "&content=" + content + image;
 
 
             try {
@@ -516,47 +608,6 @@ public class PostUpdateActivity extends AppCompatActivity {
         }
     }
 
-    // 스트링을 바이너리 바이트 배열로
-    public static byte[] binaryStringToByteArray(String s) {
-        int count = s.length() / 8;
-        byte[] b = new byte[count];
-        for (int i = 1; i < count; ++i) {
-            String t = s.substring((i - 1) * 8, i * 8);
-            b[i - 1] = binaryStringToByte(t);
-        }
-        return b;
-    }
-
-    // 스트링을 바이너리 바이트로
-    public static byte binaryStringToByte(String s) {
-        byte ret = 0, total = 0;
-        for (int i = 0; i < 8; ++i) {
-            ret = (s.charAt(7 - i) == '1') ? (byte) (1 << i) : 0;
-            total = (byte) (ret | total);
-        }
-        return total;
-    }
-
-    // 바이너리 바이트 배열을 스트링으로
-    public static String byteArrayToBinaryString(byte[] b) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < b.length; ++i) {
-            sb.append(byteToBinaryString(b[i]));
-        }
-        return sb.toString();
-    }
-
-    // 바이너리 바이트를 스트링으로
-    public static String byteToBinaryString(byte n) {
-        StringBuilder sb = new StringBuilder("00000000");
-        for (int bit = 0; bit < 8; bit++) {
-            if (((n >> bit) & 1) > 0) {
-                sb.setCharAt(7 - bit, '1');
-            }
-        }
-        return sb.toString();
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -568,7 +619,8 @@ public class PostUpdateActivity extends AppCompatActivity {
                 try {
                     // 선택한 이미지에서 비트맵 생성
                     InputStream in = getContentResolver().openInputStream(data.getData());
-                    Bitmap img = BitmapFactory.decodeStream(in);
+                    img = BitmapFactory.decodeStream(in);
+                    img = resize(img);
                     in.close();
                     // 이미지 표시
                     rl_image_container.setVisibility(View.VISIBLE);
