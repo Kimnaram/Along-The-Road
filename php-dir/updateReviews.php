@@ -13,6 +13,7 @@ if( (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['submit'])) || $andr
     $postId = $_POST['postId'];
     $title = $_POST['title'];
     $content = $_POST['content'];
+    $image = $_POST['image'];
 
     if(empty($postId)){
         $errMSG = "Post ID를 입력하세요.";
@@ -27,9 +28,10 @@ if( (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['submit'])) || $andr
     if(!isset($errMSG))
     {
         try{
-            $stmt = $con->prepare("UPDATE reviews SET title=:title, content=:content WHERE postId=:postId");
+            $stmt = $con->prepare("UPDATE reviews SET title=:title, content=:content, image=:image WHERE postId=:postId");
             $stmt->bindParam(':title', $title);
-            $stmt->bindParam(':content', $content);
+	    $stmt->bindParam(':content', $content);
+	    $stmt->bindParam(':image', $image);
             $stmt->bindParam(':postId', $postId);
 
             if($stmt->execute())
@@ -66,7 +68,8 @@ if( !$android )
         <form action="<?php $_PHP_SELF ?>" method="POST">
             POST ID : <input type = "text" name = "postId" />
             TITLE : <input type = "text" name = "title" />
-            CONTENT : <input type = "text" name = "content" />
+	    CONTENT : <input type = "text" name = "content" />
+	    IMAGE : <input type = "text" name = "image" />
             <input type = "submit" name = "submit" />
         </form>
 

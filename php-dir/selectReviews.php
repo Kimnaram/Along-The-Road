@@ -25,16 +25,16 @@ if ($postId != ""){
 	$result = array();
 
         while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-
-            extract($row);
-
-            array_push($result,
-                array("postId"=>$row["postId"],
-                "title"=>$row["title"],
-                "content"=>$row["content"],
-                "name"=>$row["name"],
-		"uid"=>$row["uid"],
-		"image"=>base64_encode($row["image"])
+		
+		extract($row);
+		
+		array_push($result,
+			array("postId"=>$row["postId"],
+                	"title"=>$row["title"],
+                	"content"=>$row["content"],
+                	"name"=>$row["name"],
+			"uid"=>$row["uid"],
+			"image"=>$row["image"]
 		));
         }
 
