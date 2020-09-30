@@ -47,8 +47,6 @@ public class PostUpdateActivity extends AppCompatActivity {
 
     private static final String TAG = "ReviewCreateActivity";
     private static final String TAG_RESULTS = "result";
-    private static final String TAG_ID = "postId";
-    private static final String TAG_NAME = "name";
     private static final String TAG_TITLE = "title";
     private static final String TAG_CONTNET = "content";
     private static final String TAG_IMAGE = "image";

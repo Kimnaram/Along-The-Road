@@ -19,6 +19,7 @@ import android.os.Looper;
 import android.os.NetworkOnMainThreadException;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -57,13 +58,15 @@ import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 
 import static android.view.View.GONE;
 import static com.example.along_the_road.LocalSelectActivity.Code;
@@ -73,7 +76,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     private static final String TAG = "HotelSelectActivity";
 
-    private final String API_KEY = "API KEY";
+    private final String API_KEY = "vfwDLW%2FCLuhdALtA9wefMOr8QKccGLoIi4w2uJGjawb3Gvjibbg2wgxXB1ZANESetWSi1K6F5S6dme0aqJPryw%3D%3D";
 
     // hotel theme code
     private final static String Hotel_t = "B02010100";
@@ -152,7 +155,6 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     private String selected_spinner = null;
 
     private Bitmap bitmap;
-    private String google_url;
     private String google_image;
     Handler handler = new Handler();
 
@@ -490,36 +492,36 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
         }
     }
 
-    public class ImageTask extends AsyncTask<String, Void, String> {
-
-        private String str = "", receiveMsg = "";
-
-        @Override
-        protected String doInBackground(String... params) {
-            URL url = null;
-            try {
-                Document doc = Jsoup.connect(google_url).get();
-                final Elements hotel_image = doc.body().select("div#islrg div.islrc div.isv-r a.wXeWr div.bRMDJf img");
-                Handler handler = new Handler(Looper.getMainLooper()); // 객체생성
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        // 이미지정보
-                        for (Element element : hotel_image) {
-                            receiveMsg = element.absUrl("src");
-                        }
-                    }
-                });
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NetworkOnMainThreadException e) {
-                e.printStackTrace();
-            }
-
-            return receiveMsg;
-        }
-    }
+//    public class ImageTask extends AsyncTask<String, Void, String> {
+//
+//        private String str = "", receiveMsg = "";
+//
+//        @Override
+//        protected String doInBackground(String... params) {
+//            URL url = null;
+//            try {
+//                Document doc = Jsoup.connect(google_url).get();
+//                final Elements hotel_image = doc.body().select("div#islrg div.islrc div.isv-r a.wXeWr div.bRMDJf img");
+//                Handler handler = new Handler(Looper.getMainLooper()); // 객체생성
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        // 이미지정보
+//                        for (Element element : hotel_image) {
+//                            receiveMsg = element.absUrl("src");
+//                        }
+//                    }
+//                });
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } catch (NetworkOnMainThreadException e) {
+//                e.printStackTrace();
+//            }
+//
+//            return receiveMsg;
+//        }
+//    }
 
     public class GetData extends AsyncTask<String, Void, String> {
 
@@ -670,38 +672,52 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                 }
 
                             } else if (imagecheck == true) {
-                                google_url = "https://www.google.com/search?q=" + HotelName[i] + "&tbm=isch";
 
-//                            Thread thread = new Thread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    // TODO Auto-generated method stub
-//                                    try {
-//                                        URL url = new URL(google_img);
-//                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//                                        conn.setDoInput(true);
-//                                        conn.connect();
-//
-//                                        InputStream is = conn.getInputStream();
-//                                        bitmap = BitmapFactory.decodeStream(is);
-//                                    } catch (MalformedURLException e) {
-//                                        e.printStackTrace();
-//                                    } catch (IOException e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                }
-//                            });
-//
-//                            thread.start();
-//
-//                            try {
-//                                thread.join();
-//
-//                                hotelImg = new BitmapDrawable(bitmap);
-//
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
+                                final int no = i;
+
+                                Thread thread = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // TODO Auto-generated method stub
+                                        Document temp = null;
+                                        Document doc = null;
+                                        try {
+//                                            temp = Jsoup.connect("https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch").get();
+//                                            Elements detail_url = temp.select("div.isv-r:nth-child(1)");
+//                                            String google_url = detail_url.attr("jsdata");
+//                                            google_url = google_url.split(";")[1];
+//                                            Log.d(TAG, "google_url : " + google_url);
+//                                            doc = Jsoup.connect("https://www.google.com/search?q=" + HotelName[i] + "&tbm=isch&bih=732#imgrc=" + google_url).get();
+//                                            Log.d(TAG, "url : " + "https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch&bih=732#imgrc=" + google_url);
+//                                            Elements contents = doc.select("div.tvh9oe:nth-child(2) > c-wiz:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > a:nth-child(1) > img:nth-child(1)");
+//                                            google_image = contents.attr("src");
+
+                                            doc = Jsoup.connect("https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch").get();
+                                            Elements contents = doc.select("div.isv-r:nth-child(1) > a:nth-child(1) > div:nth-child(1) > img:nth-child(1)");
+                                            google_image = contents.attr("src");
+                                            google_image = google_image.split(",")[1];
+                                            Log.d(TAG, "google_image : " + google_image);
+                                            byte[] decodedByte = Base64.decode(google_image, Base64.DEFAULT);
+                                            bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+
+                                        } catch (MalformedURLException e) {
+                                            e.printStackTrace();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+
+                                thread.start();
+
+                                try {
+                                    thread.join();
+
+                                    hotelImg = new BitmapDrawable(bitmap);
+
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
 
                             }
 
@@ -847,8 +863,8 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                             }
 
                         } else if (imagecheck == true) {
-
-                            google_url = "https://www.google.com/search?q=" + HotelName[0] + "&tbm=isch";
+//
+//                            google_url = "https://www.google.com/search?q=" + HotelName[0] + "&tbm=isch";
 
                         }
 
