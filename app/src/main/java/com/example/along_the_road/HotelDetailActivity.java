@@ -42,9 +42,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -82,7 +84,6 @@ public class HotelDetailActivity extends AppCompatActivity {
     private String URL;
     private String CheckIn;
     private String CheckOut;
-//    private String Member;
     private byte[] hotelImage;
     private Drawable Image;
 
@@ -158,6 +159,8 @@ public class HotelDetailActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
 
+    private static String IP_ADDRESS = "IP ADDRESS";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,7 +189,7 @@ public class HotelDetailActivity extends AppCompatActivity {
             Start_Date = intent.getStringExtra("startDate");
             End_Date = intent.getStringExtra("endDate");
             Stay(Start_Date, End_Date);
-            
+
             URL = intent.getStringExtra("URL");
             CheckIn = intent.getStringExtra("checkIn");
             CheckOut = intent.getStringExtra("checkOut");
@@ -194,7 +197,7 @@ public class HotelDetailActivity extends AppCompatActivity {
             Log.d(TAG, "hotelImage : " + hotelImage);
 
             location = Integer.parseInt(s_location);
-            if(s_locationDetail != null) {
+            if (s_locationDetail != null) {
                 locationDetail = Integer.parseInt(s_locationDetail);
             }
 
@@ -328,7 +331,7 @@ public class HotelDetailActivity extends AppCompatActivity {
                             }
 
                             introcheck = HotelObject.isNull("roomintro");
-                            if(introcheck == false) {
+                            if (introcheck == false) {
                                 roomintro[i] = HotelObject.getString("roomintro");
                             }
 
@@ -435,7 +438,7 @@ public class HotelDetailActivity extends AppCompatActivity {
 
                             String count = null;
 
-                            if(basecountcheck == false || maxcountcheck == false) {
+                            if (basecountcheck == false || maxcountcheck == false) {
                                 if ((basecountcheck == false && Integer.parseInt(roombasecount[i]) != 0)
                                         && (maxcountcheck == false && Integer.parseInt(roommaxcount[i]) != 0)) {
                                     count = roombasecount[i] + "인 기준   |   최대 " + roommaxcount[i] + "인";
@@ -475,9 +478,9 @@ public class HotelDetailActivity extends AppCompatActivity {
                                     && (peakseasonfeecheck == false && roompeakseasonminfee1[i] != 0)) {
                                 String peakminfee = Integer.toString(roompeakseasonminfee1[i]);
                                 MakeTextView("성수기 최소 ", i, 13, 0, 5, 0, 3, null, null);
-                                MakeTextView(peakminfee + "\\", i,  19, 0, 5, 0, 1, null, null);
+                                MakeTextView(peakminfee + "\\", i, 19, 0, 5, 0, 1, null, null);
                             } else if ((offseasonfeecheck == true || roomoffseasonminfee1[i] == 0)
-                                && (peakseasonfeecheck == true || roompeakseasonminfee1[i] == 0)) {
+                                    && (peakseasonfeecheck == true || roompeakseasonminfee1[i] == 0)) {
                                 MakeTextView("※ 가격 정보가 없습니다.", i, 19, 0, 5, 5, 1, null, null);
                             }
 
@@ -535,7 +538,7 @@ public class HotelDetailActivity extends AppCompatActivity {
                                 MakeRoomOption(tl, i, tl_img);
                             }
 
-                            if(introcheck == false) {
+                            if (introcheck == false) {
                                 MakeTextView(roomintro[i], i, 14, 2, 30, 50, 0, null, null);
                             }
 
@@ -557,15 +560,15 @@ public class HotelDetailActivity extends AppCompatActivity {
         btn_plus_plan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(firebaseAuth.getCurrentUser() != null) {
+                if (firebaseAuth.getCurrentUser() != null) {
                     location(location, locationDetail);
 
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     String uid = user.getUid();
                     String image;
-                    if(hotelImage != null) {
-                        image = byteArrayToBinaryString(hotelImage);
-                        Log.d(TAG, "String image : " + image);
+                    if (hotelImage != null) {
+                        image = "&image=" + byteArrayToBinaryString(hotelImage);
+                        Log.d(TAG, "image : " + image);
                     } else {
                         image = null;
                     }
@@ -578,11 +581,13 @@ public class HotelDetailActivity extends AppCompatActivity {
                     reference.child("plan").child("stay").setValue(Stay);
                     reference.child("plan").child("hotelName").setValue(HotelName);
                     reference.child("plan").child("hotelImage").setValue(image);
-                    if(URL != null) {
+                    if (URL != null) {
                         reference.child("plan").child("hotelWeb").setValue(URL.split("\"")[1]);
                     }
 
-                    Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
+                    InsertData task = new InsertData();
+                    task.execute("http://" + IP_ADDRESS + "/insertPlan.php", uid, City, Start_Date, End_Date, Stay, HotelName, image, URL.split("\"")[1]);
+
                 } else {
                     Toast.makeText(getApplicationContext(), "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
                 }
@@ -622,12 +627,12 @@ public class HotelDetailActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN :
+                    case MotionEvent.ACTION_DOWN:
                         btn_reservation.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
                         btn_reservation.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
                         return false;
 
-                    case MotionEvent.ACTION_UP :
+                    case MotionEvent.ACTION_UP:
                         btn_reservation.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
                         btn_reservation.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
                         return false;
@@ -651,7 +656,7 @@ public class HotelDetailActivity extends AppCompatActivity {
         btn_plus_plan = findViewById(R.id.btn_plus_myplan);
 
     }
-    
+
     public void Stay(String start_Date, String end_Date) {
         try {
 
@@ -666,7 +671,7 @@ public class HotelDetailActivity extends AppCompatActivity {
 
             // Date.getTime() 은 해당날짜를 기준으로1970년 00:00:00 부터 몇 초가 흘렀는지를 반환해준다.
             // 이제 24*60*60*1000(각 시간값에 따른 차이점) 을 나눠주면 일수가 나온다.
-            long calDateDays = calDate / ( 24*60*60*1000 );
+            long calDateDays = calDate / (24 * 60 * 60 * 1000);
 
             calDateDays = Math.abs(calDateDays);
             String days = Long.toString(calDateDays);
@@ -712,9 +717,9 @@ public class HotelDetailActivity extends AppCompatActivity {
                 City = "부산";
                 break;
             case Gangwondo:
-                if(locationDetail == 1) {
+                if (locationDetail == 1) {
                     City = "강릉";
-                } else if(locationDetail == 5) {
+                } else if (locationDetail == 5) {
                     City = "속초";
                 }
                 break;
@@ -761,15 +766,15 @@ public class HotelDetailActivity extends AppCompatActivity {
         Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquare.ttf");
         NotOption.setTypeface(typeface);
 
-        if(textform == 0) {
+        if (textform == 0) {
             NotOption.setPadding(15, 10, 15, 10);
-        } else if(textform == 3) {
+        } else if (textform == 3) {
             NotOption.setPadding(10, 25, 10, 0);
         }
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
         );
 
         lp.topMargin = margintop;
@@ -801,10 +806,9 @@ public class HotelDetailActivity extends AppCompatActivity {
                 NotOption.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
         }
 
-        if(textform == 0) {
+        if (textform == 0) {
             ll_room_option[i].addView(NotOption);
-        }
-        else if(textform == 1 || textform == 3) {
+        } else if (textform == 1 || textform == 3) {
             fl_fee_view[i].addView(NotOption);
         }
     }
@@ -847,9 +851,9 @@ public class HotelDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(firebaseAuth.getCurrentUser() == null) {
+        if (firebaseAuth.getCurrentUser() == null) {
             getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
-        } else if(firebaseAuth.getCurrentUser() != null) {
+        } else if (firebaseAuth.getCurrentUser() != null) {
             getMenuInflater().inflate(R.menu.toolbar_al_menu, menu);
         }
 
@@ -883,6 +887,101 @@ public class HotelDetailActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    class InsertData extends AsyncTask<String, Void, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(HotelDetailActivity.this,
+                    "일정 추가중입니다.", null, true, true);
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
+
+            Log.d(TAG, "POST response  - " + result);
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String uid = (String) params[1];
+            String city = (String) params[2];
+            String start_date = (String) params[3];
+            String end_date = (String) params[4];
+            String stay = (String) params[5];
+            String hotel_name = (String) params[6];
+            String image = (String) params[7];
+            String hotel_url = (String) params[8];
+
+            String serverURL = (String) params[0];
+            String postParameters = "uid=" + uid + "&city=" + city + "&start_date=" + start_date + "&end_date=" + end_date
+                    + "&stay=" + stay + "&hotel_name=" + hotel_name + image + "&url=" + hotel_url;
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "POST response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                } else {
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+
+                bufferedReader.close();
+
+
+                return sb.toString();
+
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+
+                return new String("Error: " + e.getMessage());
+            }
+
         }
     }
 

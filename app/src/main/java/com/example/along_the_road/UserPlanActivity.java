@@ -34,10 +34,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.apmem.tools.layouts.FlowLayout;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,6 +51,19 @@ import java.net.URL;
 public class UserPlanActivity extends AppCompatActivity {
 
     private final static String TAG = "UserPlanActivity";
+    private static final String TAG_RESULTS = "result";
+    private static final String TAG_UID = "uid";
+    private static final String TAG_CITY = "city";
+    private static final String TAG_START_DATE = "start_date";
+    private static final String TAG_END_DATE = "end_date";
+    private static final String TAG_STAY = "stay";
+    private static final String TAG_HOTEL_NAME = "hotel_name";
+    private static final String TAG_IMAGE = "image";
+    private static final String TAG_URL = "url";
+    private static String IP_ADDRESS = "IP ADDRESS";
+
+    private String JSONString;
+    private JSONArray plans = null;
 
     private RelativeLayout rl_info_popup;
     private RelativeLayout rl_popup_info_ok;
@@ -60,7 +79,7 @@ public class UserPlanActivity extends AppCompatActivity {
     private TextView tv_hotel_name;
     private TextView tv_course_x;
     private TextView tv_popup_msg;
-    private Button btn_reservation;
+    private Button btn_remove_reservation;
 
     private Bitmap[] bitmap;
 
@@ -91,8 +110,8 @@ public class UserPlanActivity extends AppCompatActivity {
             final String uid = firebaseAuth.getCurrentUser().getUid();
             final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 
-            getData task = new getData();
-            task.execute();
+            GetData task = new GetData();
+            task.execute(uid);
 
             if (!tv_info_my_plan_area.getText().toString().isEmpty() && tv_info_my_plan_day.getText().toString().isEmpty()) {
                 tv_info_my_plan_day.setText("당일치기");
@@ -129,7 +148,7 @@ public class UserPlanActivity extends AppCompatActivity {
 //            }
 
 
-            btn_reservation.setOnClickListener(new View.OnClickListener() {
+            btn_remove_reservation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     AlertDialog.Builder alBuilder = new AlertDialog.Builder(UserPlanActivity.this, R.style.AlertDialogStyle);
@@ -140,19 +159,22 @@ public class UserPlanActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            firebaseDatabase.getReference("users/" + uid + "/plan").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    tv_popup_msg.setText("삭제되었습니다.\n새로운 일정을 만들 수 있습니다!");
-                                    rl_info_popup.setVisibility(View.VISIBLE);
-                                    rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            finish();
-                                        }
-                                    });
-                                }
-                            });
+//                            firebaseDatabase.getReference("users/" + uid + "/plan").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                @Override
+//                                public void onSuccess(Void aVoid) {
+//                                    tv_popup_msg.setText("삭제되었습니다.\n새로운 일정을 만들 수 있습니다!");
+//                                    rl_info_popup.setVisibility(View.VISIBLE);
+//                                    rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            finish();
+//                                        }
+//                                    });
+//                                }
+//                            });
+
+                            DeleteData deleteTask = new DeleteData();
+                            deleteTask.execute(uid);
 
                         }
                     });
@@ -168,18 +190,18 @@ public class UserPlanActivity extends AppCompatActivity {
                 }
             });
 
-            btn_reservation.setOnTouchListener(new View.OnTouchListener() {
+            btn_remove_reservation.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN :
-                            btn_reservation.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
-                            btn_reservation.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+                            btn_remove_reservation.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
+                            btn_remove_reservation.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
                             return false;
 
                         case MotionEvent.ACTION_UP :
-                            btn_reservation.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
-                            btn_reservation.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
+                            btn_remove_reservation.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
+                            btn_remove_reservation.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
                             return false;
                     }
                     return false;
@@ -238,7 +260,7 @@ public class UserPlanActivity extends AppCompatActivity {
         tv_course_x = findViewById(R.id.tv_course_x);
         tv_popup_msg = findViewById(R.id.tv_popup_msg);
 
-        btn_reservation = findViewById(R.id.btn_reservation);
+        btn_remove_reservation = findViewById(R.id.btn_remove_reservation);
 
     }
 
@@ -261,8 +283,147 @@ public class UserPlanActivity extends AppCompatActivity {
         return total;
     }
 
-    private class getData extends AsyncTask<String, Void, String> {
+    public static Bitmap StringToBitmap(String ImageString) {
+        try {
+//            String decodedString = URLDecoder.decode(encodedString, "utf-8");
+//            Log.d(TAG, "decodedString : " + decodedString);
+//            byte[] encodeByte = Base64.decode(decodedString, Base64.DEFAULT);
+            byte[] bytes = binaryStringToByteArray(ImageString);
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            Bitmap bitmap = BitmapFactory.decodeStream(bais);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
 
+//    private class getData extends AsyncTask<String, Void, String> {
+//
+//        String errorString = null;
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//
+//            progressDialog = ProgressDialog.show(UserPlanActivity.this,
+//                    "로딩중입니다.", null, true, true);
+//
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String result) {
+//            super.onPostExecute(result);
+//
+//            progressDialog.dismiss();
+//
+//            Log.d(TAG, "response - " + result);
+//
+//        }
+//
+//        @Override
+//        protected String doInBackground(String... params) {
+//
+//            final String uid = firebaseAuth.getCurrentUser().getUid();
+//
+//            final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+//            firebaseDatabase.getReference("users/" + uid + "/plan").addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    for (final DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                        if (dataSnapshot.getKey().equals("city")) {
+//                            tv_area_name.setText(dataSnapshot.getValue().toString());
+//                            tv_info_my_plan_area.setText(dataSnapshot.getValue().toString() + "  에서의");
+//                            tv_info_my_plan_area.setVisibility(View.VISIBLE);
+//                        } else if (dataSnapshot.getKey().equals("startDate")) {
+//                            tv_start_date.setText(dataSnapshot.getValue().toString());
+//                        } else if (dataSnapshot.getKey().equals("endDate")) {
+//                            tv_end_date.setText(dataSnapshot.getValue().toString());
+//                        } else if (dataSnapshot.getKey().equals("stay")) {
+//                            tv_info_my_plan_day.setText(dataSnapshot.getValue().toString());
+//                            tv_info_my_plan_day.setVisibility(View.VISIBLE);
+//                        } else if (dataSnapshot.getKey().equals("hotelName")) {
+//                            tv_hotel_name.setText(dataSnapshot.getValue().toString());
+//                        } else if (dataSnapshot.getKey().equals("hotelImage")) {
+//                            String image = dataSnapshot.getValue().toString();
+//                            byte[] b = binaryStringToByteArray(image);
+//                            Log.d("UserPlanActivity", "b : " + b);
+//                            ByteArrayInputStream is = new ByteArrayInputStream(b);
+//                            Drawable hotelImage = Drawable.createFromStream(is, "hotelImage");
+//                            iv_hotel_image.setImageDrawable(hotelImage);
+//                        } else if (dataSnapshot.getKey().equals("course")) {
+//                            int length = Integer.parseInt(Long.toString(dataSnapshot.getChildrenCount()));
+//                            for (int i = 0; i < length; i++) {
+//                                TextView tv_course_name = new TextView(UserPlanActivity.this);
+//                                if (i < length - 1) {
+//                                    tv_course_name.setText(dataSnapshot.child(Integer.toString(i)).getValue().toString() + " > ");
+//                                } else if (i == length - 1) {
+//                                    tv_course_name.setText(dataSnapshot.child(Integer.toString(i)).getValue().toString());
+//                                }
+//                                Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
+//                                tv_course_name.setTypeface(typeface);
+//                                tv_course_name.setTextSize(17);
+//                                fl_course_list.addView(tv_course_name);
+//                            }
+//                            tv_course_x.setVisibility(View.GONE);
+//                        } else if (dataSnapshot.getKey().equals("courseImage")) {
+//                            int length = Integer.parseInt(Long.toString(dataSnapshot.getChildrenCount()));
+//                            for (int i = 0; i < length; i++) {
+//                                bitmap = new Bitmap[length];
+//                                final int no = i;
+//                                if (iv_hotel_image.getDrawable() == null) {
+//                                    Thread thread = new Thread(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            // TODO Auto-generated method stub
+//                                            try {
+//                                                URL url = new URL(dataSnapshot.child(Integer.toString(no)).getValue().toString());
+//                                                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                                                conn.setDoInput(true);
+//                                                conn.connect();
+//
+//                                                InputStream is = conn.getInputStream();
+//                                                bitmap[no] = BitmapFactory.decodeStream(is);
+//                                            } catch (MalformedURLException e) {
+//                                                e.printStackTrace();
+//                                            } catch (IOException e) {
+//                                                e.printStackTrace();
+//                                            }
+//                                        }
+//                                    });
+//
+//                                    thread.start();
+//
+//                                    try {
+//                                        thread.join();
+//
+//                                        iv_hotel_image.setImageBitmap(bitmap[0]);
+//                                        img_no = 0;
+////                                        hotelImg = new BitmapDrawable(bitmap);
+//
+//                                    } catch (InterruptedException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//                    errorString = error.toString();
+//                }
+//            });
+//
+//            return errorString;
+//
+//        }
+//    }
+
+    private class GetData extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
         String errorString = null;
 
         @Override
@@ -271,7 +432,6 @@ public class UserPlanActivity extends AppCompatActivity {
 
             progressDialog = ProgressDialog.show(UserPlanActivity.this,
                     "로딩중입니다.", null, true, true);
-
         }
 
         @Override
@@ -279,107 +439,217 @@ public class UserPlanActivity extends AppCompatActivity {
             super.onPostExecute(result);
 
             progressDialog.dismiss();
-
             Log.d(TAG, "response - " + result);
 
+            if (result == null) {
+                // 오류 시
+            } else {
+
+                if(result.contains("찾을 수 없습니다.")) {
+                    tv_popup_msg.setText("여행 계획이 존재하지 않습니다.");
+                    rl_info_popup.setVisibility(View.VISIBLE);
+                    rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            finish();
+                        }
+                    });
+                } else {
+                    rl_plan_container.setVisibility(View.VISIBLE);
+                    JSONString = result;
+                    showResult();
+                }
+
+            }
         }
 
         @Override
         protected String doInBackground(String... params) {
 
-            final String uid = firebaseAuth.getCurrentUser().getUid();
+            String uid = params[0];
 
-            final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-            firebaseDatabase.getReference("users/" + uid + "/plan").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for (final DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        if (dataSnapshot.getKey().equals("city")) {
-                            tv_area_name.setText(dataSnapshot.getValue().toString());
-                            tv_info_my_plan_area.setText(dataSnapshot.getValue().toString() + "  에서의");
-                            tv_info_my_plan_area.setVisibility(View.VISIBLE);
-                        } else if (dataSnapshot.getKey().equals("startDate")) {
-                            tv_start_date.setText(dataSnapshot.getValue().toString());
-                        } else if (dataSnapshot.getKey().equals("endDate")) {
-                            tv_end_date.setText(dataSnapshot.getValue().toString());
-                        } else if (dataSnapshot.getKey().equals("stay")) {
-                            tv_info_my_plan_day.setText(dataSnapshot.getValue().toString());
-                            tv_info_my_plan_day.setVisibility(View.VISIBLE);
-                        } else if (dataSnapshot.getKey().equals("hotelName")) {
-                            tv_hotel_name.setText(dataSnapshot.getValue().toString());
-                        } else if (dataSnapshot.getKey().equals("hotelImage")) {
-                            String image = dataSnapshot.getValue().toString();
-                            byte[] b = binaryStringToByteArray(image);
-                            Log.d("UserPlanActivity", "b : " + b);
-                            ByteArrayInputStream is = new ByteArrayInputStream(b);
-                            Drawable hotelImage = Drawable.createFromStream(is, "hotelImage");
-                            iv_hotel_image.setImageDrawable(hotelImage);
-                        } else if (dataSnapshot.getKey().equals("course")) {
-                            int length = Integer.parseInt(Long.toString(dataSnapshot.getChildrenCount()));
-                            for (int i = 0; i < length; i++) {
-                                TextView tv_course_name = new TextView(UserPlanActivity.this);
-                                if (i < length - 1) {
-                                    tv_course_name.setText(dataSnapshot.child(Integer.toString(i)).getValue().toString() + " > ");
-                                } else if (i == length - 1) {
-                                    tv_course_name.setText(dataSnapshot.child(Integer.toString(i)).getValue().toString());
-                                }
-                                Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
-                                tv_course_name.setTypeface(typeface);
-                                tv_course_name.setTextSize(17);
-                                fl_course_list.addView(tv_course_name);
-                            }
-                            tv_course_x.setVisibility(View.GONE);
-                        } else if (dataSnapshot.getKey().equals("courseImage")) {
-                            int length = Integer.parseInt(Long.toString(dataSnapshot.getChildrenCount()));
-                            for (int i = 0; i < length; i++) {
-                                bitmap = new Bitmap[length];
-                                final int no = i;
-                                if (iv_hotel_image.getDrawable() == null) {
-                                    Thread thread = new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            // TODO Auto-generated method stub
-                                            try {
-                                                URL url = new URL(dataSnapshot.child(Integer.toString(no)).getValue().toString());
-                                                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                                                conn.setDoInput(true);
-                                                conn.connect();
+            String serverURL = "http://" + IP_ADDRESS + "/selectPlan.php";
+            String postParameters = "uid=" + uid;
 
-                                                InputStream is = conn.getInputStream();
-                                                bitmap[no] = BitmapFactory.decodeStream(is);
-                                            } catch (MalformedURLException e) {
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
+            try {
 
-                                    thread.start();
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
-                                    try {
-                                        thread.join();
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.connect();
 
-                                        iv_hotel_image.setImageBitmap(bitmap[0]);
-                                        img_no = 0;
-//                                        hotelImg = new BitmapDrawable(bitmap);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
 
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                    }
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                } else {
+                    inputStream = httpURLConnection.getErrorStream();
                 }
 
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                bufferedReader.close();
+
+                return sb.toString().trim();
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "SelectData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
+
+        }
+    }
+
+    private void showResult() {
+        try {
+            JSONObject jsonObject = new JSONObject(JSONString);
+            JSONArray jsonArray = jsonObject.getJSONArray(TAG_RESULTS);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+
+                JSONObject item = jsonArray.getJSONObject(i);
+
+                String city = item.getString(TAG_CITY);
+                String start_date = item.getString(TAG_START_DATE);
+                String end_date = item.getString(TAG_END_DATE);
+                String stay = item.getString(TAG_STAY);
+                String hotel_name = item.getString(TAG_HOTEL_NAME);
+                String image = item.getString(TAG_IMAGE);
+                String url = item.getString(TAG_URL);
+
+                Log.d(TAG, "image : " + image);
+
+                if (image == null || image.isEmpty()) {
+                    Log.d(TAG, "Image is null");
+                } else {
+                    Bitmap bitmap = StringToBitmap(image);
+                    iv_hotel_image.setImageBitmap(bitmap);
+                    iv_hotel_image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    iv_hotel_image.setVisibility(View.VISIBLE);
+                }
+
+                tv_area_name.setText(city);
+                tv_hotel_name.setText(hotel_name);
+                tv_start_date.setText(start_date);
+                tv_end_date.setText(end_date);
+                tv_info_my_plan_area.setText(city + "  에서의");
+                tv_info_my_plan_day.setText(stay);
+
+            }
+
+        } catch (JSONException e) {
+
+            Log.d(TAG, "showResult : ", e);
+        }
+
+    }
+
+    private class DeleteData extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+        String errorString = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(UserPlanActivity.this,
+                    "삭제중입니다.", null, true, true);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            tv_popup_msg.setText("삭제되었습니다.\n새로운 일정을 만들 수 있습니다!");
+            rl_info_popup.setVisibility(View.VISIBLE);
+            rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    errorString = error.toString();
+                public void onClick(View v) {
+                    finish();
                 }
             });
+            Log.d(TAG, "response - " + result);
+        }
 
-            return errorString;
+        @Override
+        protected String doInBackground(String... params) {
+
+            String uid = params[0];
+
+            String serverURL = "http://" + IP_ADDRESS + "/deletePlan.php";
+            String postParameters = "uid=" + uid;
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.connect();
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                } else {
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                bufferedReader.close();
+
+                return sb.toString().trim();
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "DeleteData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
 
         }
     }

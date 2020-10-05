@@ -724,7 +724,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
             } catch (Exception e) {
 
-                Log.d(TAG, "InsertData: Error ", e);
+                Log.d(TAG, "SelectData: Error ", e);
                 errorString = e.toString();
 
                 return null;
@@ -819,7 +819,7 @@ public class PostDetailActivity extends AppCompatActivity {
             super.onPreExecute();
 
             progressDialog = ProgressDialog.show(PostDetailActivity.this,
-                    "로딩중입니다.", null, true, true);
+                    "삭제중입니다.", null, true, true);
         }
 
         @Override

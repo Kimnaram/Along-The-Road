@@ -31,7 +31,8 @@
             android:id="@+id/rl_plan_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="20dp">
+            android:layout_margin="20dp"
+            android:visibility="gone">
 
             <RelativeLayout
                 android:id="@+id/rl_info_container"
@@ -229,7 +230,7 @@
         </RelativeLayout>
 
         <Button
-            android:id="@+id/btn_reservation"
+            android:id="@+id/btn_remove_reservation"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -264,6 +265,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
+                android:layout_marginBottom="10dp"
                 android:fontFamily="@font/robotolight"
                 android:gravity="center"
                 android:text="안내"
