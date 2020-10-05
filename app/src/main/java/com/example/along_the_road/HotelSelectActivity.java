@@ -15,11 +15,8 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.NetworkOnMainThreadException;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -53,17 +50,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -666,6 +659,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                     thread.join();
 
                                     hotelImg = new BitmapDrawable(bitmap);
+                                    bitmap = null;
 
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
@@ -678,27 +672,38 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                 Thread thread = new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        // TODO Auto-generated method stub
+//                                         TODO Auto-generated method stub
                                         Document temp = null;
                                         Document doc = null;
                                         try {
-//                                            temp = Jsoup.connect("https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch").get();
-//                                            Elements detail_url = temp.select("div.isv-r:nth-child(1)");
-//                                            String google_url = detail_url.attr("jsdata");
-//                                            google_url = google_url.split(";")[1];
-//                                            Log.d(TAG, "google_url : " + google_url);
-//                                            doc = Jsoup.connect("https://www.google.com/search?q=" + HotelName[i] + "&tbm=isch&bih=732#imgrc=" + google_url).get();
-//                                            Log.d(TAG, "url : " + "https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch&bih=732#imgrc=" + google_url);
-//                                            Elements contents = doc.select("div.tvh9oe:nth-child(2) > c-wiz:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > a:nth-child(1) > img:nth-child(1)");
-//                                            google_image = contents.attr("src");
+                                            temp = Jsoup.connect("https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch").get();
+                                            Elements detail_url = temp.select("div.isv-r:nth-child(1)");
+                                            String google_url = detail_url.attr("jsdata");
+                                            google_url = google_url.split(";")[1];
+                                            Log.d(TAG, "google_url : " + google_url);
 
-                                            doc = Jsoup.connect("https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch").get();
-                                            Elements contents = doc.select("div.isv-r:nth-child(1) > a:nth-child(1) > div:nth-child(1) > img:nth-child(1)");
+                                            doc = Jsoup.connect("https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch&bih=604&dpr=2.63#imgrc=" + google_url).get();
+                                            Log.d(TAG, "doc : " + "https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch&bih=604&dpr=2.63#imgrc=" + google_url);
+                                            Elements contents = doc.select("div.tvh9oe:nth-child(2) > c-wiz:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > a:nth-child(1) > img:nth-child(1)");
                                             google_image = contents.attr("src");
-                                            google_image = google_image.split(",")[1];
-                                            Log.d(TAG, "google_image : " + google_image);
-                                            byte[] decodedByte = Base64.decode(google_image, Base64.DEFAULT);
-                                            bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+                                            Log.d(TAG, "src : " + google_image);
+                                            URL url = new URL(google_image);
+                                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                            conn.setDoInput(true);
+                                            conn.connect();
+
+                                            InputStream is = conn.getInputStream();
+                                            bitmap = BitmapFactory.decodeStream(is);
+
+//                                            doc = Jsoup.connect("https://www.google.com/search?q=" + HotelName[no] + "&tbm=isch").get();
+//                                            Elements contents = doc.select("div.isv-r:nth-child(1) > a:nth-child(1) > div:nth-child(1) > img:nth-child(1)");
+//                                            google_image = contents.attr("src");
+//                                            google_image = google_image.split(",")[1];
+//                                            Log.d(TAG, "google_image : " + google_image);
+//                                            byte[] decodedByte = Base64.decode(google_image, Base64.DEFAULT);
+//                                            bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+//                                            Log.d(TAG, "bitmap : " + bitmap);
+//                                            hotelImg = new BitmapDrawable(bitmap);
 
                                         } catch (MalformedURLException e) {
                                             e.printStackTrace();
@@ -714,6 +719,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                                     thread.join();
 
                                     hotelImg = new BitmapDrawable(bitmap);
+                                    bitmap = null;
 
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();

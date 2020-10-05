@@ -787,7 +787,9 @@ public class PostDetailActivity extends AppCompatActivity {
 
                 Log.d(TAG, "image : " + image);
 
-                if (image != null) {
+                if (image == null || image.isEmpty()) {
+                    Log.d(TAG, "Image is null");
+                } else {
                     Bitmap bitmap = StringToBitmap(image);
                     iv_review_image.setImageBitmap(bitmap);
                     iv_review_image.setScaleType(ImageView.ScaleType.CENTER_CROP);
