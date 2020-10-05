@@ -31,7 +31,7 @@
             $errMSG = "이름을 입력하세요.";
         }
         else if(empty($uid)) {
-            $errMSG = "회원가입을 하셔야 합니다.";
+            $errMSG = "로그인을 하셔야 합니다.";
         }
 
         if(!isset($errMSG))
