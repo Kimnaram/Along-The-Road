@@ -1,9 +1,9 @@
 <?php
 
-$host = '3.92.65.36';
-$username = 'naram'; # MySQL 계정 아이디
-$password = 'kimnaram'; # MySQL 계정 패스워드
-$dbname = 'alongtheroad';  # DATABASE 이름
+$host = '';
+$username = ''; # MySQL 계정 아이디
+$password = ''; # MySQL 계정 패스워드
+$dbname = '';  # DATABASE 이름
 
 $con = mysqli_connect($host, $username, $password, $dbname);
 
