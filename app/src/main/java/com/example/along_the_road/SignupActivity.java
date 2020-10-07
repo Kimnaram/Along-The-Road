@@ -2,6 +2,7 @@ package com.example.along_the_road;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,14 +18,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class SignupActivity extends AppCompatActivity {
 
     private static final String TAG = "SignupActivity";
+
+    private static String IP_ADDRESS = "IP ADDRESS";
 
     private EditText ed_email_field;
     private EditText ed_username_field;
@@ -81,24 +87,20 @@ public class SignupActivity extends AppCompatActivity {
                                             String name = ed_username_field.getText().toString();
                                             String pwd = ed_pw_field.getText().toString();
 
-                                            //해쉬맵 테이블을 파이어베이스 데이터베이스에 저장
-                                            HashMap<Object, String> hashMap = new HashMap<>();
-                                            hashMap.put("email", email);
-                                            hashMap.put("uid", uid);
-                                            hashMap.put("name", name);
-                                            hashMap.put("pwd", pwd);
+//                                            //해쉬맵 테이블을 파이어베이스 데이터베이스에 저장
+//                                            HashMap<Object, String> hashMap = new HashMap<>();
+//                                            hashMap.put("email", email);
+//                                            hashMap.put("uid", uid);
+//                                            hashMap.put("name", name);
+//                                            hashMap.put("pwd", pwd);
+//
+//                                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+//                                            DatabaseReference reference = database.getReference("users");
+//                                            reference.child(uid).setValue(hashMap);
 
-                                            FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                            DatabaseReference reference = database.getReference("users");
-                                            reference.child(uid).setValue(hashMap);
+                                            InsertData Itask = new InsertData();
+                                            Itask.execute("http://" + IP_ADDRESS + "/insertUser.php", uid, email, pwd, name);
 
-
-                                            //가입이 이루어졌을시 가입 화면을 빠져나감.
-                                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-
-                                            startActivity(intent);
-                                            finish();
-                                            Toast.makeText(SignupActivity.this, "회원가입에 성공하셨습니다.", Toast.LENGTH_SHORT).show();
                                         } else {
                                             mDialog.dismiss();
                                             Toast.makeText(getApplicationContext(), "이미 존재하는 계정입니다.", Toast.LENGTH_SHORT).show();
@@ -120,6 +122,105 @@ public class SignupActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+
+    class InsertData extends AsyncTask<String, Void, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(SignupActivity.this,
+                    "회원 정보 저장 중입니다.", null, true, true);
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+
+            //가입이 이루어졌을시 가입 화면을 빠져나감.
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+
+            startActivity(intent);
+            finish();
+
+            Toast.makeText(SignupActivity.this, "회원가입에 성공하셨습니다.", Toast.LENGTH_SHORT).show();
+
+            Log.d(TAG, "POST response  - " + result);
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String uid = (String)params[1];
+            String email = (String)params[2];
+            String password = (String)params[3];
+            String name = (String)params[4];
+
+            String serverURL = (String)params[0];
+            String postParameters = "uid=" + uid + "&email=" + email + "&password=" +password + "&name=" + name;
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "POST response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+
+                bufferedReader.close();
+
+
+                return sb.toString();
+
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+
+                return new String("Error: " + e.getMessage());
+            }
+
+        }
     }
 
 }

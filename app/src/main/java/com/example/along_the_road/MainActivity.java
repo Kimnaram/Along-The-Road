@@ -10,10 +10,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -35,7 +37,10 @@ import static com.example.along_the_road.R.drawable.main_menu;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
+
     private FirebaseAuth firebaseAuth;
+    private DBOpenHelper dbOpenHelper;
 
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -81,9 +86,9 @@ public class MainActivity extends AppCompatActivity {
         //Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
         // 커스텀폰트 오류 발생, 시스템폰트 사용으로 변경
         Typeface typeface = null;
-        try{
-            typeface = Typeface.createFromAsset(this.getAssets(),"nanumsquarebold.ttf");
-        } catch(Exception e){
+        try {
+            typeface = Typeface.createFromAsset(this.getAssets(), "nanumsquarebold.ttf");
+        } catch (Exception e) {
             typeface = Typeface.defaultFromStyle(0);
         }
 
@@ -120,16 +125,34 @@ public class MainActivity extends AppCompatActivity {
         tv_login_or_out.setLayoutParams(param3);
 
         final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        if(firebaseUser != null) {
+        if (firebaseUser != null) {
             String uid = firebaseUser.getUid();
+
+            dbOpenHelper = new DBOpenHelper(this);
+            dbOpenHelper.open();
+
+            Cursor iCursor = dbOpenHelper.selectColumn(uid);
+            Log.d(TAG, "DB Size: " + iCursor.getCount());
+
+            while (iCursor.moveToNext()) {
+
+                String tempName = iCursor.getString(iCursor.getColumnIndex("name"));
+                String tempEMAIL = iCursor.getString(iCursor.getColumnIndex("email"));
+
+                Log.d(TAG, "name : " + tempName);
+                tv_username.setText(tempName + " 님");
+                tv_useremail.setText(tempEMAIL);
+
+            }
+
             FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
             firebaseDatabase.getReference("users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         if (dataSnapshot.getKey().equals("name")) {
                             username = dataSnapshot.getValue().toString();
-                            tv_username.setText(username + " 님");
+//                            tv_username.setText(username + " 님");
                         } else if (dataSnapshot.getKey().equals("plan")) {
                             for (DataSnapshot Snapshot : dataSnapshot.getChildren()) {
                                 if (Snapshot.getKey().equals("city")) {
@@ -146,21 +169,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            tv_useremail.setText(firebaseUser.getEmail());
+//            tv_useremail.setText(firebaseUser.getEmail());
             tv_login_or_out.setText("로그아웃");
 
             tv_login_or_out.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    String uid = firebaseAuth.getCurrentUser().getUid();
+                    dbOpenHelper.deleteColumn(uid);
+
                     firebaseAuth.signOut();
 
                     Intent navi_to_logout = new Intent(getApplicationContext(), MainActivity.class);
-
                     startActivity(navi_to_logout);
                 }
             });
 
-        } else if(firebaseUser == null) {
+        } else if (firebaseUser == null) {
 
             tv_username.setText("로그인이 필요합니다.");
             tv_useremail.setVisibility(View.GONE);
@@ -194,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                 int id = menuItem.getItemId();
 
                 //길 찾기
-                if(id == R.id.item_directions) {
+                if (id == R.id.item_directions) {
                     startActivity(new Intent(getApplicationContext(), TrafficSearchActivity.class));
                 }
                 //내 여행 계획 보기
@@ -281,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home : {
+            case android.R.id.home: {
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             }
@@ -296,8 +321,7 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = findViewById(R.id.drawerLayout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }
-        else {
+        } else {
             AlertDialog.Builder alBuilder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
             alBuilder.setMessage("종료하시겠습니까?");
 
@@ -319,4 +343,5 @@ public class MainActivity extends AppCompatActivity {
             alBuilder.show(); // AlertDialog.Bulider로 만든 AlertDialog를 보여준다.
         }
     }
+
 }

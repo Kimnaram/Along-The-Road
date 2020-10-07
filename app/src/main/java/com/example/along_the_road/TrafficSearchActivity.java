@@ -749,7 +749,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                     TextView tv_method_course = new TextView(TrafficSearchActivity.this);
                     tv_method_course.setText(step[no][i].split(">")[0].trim());
-                    tv_method_course.setTextSize(22);
+                    tv_method_course.setTextSize(20);
                     tv_method_course.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
                     tv_method_course.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) tv_method_course.getLayoutParams();
@@ -763,7 +763,7 @@ public class TrafficSearchActivity extends AppCompatActivity
 
                     TextView tv_detail_course = new TextView(TrafficSearchActivity.this);
                     tv_detail_course.setText(getInstructions[no][i]);
-                    tv_detail_course.setTextSize(20);
+                    tv_detail_course.setTextSize(18);
                     tv_detail_course.setTextColor(getResources().getColor(R.color.basic_color_73A9FF));
                     tv_detail_course.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) tv_detail_course.getLayoutParams();

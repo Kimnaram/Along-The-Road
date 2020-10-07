@@ -1,6 +1,5 @@
 package com.example.along_the_road;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -11,9 +10,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,12 +23,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
@@ -45,14 +38,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class UserPlanActivity extends AppCompatActivity {
 
     private final static String TAG = "UserPlanActivity";
     private static final String TAG_RESULTS = "result";
-    private static final String TAG_UID = "uid";
     private static final String TAG_CITY = "city";
     private static final String TAG_START_DATE = "start_date";
     private static final String TAG_END_DATE = "end_date";
@@ -80,12 +71,6 @@ public class UserPlanActivity extends AppCompatActivity {
     private TextView tv_course_x;
     private TextView tv_popup_msg;
     private Button btn_remove_reservation;
-
-    private Bitmap[] bitmap;
-
-    private String username;
-
-    private int img_no = 0;
 
     private FirebaseAuth firebaseAuth;
 
@@ -554,7 +539,7 @@ public class UserPlanActivity extends AppCompatActivity {
                 tv_hotel_name.setText(hotel_name);
                 tv_start_date.setText(start_date);
                 tv_end_date.setText(end_date);
-                tv_info_my_plan_area.setText(city + "  에서의");
+                tv_info_my_plan_area.setText(city);
                 tv_info_my_plan_day.setText(stay);
 
             }

@@ -43,7 +43,7 @@
 
         <com.example.along_the_road.ClearEditText
             android:id="@+id/depart_loc"
-            android:layout_width="230sp"
+            android:layout_width="230dp"
             android:layout_height="40dp"
             android:layout_toRightOf="@+id/arrow"
             android:background="@color/basic_color_FFFFFF"
