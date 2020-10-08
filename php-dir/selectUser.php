@@ -5,37 +5,34 @@ ini_set('display_errors',1);
 include('dbcon.php');
 
 //POST 값을 읽어온다.
-$postId=isset($_POST['postId']) ? $_POST['postId'] : '';
+$uid=isset($_POST['uid']) ? $_POST['uid'] : '';
 $android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
 
-if ($postId != ""){
+if ($uid != ""){
 
-  $sql="select postId, title, content, name, R.uid, image from reviews R, users U where postId=$postId and R.uid = U.uid";
+  $sql="select * from users where uid='$uid'";
   $stmt = $con->prepare($sql);
   $stmt->execute();
 
   if ($stmt->rowCount() == 0){
 
         echo "";
-        echo $postId;
+        echo $uid;
         echo "은 찾을 수 없습니다.";
   }
-  else{
+	else{
 
-	$result = array();
+   		$result = array();
 
         while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-		
-		extract($row);
-		
-		array_push($result,
-			array("postId"=>$row["postId"],
-                	"title"=>$row["title"],
-                	"content"=>$row["content"],
-                	"name"=>$row["name"],
-			"uid"=>$row["uid"],
-			"image"=>$row["image"]
-		));
+
+        	extract($row);
+
+            array_push($result,
+                array("uid"=>$row["uid"],
+                "email"=>$row["email"],
+                "name"=>$row["name"]
+            ));
         }
 
 
@@ -51,7 +48,7 @@ if ($postId != ""){
     }
 }
 else {
-    echo "Reivew : ";
+    echo "User : ";
 }
 
 ?>
@@ -69,7 +66,7 @@ if (!$android){
    <body>
 
       <form action="<?php $_PHP_SELF ?>" method="POST">
-         postId: <input type = "text" name = "postId" />
+         UID : <input type = "text" name = "uid" />
          <input type = "submit" />
       </form>
 
@@ -80,3 +77,4 @@ if (!$android){
 
 
 ?>
+
