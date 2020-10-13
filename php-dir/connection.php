@@ -13,7 +13,7 @@ if (mysqli_connect_errno($con)) {
 
 mysqli_set_charset($con, "utf8");
 
-$res = mysqli_query($con, "select * from reviews order by postId desc");
+$res = mysqli_query($con, "select postId, title, content, name, R.uid from reviews R, users U where R.uid = U.uid order by postId desc");
 
 $result = array();
 

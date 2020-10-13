@@ -14,7 +14,7 @@
     {
         $title = $_POST['title'];
 	$content = $_POST['content'];
-        $name = $_POST['name'];
+#        $name = $_POST['name'];
         $uid = $_POST['uid'];
 	$image = $_POST['image'];
 #	$data = base64_decode($image);
@@ -27,9 +27,9 @@
         else if(empty($content)){
             $errMSG = "내용을 입력하세요.";
         }
-        else if(empty($name)) {
-            $errMSG = "이름을 입력하세요.";
-        }
+#        else if(empty($name)) {
+#            $errMSG = "이름을 입력하세요.";
+#        }
         else if(empty($uid)) {
             $errMSG = "로그인을 하셔야 합니다.";
         }
@@ -37,10 +37,10 @@
         if(!isset($errMSG))
         {
             try{
-                $stmt = $con->prepare('INSERT INTO reviews(title, content, name, uid, image) VALUES(:title, :content, :name, :uid, :image)');
+                $stmt = $con->prepare('INSERT INTO reviews(title, content, uid, image) VALUES(:title, :content, :uid, :image)');
                 $stmt->bindParam(':title', $title);
 		$stmt->bindParam(':content', $content);
-		$stmt->bindParam(':name', $name);
+#		$stmt->bindParam(':name', $name);
 		$stmt->bindParam(':uid', $uid);
 		$stmt->bindParam(':image', $image);
 
@@ -78,7 +78,7 @@
             <form action="<?php $_PHP_SELF ?>" method="POST">
                 TITLE : <input type = "text" name = "title" />
                 CONTENT : <input type = "text" name = "content" />
-                NAME : <input type = "text" name = "name" />
+<!--                NAME : <input type = "text" name = "name" /> -->
                 UID : <input type = "text" name = "uid" />
                 IMAGE : <input type = "text" name = "image" />
                 <input type = "submit" name = "submit" />

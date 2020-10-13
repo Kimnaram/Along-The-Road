@@ -10,7 +10,7 @@ $android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
 
 if ($postId != ""){
 
-  $sql="select * from reviews where postId=$postId";
+  $sql="select postId, title, content, name, R.uid, image from reviews R, users U where postId=$postId and R.uid = U.uid";
   $stmt = $con->prepare($sql);
   $stmt->execute();
 

@@ -10,7 +10,7 @@ $android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
 
 if ($uid != ""){
 
-  $sql="select * from plan where uid='$uid'";
+  $sql="SELECT u.uid, name, email, city FROM plan p RIGHT JOIN users u ON p.uid = u.uid WHERE u.uid = '$uid';";
   $stmt = $con->prepare($sql);
   $stmt->execute();
 
@@ -28,17 +28,12 @@ if ($uid != ""){
 
         	extract($row);
 
-	        array_push($result,
-                	array("uid"=>$row["uid"],
-                	"city"=>$row["city"],
-                	"start_date"=>$row["start_date"],
-                	"end_date"=>$row["end_date"],
-                	"stay"=>$row["stay"],
-                	"hotel_name"=>$row["hotel_name"],
-                	"image"=>$row["image"],
-			"url"=>$row["url"],
-			"course"=>$row["course"]
-                ));
+            array_push($result,
+                array("uid"=>$row["uid"],
+                "email"=>$row["email"],
+		"name"=>$row["name"],
+		"city"=>$row["city"]
+            ));
         }
 
 
@@ -54,7 +49,7 @@ if ($uid != ""){
     }
 }
 else {
-    echo "Plan : ";
+    echo "User : ";
 }
 
 ?>
