@@ -36,7 +36,8 @@ if ($uid != ""){
                 	"stay"=>$row["stay"],
                 	"hotel_name"=>$row["hotel_name"],
                 	"image"=>$row["image"],
-                	"url"=>$row["url"]
+			"url"=>$row["url"],
+			"course"=>$row["course"]
                 ));
         }
 
@@ -53,7 +54,7 @@ if ($uid != ""){
     }
 }
 else {
-    echo "Reivew : ";
+    echo "Plan : ";
 }
 
 ?>

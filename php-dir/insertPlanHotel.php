@@ -71,8 +71,12 @@
 	      else {
                 $errMSG = "계획 추가 에러";
               }
-            } else {
-		    $ustmt = $con->prepare("UPDATE plan SET start_date=:start_date, end_date=:end_date, stay=:stay, hotel_name=:hotel_name, image=:image, url=:url WHERE uid='$uid'");
+	    } else {
+#		    $update_sql = "UPDATE plan SET image=null WHERE uid='$uid'";
+#		    $stmt = $con->prepare($update_sql);
+#		    $stmt->execute();
+
+		    $ustmt = $con->prepare("UPDATE plan SET start_date=:start_date, end_date=:end_date, stay=:stay, hotel_name=:hotel_name, image=:image, url=:url WHERE uid=:uid");
 		    $ustmt->bindParam(':uid', $uid);
 		    $ustmt->bindParam(':start_date', $start_date);
 		    $ustmt->bindParam(':end_date', $end_date);

@@ -5,7 +5,6 @@
 
     include('dbcon.php');
 
-
     $android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
 
 
@@ -37,13 +36,15 @@
 	    $sstmt = $con->prepare($select_sql);
 	    $sstmt->execute();
 
+	    echo $select_sql;
+
             if ($sstmt->rowCount() == 0) {
               $istmt = $con->prepare('INSERT INTO plan(uid, city, stay, image, course) VALUES(:uid, :city, :stay, :image, :course)');
               $istmt->bindParam(':uid', $uid);
               $istmt->bindParam(':city', $city);
 	      $istmt->bindParam(':stay', $stay);
 	      $istmt->bindParam(':image', $image);
-              $istmt->bindParam(':course', $course);
+	      $istmt->bindParam(':course', $course);
 
               if($istmt->execute()) {
                 $successMSG = "새로운 계획을 추가했습니다.";
@@ -53,11 +54,10 @@
               }
             } else {
 
-              $ustmt = $con->prepare("UPDATE plan SET course=:course, image=:image WHERE uid='$uid'");
+              $ustmt = $con->prepare("UPDATE plan SET course=:course WHERE uid=:uid");
 	      $ustmt->bindParam(':uid', $uid);
 	      $ustmt->bindParam(':course', $course);
-	      $ustmt->bindParam(':image', $image);
-	      
+
 	      if($ustmt->execute()) {
 		      $successMSG = "새로운 계획을 추가했습니다.";
               }

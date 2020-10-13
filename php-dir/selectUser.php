@@ -10,7 +10,7 @@ $android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
 
 if ($uid != ""){
 
-  $sql="select * from users where uid='$uid'";
+  $sql="SELECT u.uid, name, email, city FROM plan p RIGHT JOIN users u ON p.uid = u.uid WHERE u.uid = '$uid';";
   $stmt = $con->prepare($sql);
   $stmt->execute();
 
@@ -31,7 +31,8 @@ if ($uid != ""){
             array_push($result,
                 array("uid"=>$row["uid"],
                 "email"=>$row["email"],
-                "name"=>$row["name"]
+		"name"=>$row["name"],
+		"city"=>$row["city"]
             ));
         }
 
