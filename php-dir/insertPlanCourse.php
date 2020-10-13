@@ -12,16 +12,11 @@
     if( (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['submit'])) || $android ) {
 
         // 안드로이드 코드의 postParameters 변수에 적어준 이름을 가지고 값을 전달 받습니다.
-        // uid, City, Start_Date, End_Date, Stay, HotelName, image, URL.split("\"")[1]
         $uid = $_POST['uid'];
         $city = $_POST['city'];
         $stay = $_POST['stay'];
         $course = $_POST['course'];
         $image = $_POST['image'];
-
-#        $data = base64_decode($image);
-#        $escaped_value = mysqli_real_escape_string($con, $data);
-#        echo $escaped_value;
 
         if(empty($uid)){
             $errMSG = "로그인을 하셔야 합니다.";
@@ -38,33 +33,37 @@
 
         if(!isset($errMSG)) {
           try {
-            $select_sql="select hotel_name, course from plan where uid='$uid'";
-			      $sstmt = $con->prepare($select_sql);
-			      $sstmt->execute();
+            $select_sql="SELECT hotel_name, course FROM plan WHERE uid='$uid'";
+	    $sstmt = $con->prepare($select_sql);
+	    $sstmt->execute();
 
-            if ($stmt->rowCount() == 0) {
-              $stmt = $con->prepare('INSERT INTO plan(uid, city, stay, course, image) VALUES(:uid, :city, :start_date, :end_date, :stay, :hotel_name, :image, :url)');
-              $stmt->bindParam(':uid', $uid);
-              $stmt->bindParam(':city', $city);
-              $stmt->bindParam(':stay', $stay);
-              $stmt->bindParam(':course', $course);
-			  	    $stmt->bindParam(':image', $image);
+            if ($sstmt->rowCount() == 0) {
+              $istmt = $con->prepare('INSERT INTO plan(uid, city, stay, image, course) VALUES(:uid, :city, :stay, :image, :course)');
+              $istmt->bindParam(':uid', $uid);
+              $istmt->bindParam(':city', $city);
+	      $istmt->bindParam(':stay', $stay);
+	      $istmt->bindParam(':image', $image);
+              $istmt->bindParam(':course', $course);
 
-              if($stmt->execute()) {
+              if($istmt->execute()) {
                 $successMSG = "새로운 계획을 추가했습니다.";
               }
-			  	    else {
+	      else {
                 $errMSG = "계획 추가 에러";
               }
             } else {
 
-              $stmt = $con->prepare("UPDATE plan SET course=:course, image=:image, url=:url WHERE uid='$uid'");
-					    $stmt->bindParam(':uid', $uid);
-              $stmt->bindParam(':city', $city);
-			  		  $stmt->bindParam(':stay', $stay);
-			  		  $stmt->bindParam(':hotel_name', $hotel_name);
-			  		  $stmt->bindParam(':image', $image);
-			  		  $stmt->bindParam(':url', $url);
+              $ustmt = $con->prepare("UPDATE plan SET course=:course, image=:image WHERE uid='$uid'");
+	      $ustmt->bindParam(':uid', $uid);
+	      $ustmt->bindParam(':course', $course);
+	      $ustmt->bindParam(':image', $image);
+	      
+	      if($ustmt->execute()) {
+		      $successMSG = "새로운 계획을 추가했습니다.";
+              }
+	      else {
+		      $errMSG = "계획 추가 에러";
+              }
 
             }
           } catch(PDOException $e) {
@@ -91,7 +90,6 @@
             <form action="<?php $_PHP_SELF ?>" method="POST">
                 UID : <input type = "text" name = "uid" />
                 CITY : <input type = "text" name = "city" />
-                TITLE : <input type = "text" name = "title" />
                 COURSE : <input type = "text" name = "course" />
                 STAY : <input type = "text" name = "stay" />
                 IMAGE : <input type = "text" name = "image" />

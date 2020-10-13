@@ -51,38 +51,42 @@
         if(!isset($errMSG)) {
           try {
             $select_sql="select hotel_name, course from plan where uid='$uid'";
-			      $sstmt = $con->prepare($select_sql);
-			      $sstmt->execute();
+	    $sstmt = $con->prepare($select_sql);
+	    $sstmt->execute();
 
-            if ($stmt->rowCount() == 0) {
-              $stmt = $con->prepare('INSERT INTO plan(uid, city, start_date, end_date, stay, hotel_name, image, url) VALUES(:uid, :city, :start_date, :end_date, :stay, :hotel_name, :image, :url)');
-              $stmt->bindParam(':uid', $uid);
-              $stmt->bindParam(':city', $city);
-              $stmt->bindParam(':start_date', $start_date);
-              $stmt->bindParam(':end_date', $end_date);
-              $stmt->bindParam(':stay', $stay);
-              $stmt->bindParam(':hotel_name', $hotel_name);
-			  	    $stmt->bindParam(':image', $image);
-			  	    $stmt->bindParam(':url', $url);
+            if ($sstmt->rowCount() == 0) {
+              $istmt = $con->prepare('INSERT INTO plan(uid, city, start_date, end_date, stay, hotel_name, image, url) VALUES(:uid, :city, :start_date, :end_date, :stay, :hotel_name, :image, :url)');
+              $istmt->bindParam(':uid', $uid);
+              $istmt->bindParam(':city', $city);
+              $istmt->bindParam(':start_date', $start_date);
+              $istmt->bindParam(':end_date', $end_date);
+              $istmt->bindParam(':stay', $stay);
+              $istmt->bindParam(':hotel_name', $hotel_name);
+	      $istmt->bindParam(':image', $image);
+	      $istmt->bindParam(':url', $url);
 
-              if($stmt->execute()) {
+              if($istmt->execute()) {
                 $successMSG = "새로운 계획을 추가했습니다.";
               }
-			  	    else {
+	      else {
                 $errMSG = "계획 추가 에러";
               }
             } else {
-              
-              $stmt = $con->prepare("UPDATE plan SET start_date=:start_date, end_date=:end_date, stay=:stay, hotel_name=:hotel_name, image=:image, url=:url WHERE uid='$uid'");
-					    $stmt->bindParam(':uid', $uid);
-              $stmt->bindParam(':city', $city);
-			  		  $stmt->bindParam(':start_date', $start_date);
-			  		  $stmt->bindParam(':end_date', $end_date);
-			  		  $stmt->bindParam(':stay', $stay);
-			  		  $stmt->bindParam(':hotel_name', $hotel_name);
-			  		  $stmt->bindParam(':image', $image);
-			  		  $stmt->bindParam(':url', $url);
-              
+		    $ustmt = $con->prepare("UPDATE plan SET start_date=:start_date, end_date=:end_date, stay=:stay, hotel_name=:hotel_name, image=:image, url=:url WHERE uid='$uid'");
+		    $ustmt->bindParam(':uid', $uid);
+		    $ustmt->bindParam(':start_date', $start_date);
+		    $ustmt->bindParam(':end_date', $end_date);
+		    $ustmt->bindParam(':stay', $stay);
+		    $ustmt->bindParam(':hotel_name', $hotel_name);
+		    $ustmt->bindParam(':image', $image);
+		    $ustmt->bindParam(':url', $url);
+
+		    if($ustmt->execute()) {
+			    $successMSG = "새로운 계획을 추가했습니다.";
+	    	    }
+	    	    else {
+			    $errMSG = "계획 추가 에러";
+		    }		  
             }
           } catch(PDOException $e) {
             die("Database error: " . $e->getMessage());
