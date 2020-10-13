@@ -43,7 +43,7 @@ public class PostListActivity extends AppCompatActivity {
     private static final String TAG_NAME = "name";
     private static final String TAG_TITLE = "title";
     private static final String TAG_LIKE = "count(*)";
-    private static String IP_ADDRESS = "";
+    private static String IP_ADDRESS = "IP ADDRESS";
 
     // Review list
     private RecyclerView rv_review_container;
@@ -65,6 +65,8 @@ public class PostListActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
+
+    private DBOpenHelper dbOpenHelper;
 
     private ProgressDialog progressDialog;
 
@@ -199,6 +201,9 @@ public class PostListActivity extends AppCompatActivity {
         ib_write_review = findViewById(R.id.ib_write_review);
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        dbOpenHelper = new DBOpenHelper(this);
+        dbOpenHelper.open();
 
     }
 
@@ -348,12 +353,14 @@ public class PostListActivity extends AppCompatActivity {
                 startActivity(revlist_to_signup);
                 return true;
             case R.id.menu_logout:
-
-                FirebaseAuth.getInstance().signOut();
-
                 final ProgressDialog mDialog = new ProgressDialog(PostListActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
+
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                dbOpenHelper.deleteColumn(uid);
+
+                FirebaseAuth.getInstance().signOut();
 
                 Intent logout_to_revlist = new Intent(getApplicationContext(), PostListActivity.class);
                 mDialog.dismiss();

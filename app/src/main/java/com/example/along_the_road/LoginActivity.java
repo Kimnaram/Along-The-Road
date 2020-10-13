@@ -50,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG_UID = "uid";
     private static final String TAG_EMAIL = "email";
     private static final String TAG_NAME = "name";
+    private static final String TAG_CITY = "city";
     private static String IP_ADDRESS = "IP ADDRESS";
 
     private String JSONString;
@@ -58,6 +59,7 @@ public class LoginActivity extends AppCompatActivity {
     private String uid = "";
     private String email = "";
     private String name = "";
+    private String city = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,8 +242,9 @@ public class LoginActivity extends AppCompatActivity {
                 uid = item.getString(TAG_UID);
                 email = item.getString(TAG_EMAIL);
                 name = item.getString(TAG_NAME);
+                city = item.getString(TAG_CITY);
 
-                dbOpenHelper.insertColumn(uid, email, name);
+                dbOpenHelper.insertColumn(uid, email, name, city);
 
             }
 

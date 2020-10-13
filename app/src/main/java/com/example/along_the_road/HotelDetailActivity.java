@@ -159,6 +159,8 @@ public class HotelDetailActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
 
+    private DBOpenHelper dbOpenHelper;
+
     private static String IP_ADDRESS = "IP ADDRESS";
 
     @Override
@@ -573,20 +575,8 @@ public class HotelDetailActivity extends AppCompatActivity {
                         image = null;
                     }
 
-                    firebaseDatabase = FirebaseDatabase.getInstance();
-                    DatabaseReference reference = firebaseDatabase.getReference("users/" + uid);
-                    reference.child("plan").child("city").setValue(City);
-                    reference.child("plan").child("startDate").setValue(Start_Date);
-                    reference.child("plan").child("endDate").setValue(End_Date);
-                    reference.child("plan").child("stay").setValue(Stay);
-                    reference.child("plan").child("hotelName").setValue(HotelName);
-                    reference.child("plan").child("hotelImage").setValue(image);
-                    if (URL != null) {
-                        reference.child("plan").child("hotelWeb").setValue(URL.split("\"")[1]);
-                    }
-
                     InsertData task = new InsertData();
-                    task.execute("http://" + IP_ADDRESS + "/insertPlan.php", uid, City, Start_Date, End_Date, Stay, HotelName, image, URL.split("\"")[1]);
+                    task.execute("http://" + IP_ADDRESS + "/insertPlanHotel.php", uid, City, Start_Date, End_Date, Stay, HotelName, image, URL.split("\"")[1]);
 
                 } else {
                     Toast.makeText(getApplicationContext(), "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
@@ -654,6 +644,9 @@ public class HotelDetailActivity extends AppCompatActivity {
 
         btn_reservation = findViewById(R.id.btn_reservation);
         btn_plus_plan = findViewById(R.id.btn_plus_myplan);
+
+        dbOpenHelper = new DBOpenHelper(this);
+        dbOpenHelper.open();
 
     }
 
@@ -874,11 +867,14 @@ public class HotelDetailActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                 return true;
             case R.id.menu_logout:
-                FirebaseAuth.getInstance().signOut();
-
                 final ProgressDialog mDialog = new ProgressDialog(HotelDetailActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
+
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                dbOpenHelper.deleteColumn(uid);
+
+                FirebaseAuth.getInstance().signOut();
 
                 finish();
                 mDialog.dismiss();

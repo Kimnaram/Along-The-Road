@@ -70,13 +70,15 @@ public class DBOpenHelper {
         mDB.close();
     }
 
-    public long insertColumn(String uid, String email, String name) {
+    public long insertColumn(String uid, String email, String name, String city) {
+
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(Databases.UserDB.UID, uid);
         values.put(Databases.UserDB.EMAIL, email);
         values.put(Databases.UserDB.NAME, name);
+        values.put(Databases.UserDB.CITY, city);
         // SQLite 이미지 저장 코드 추가 필요
 
         return mDB.insert(Databases.UserDB.TABLE_NAME, null, values);
@@ -109,7 +111,7 @@ public class DBOpenHelper {
     }
 
     public Cursor selectColumn(String uid) {
-        Cursor c = mDB.rawQuery("SELECT name, email FROM " + Databases.UserDB.TABLE_NAME + " WHERE uid='" + uid + "';", null);
+        Cursor c = mDB.rawQuery("SELECT name, email, city FROM " + Databases.UserDB.TABLE_NAME + " WHERE uid='" + uid + "';", null);
         return c;
     }
 

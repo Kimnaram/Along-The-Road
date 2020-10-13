@@ -69,7 +69,7 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
 
     private static final String TAG = "HotelSelectActivity";
 
-    private final String API_KEY = "vfwDLW%2FCLuhdALtA9wefMOr8QKccGLoIi4w2uJGjawb3Gvjibbg2wgxXB1ZANESetWSi1K6F5S6dme0aqJPryw%3D%3D";
+    private final String API_KEY = "API KEY";
 
     // hotel theme code
     private final static String Hotel_t = "B02010100";
@@ -152,6 +152,8 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
     Handler handler = new Handler();
 
     private FirebaseAuth firebaseAuth;
+
+    private DBOpenHelper dbOpenHelper;
 
     /************* Google Map API 관련 변수 *************/
     private GoogleMap mMap;
@@ -309,6 +311,9 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
         btn_map_remove = findViewById(R.id.btn_map_remove);
 
         spinner = findViewById(R.id.sp_reselect);
+
+        dbOpenHelper = new DBOpenHelper(this);
+        dbOpenHelper.open();
 
     }
 
@@ -469,11 +474,13 @@ public class HotelSelectActivity extends AppCompatActivity implements OnMapReady
                 startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                 return true;
             case R.id.menu_logout:
-                FirebaseAuth.getInstance().signOut();
-
                 final ProgressDialog mDialog = new ProgressDialog(HotelSelectActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
+
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                dbOpenHelper.deleteColumn(uid);
+                FirebaseAuth.getInstance().signOut();
 
                 finish();
                 mDialog.dismiss();

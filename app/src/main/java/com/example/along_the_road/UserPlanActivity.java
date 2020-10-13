@@ -26,7 +26,6 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +37,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class UserPlanActivity extends AppCompatActivity {
@@ -51,15 +51,18 @@ public class UserPlanActivity extends AppCompatActivity {
     private static final String TAG_HOTEL_NAME = "hotel_name";
     private static final String TAG_IMAGE = "image";
     private static final String TAG_URL = "url";
+    private static final String TAG_COURSE = "course";
     private static String IP_ADDRESS = "IP ADDRESS";
 
     private String JSONString;
     private JSONArray plans = null;
 
+    private DBOpenHelper dbOpenHelper;
+
     private RelativeLayout rl_info_popup;
     private RelativeLayout rl_popup_info_ok;
     private RelativeLayout rl_plan_container;
-    private FlowLayout fl_course_list;
+//    private FlowLayout fl_course_list;
 
     private TextView tv_info_my_plan_area;
     private TextView tv_info_my_plan_day;
@@ -68,9 +71,11 @@ public class UserPlanActivity extends AppCompatActivity {
     private TextView tv_start_date;
     private TextView tv_end_date;
     private TextView tv_hotel_name;
-    private TextView tv_course_x;
+    private TextView tv_course_name;
     private TextView tv_popup_msg;
     private Button btn_remove_reservation;
+
+    private Bitmap bitmap;
 
     private FirebaseAuth firebaseAuth;
 
@@ -232,7 +237,7 @@ public class UserPlanActivity extends AppCompatActivity {
         rl_info_popup = findViewById(R.id.rl_info_popup);
         rl_popup_info_ok = findViewById(R.id.rl_popup_info_ok);
         rl_plan_container = findViewById(R.id.rl_plan_container);
-        fl_course_list = findViewById(R.id.fl_course_list);
+//        fl_course_list = findViewById(R.id.fl_course_list);
 
         tv_info_my_plan_area = findViewById(R.id.tv_info_my_plan_area);
         tv_info_my_plan_day = findViewById(R.id.tv_info_my_plan_day);
@@ -242,10 +247,13 @@ public class UserPlanActivity extends AppCompatActivity {
         tv_start_date = findViewById(R.id.tv_start_date);
         tv_end_date = findViewById(R.id.tv_end_date);
         tv_hotel_name = findViewById(R.id.tv_hotel_name);
-        tv_course_x = findViewById(R.id.tv_course_x);
+        tv_course_name = findViewById(R.id.tv_course_name);
         tv_popup_msg = findViewById(R.id.tv_popup_msg);
 
         btn_remove_reservation = findViewById(R.id.btn_remove_reservation);
+
+        dbOpenHelper = new DBOpenHelper(this);
+        dbOpenHelper.open();
 
     }
 
@@ -517,28 +525,95 @@ public class UserPlanActivity extends AppCompatActivity {
                 JSONObject item = jsonArray.getJSONObject(i);
 
                 String city = item.getString(TAG_CITY);
-                String start_date = item.getString(TAG_START_DATE);
-                String end_date = item.getString(TAG_END_DATE);
+                String start_date = "";
+                String end_date = "";
+                String hotel_name = "";
+                String image = "";
+                String course = "";
+                boolean sdcheck = item.isNull(TAG_START_DATE);
+                if(sdcheck == false) {
+                    start_date = item.getString(TAG_START_DATE);
+                }
+                boolean edcheck = item.isNull(TAG_END_DATE);
+                if(edcheck == false) {
+                    end_date = item.getString(TAG_END_DATE);
+                }
                 String stay = item.getString(TAG_STAY);
-                String hotel_name = item.getString(TAG_HOTEL_NAME);
-                String image = item.getString(TAG_IMAGE);
+                boolean hncheck = item.isNull(TAG_HOTEL_NAME);
+                if(hncheck == false) {
+                    hotel_name = item.getString(TAG_HOTEL_NAME);
+                }
+                boolean imcheck  = item.isNull(TAG_IMAGE);
+                if(imcheck == false) {
+                    image = item.getString(TAG_IMAGE);
+                }
                 String url = item.getString(TAG_URL);
+                boolean cocheck  = item.isNull(TAG_COURSE);
+                if(cocheck == false) {
+                    course = item.getString(TAG_COURSE);
+                }
 
                 Log.d(TAG, "image : " + image);
 
-                if (image == null || image.isEmpty()) {
-                    Log.d(TAG, "Image is null");
-                } else {
-                    Bitmap bitmap = StringToBitmap(image);
-                    iv_hotel_image.setImageBitmap(bitmap);
-                    iv_hotel_image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    iv_hotel_image.setVisibility(View.VISIBLE);
+                if (imcheck == false) {
+                    if(image.contains("http:")) {
+                        final String imageURL = image;
+
+                        Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // TODO Auto-generated method stub
+                                try {
+                                    URL url = new URL(imageURL);
+                                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                    conn.setDoInput(true);
+                                    conn.connect();
+
+                                    InputStream is = conn.getInputStream();
+                                    bitmap = BitmapFactory.decodeStream(is);
+                                } catch (MalformedURLException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        thread.start();
+
+                        try {
+                            thread.join();
+
+                            iv_hotel_image.setImageBitmap(bitmap);
+                            iv_hotel_image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                            iv_hotel_image.setVisibility(View.VISIBLE);
+
+                            bitmap = null;
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        bitmap = StringToBitmap(image);
+                        iv_hotel_image.setImageBitmap(bitmap);
+                        iv_hotel_image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        iv_hotel_image.setVisibility(View.VISIBLE);
+                    }
                 }
 
                 tv_area_name.setText(city);
-                tv_hotel_name.setText(hotel_name);
-                tv_start_date.setText(start_date);
-                tv_end_date.setText(end_date);
+                if(hncheck == false) {
+                    tv_hotel_name.setText(hotel_name);
+                }
+                if(sdcheck == false) {
+                    tv_start_date.setText(start_date);
+                }
+                if(edcheck == false) {
+                    tv_end_date.setText(end_date);
+                }
+                if(cocheck == false) {
+                    tv_course_name.setText(course);
+                }
                 tv_info_my_plan_area.setText(city);
                 tv_info_my_plan_day.setText(stay);
 
@@ -670,15 +745,18 @@ public class UserPlanActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                 return true;
             case R.id.menu_logout:
-                FirebaseAuth.getInstance().signOut();
-
                 final ProgressDialog mDialog = new ProgressDialog(UserPlanActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
 
-                finish();
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                dbOpenHelper.deleteColumn(uid);
+
+                FirebaseAuth.getInstance().signOut();
+
                 mDialog.dismiss();
 
+                finish();
                 startActivity(new Intent(getApplicationContext(), UserPlanActivity.class));
                 return true;
             default:

@@ -98,6 +98,8 @@ public class TrafficSearchActivity extends AppCompatActivity
 
     private FirebaseAuth firebaseAuth;
 
+    private DBOpenHelper dbOpenHelper;
+
     /****************************** Directions API 관련 변수 *******************************/
     private static final String API_KEY = "API KEY";
     private String str_url = null; // URL
@@ -270,6 +272,9 @@ public class TrafficSearchActivity extends AppCompatActivity
         ll_traffic_detail_route_container = findViewById(R.id.ll_traffic_detail_route_container);
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        dbOpenHelper = new DBOpenHelper(this);
+        dbOpenHelper.open();
 
     }
 
@@ -940,15 +945,18 @@ public class TrafficSearchActivity extends AppCompatActivity
                 startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                 return true;
             case R.id.menu_logout:
-                FirebaseAuth.getInstance().signOut();
-
                 final ProgressDialog mDialog = new ProgressDialog(TrafficSearchActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
 
-                finish();
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                dbOpenHelper.deleteColumn(uid);
+
+                FirebaseAuth.getInstance().signOut();
+
                 mDialog.dismiss();
 
+                finish();
                 startActivity(new Intent(getApplicationContext(), TrafficSearchActivity.class));
                 return true;
             default:

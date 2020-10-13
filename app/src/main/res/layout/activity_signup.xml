@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MEMBER_RegisterActivity"
+    tools:context=".SignupActivity"
     android:background="@color/basic_color_3A7AFF">
 
     <ImageView
@@ -33,6 +33,7 @@
                 android:textColor="@color/basic_color_FFFFFF"
                 android:textColorHint="@color/basic_color_FFFFFF"
                 android:fontFamily="@font/nanumsquarebold"
+                android:textSize="18dp"
                 android:hint="User Name" />
 
             <EditText
@@ -46,6 +47,7 @@
                 android:textColorHint="@color/basic_color_FFFFFF"
                 android:fontFamily="@font/nanumsquarebold"
                 android:inputType="textEmailAddress"
+                android:textSize="18dp"
                 android:hint="Email" />
 
             <EditText
@@ -54,11 +56,13 @@
                 android:layout_height="40dp"
                 android:layout_below="@+id/ed_email_field"
                 android:layout_centerHorizontal="true"
-                android:backgroundTint="@color/basic_color_FFFFFF"
+                style="@style/EditTheme"
                 android:textColor="@color/basic_color_FFFFFF"
                 android:textColorHint="@color/basic_color_FFFFFF"
                 android:fontFamily="@font/nanumsquarebold"
                 android:inputType="textPassword"
+                android:textSize="18dp"
+                app:theme="@style/EditTheme"
                 android:hint="Password" />
 
             <EditText
@@ -67,13 +71,14 @@
                 android:layout_height="40dp"
                 android:layout_below="@+id/ed_pw_field"
                 android:layout_centerHorizontal="true"
-                android:backgroundTint="@color/basic_color_FFFFFF"
+                style="@style/EditTheme"
                 android:textColor="@color/basic_color_FFFFFF"
                 android:textColorHint="@color/basic_color_FFFFFF"
                 android:fontFamily="@font/nanumsquarebold"
                 android:inputType="textPassword"
                 android:hint="Password Check"
-                app:passwordToggleEnabled="true" />
+                app:theme="@style/EditTheme"
+                android:textSize="18dp" />
 
         </RelativeLayout>
 

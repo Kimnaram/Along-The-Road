@@ -36,15 +36,17 @@
 
         <EditText
             android:id="@+id/ed_email_field"
+            style="@style/EditTheme"
             android:layout_width="300dp"
             android:layout_height="40dp"
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/tv_notification_wrong"
-            android:backgroundTint="@color/basic_color_FFFFFF"
             android:fontFamily="@font/nanumsquarebold"
             android:hint="Email"
             android:textColor="@color/basic_color_FFFFFF"
             android:inputType="textEmailAddress"
+            android:textSize="18dp"
+            app:theme="@style/EditTheme"
             android:textColorHint="@color/basic_color_FFFFFF" />
 
         <EditText
@@ -52,13 +54,14 @@
             android:layout_width="300dp"
             android:layout_height="40dp"
             android:layout_centerHorizontal="true"
-            android:backgroundTint="@color/basic_color_FFFFFF"
             android:fontFamily="@font/nanumsquarebold"
             android:hint="Password"
+            android:backgroundTint="@color/basic_color_FFFFFF"
             android:textColorHint="@color/basic_color_FFFFFF"
             android:layout_marginBottom="10dp"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/basic_color_FFFFFF"
             android:inputType="textPassword"
+            android:textSize="18dp"
             android:layout_below="@+id/ed_email_field" />
 
         <Button

@@ -50,7 +50,8 @@ public class PostUpdateActivity extends AppCompatActivity {
     private static final String TAG_TITLE = "title";
     private static final String TAG_CONTNET = "content";
     private static final String TAG_IMAGE = "image";
-    private static String IP_ADDRESS = "";
+    private static String IP_ADDRESS = "IP ADDRESS";
+
     private static final int REQUEST_CODE = 1001;
 
     private RelativeLayout rl_image_container;
@@ -65,6 +66,8 @@ public class PostUpdateActivity extends AppCompatActivity {
     private Button btn_review_cancel;
 
     private FirebaseAuth firebaseAuth;
+
+    private DBOpenHelper dbOpenHelper;
 
     private int PostId;
     private String JSONString;
@@ -245,6 +248,9 @@ public class PostUpdateActivity extends AppCompatActivity {
         btn_image_upload = findViewById(R.id.btn_image_upload);
         btn_review_update = findViewById(R.id.btn_review_update);
         btn_review_cancel = findViewById(R.id.btn_review_cancel);
+
+        dbOpenHelper = new DBOpenHelper(this);
+        dbOpenHelper.open();
 
     }
 
@@ -659,12 +665,14 @@ public class PostUpdateActivity extends AppCompatActivity {
                 startActivity(revupdate_to_signup);
                 return true;
             case R.id.menu_logout:
-
-                FirebaseAuth.getInstance().signOut();
-
                 final ProgressDialog mDialog = new ProgressDialog(PostUpdateActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
+
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                dbOpenHelper.deleteColumn(uid);
+
+                FirebaseAuth.getInstance().signOut();
 
                 Intent logout_to_revupdate = new Intent(getApplicationContext(), PostUpdateActivity.class);
                 mDialog.dismiss();

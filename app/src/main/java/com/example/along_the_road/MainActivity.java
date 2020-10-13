@@ -28,11 +28,6 @@ import android.widget.TextView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import static com.example.along_the_road.R.drawable.main_menu;
 
 public class MainActivity extends AppCompatActivity {
@@ -137,37 +132,16 @@ public class MainActivity extends AppCompatActivity {
             while (iCursor.moveToNext()) {
 
                 String tempName = iCursor.getString(iCursor.getColumnIndex("name"));
-                String tempEMAIL = iCursor.getString(iCursor.getColumnIndex("email"));
+                username = tempName;
+                String tempEmail = iCursor.getString(iCursor.getColumnIndex("email"));
+                String tempCity = iCursor.getString(iCursor.getColumnIndex("city"));
+                area = tempCity;
 
                 Log.d(TAG, "name : " + tempName);
                 tv_username.setText(tempName + " 님");
-                tv_useremail.setText(tempEMAIL);
+                tv_useremail.setText(tempEmail);
 
             }
-
-            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-            firebaseDatabase.getReference("users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        if (dataSnapshot.getKey().equals("name")) {
-                            username = dataSnapshot.getValue().toString();
-//                            tv_username.setText(username + " 님");
-                        } else if (dataSnapshot.getKey().equals("plan")) {
-                            for (DataSnapshot Snapshot : dataSnapshot.getChildren()) {
-                                if (Snapshot.getKey().equals("city")) {
-                                    area = Snapshot.getValue().toString();
-                                }
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
 
 //            tv_useremail.setText(firebaseUser.getEmail());
             tv_login_or_out.setText("로그아웃");
@@ -261,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), CourseRecoActivity.class);
-                intent.putExtra("fbareaName", area);
+                intent.putExtra("sqliteArea", area);
 
                 startActivity(intent);
             }
@@ -281,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PostListActivity.class);
-                intent.putExtra("username", username);
 
                 startActivity(intent);
             }

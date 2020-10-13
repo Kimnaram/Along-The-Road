@@ -37,12 +37,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.apmem.tools.layouts.FlowLayout;
@@ -52,12 +47,13 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import static com.example.along_the_road.LocalSelectActivity.Code;
@@ -79,8 +75,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 
     private int areaCode = Code;
     private int detailCode = Detail_Code;
-    private String areaName = "";
-    private String fbareaName = "";
+    private String sqliteArea = "";
     private String city = "";
     private String Theme = null;
     private String Total_Theme = null;
@@ -147,6 +142,11 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
 
+    private DBOpenHelper dbOpenHelper;
+
+    private String entireCourse = "";
+        private static String IP_ADDRESS = "IP ADDRESS";
+
     /************* Google Map API 관련 변수 *************/
     private RelativeLayout rl_course_map;
     private GoogleMap mMap;
@@ -178,13 +178,13 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
 
         Intent intent = getIntent();
         if (intent != null) {
-            fbareaName = intent.getStringExtra("fbareaName");
-            Log.d(TAG, "fbareaName : " + fbareaName);
+            sqliteArea = intent.getStringExtra("sqliteArea");
+            Log.d(TAG, "sqliteArea : " + sqliteArea);
         }
 
         initAllComponent();
 
-        if (areaCode == 0 && fbareaName.isEmpty()) {
+        if (areaCode == 0 && sqliteArea.isEmpty()) {
             String popup_msg = "지역을 선택해야 합니다.";
             tv_popup_msg.setText(popup_msg);
             rl_info_popup.setVisibility(View.VISIBLE);
@@ -198,8 +198,8 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                     startActivity(course_to_local);
                 }
             });
-        } else if (areaCode == 0 && !fbareaName.isEmpty()) {
-            FixAreaCode(fbareaName);
+        } else if (areaCode == 0 && !sqliteArea.isEmpty()) {
+            FixAreaCode(sqliteArea);
             AreaCodetoCity();
         } else {
             AreaCodetoCity();
@@ -511,6 +511,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                         try {
 
                             search_url = detail_Course;
+                            Log.d(TAG, "url : " + detail_Course);
                             resultText2 = new Task().execute().get(); // URL에 있는 내용을 받아옴
 
                             search_url = null;
@@ -611,12 +612,12 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN :
+                    case MotionEvent.ACTION_DOWN:
                         btn_course_select.setBackground(getResources().getDrawable(R.drawable.btn_style_common_reversal));
                         btn_course_select.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
                         return false;
 
-                    case MotionEvent.ACTION_UP :
+                    case MotionEvent.ACTION_UP:
                         btn_course_select.setBackground(getResources().getDrawable(R.drawable.btn_style_common));
                         btn_course_select.setTextColor(getResources().getColor(R.color.basic_color_3A7AFF));
                         return false;
@@ -650,7 +651,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                     case 1:
                         areaCode = 0;
                         Intent course_to_local = new Intent(getApplicationContext(), LocalSelectActivity.class);
-                        course_to_local.putExtra("fbareaName", fbareaName);
+                        course_to_local.putExtra("sqliteArea", sqliteArea);
                         course_to_local.putExtra("REQUEST", AreaCodeIsNull);
 
                         startActivity(course_to_local);
@@ -704,10 +705,13 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
         tv_selected_course = findViewById(R.id.tv_selected_course);
         tv_popup_msg = findViewById(R.id.tv_popup_msg);
 
+        dbOpenHelper = new DBOpenHelper(this);
+        dbOpenHelper.open();
+
     }
 
     public void FixAreaCode(String areaName) {
-        switch (fbareaName) {
+        switch (sqliteArea) {
             case "서울":
                 areaCode = 1;
                 break;
@@ -815,114 +819,62 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                     rl_course_map.setVisibility(View.VISIBLE);
                     state[no] = 1;
 
-                    for (int k = 0; k < getPolyline[no].length; k++) {
-                        ArrayList<LatLng> path_points = decodePolyPoints(getPolyline[no][k]); // 폴리라인 포인트 디코드 후 ArrayList에 저장
-
-                        mMap.addMarker(new MarkerOptions().position(getStartLocation[no][k]));
-                        mMap.addMarker(new MarkerOptions().position(getEndLocation[no][k]));
-
-
-                        LatLng START_LOC = new LatLng(path_points.get(0).latitude, path_points.get(0).longitude);
-
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(START_LOC));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
-
-                        Polyline line = null;
-
-                        if (line == null) {
-                            line = mMap.addPolyline(new PolylineOptions()
-                                    .color(Color.rgb(58, 122, 255))
-                                    .geodesic(true)
-                                    .addAll(path_points));
-                        } else {
-                            line.remove();
-                            line = mMap.addPolyline(new PolylineOptions()
-                                    .color(Color.rgb(58, 122, 255))
-                                    .geodesic(true)
-                                    .addAll(path_points));
-                        }
-                    }
+//                    for (int k = 0; k < getPolyline[no].length; k++) {
+//                        ArrayList<LatLng> path_points = decodePolyPoints(getPolyline[no][k]); // 폴리라인 포인트 디코드 후 ArrayList에 저장
+//
+//                        mMap.addMarker(new MarkerOptions().position(getStartLocation[no][k]));
+//                        mMap.addMarker(new MarkerOptions().position(getEndLocation[no][k]));
+//
+//
+//                        LatLng START_LOC = new LatLng(path_points.get(0).latitude, path_points.get(0).longitude);
+//
+//                        mMap.moveCamera(CameraUpdateFactory.newLatLng(START_LOC));
+//                        mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+//
+//                        Polyline line = null;
+//
+//                        if (line == null) {
+//                            line = mMap.addPolyline(new PolylineOptions()
+//                                    .color(Color.rgb(58, 122, 255))
+//                                    .geodesic(true)
+//                                    .addAll(path_points));
+//                        } else {
+//                            line.remove();
+//                            line = mMap.addPolyline(new PolylineOptions()
+//                                    .color(Color.rgb(58, 122, 255))
+//                                    .geodesic(true)
+//                                    .addAll(path_points));
+//                        }
+//                    }
 
                     btn_plus_myplan.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             if (firebaseAuth.getCurrentUser() != null) {
 
-                                if (fbareaName == null || fbareaName.equals(city)) {
-                                    Log.d(TAG, "fbareaName : " + fbareaName);
+                                String uid = firebaseAuth.getCurrentUser().getUid();
+                                String stay = "당일치기";
+                                String image = "";
 
-                                    FirebaseUser user = firebaseAuth.getCurrentUser();
-                                    String uid = user.getUid();
-
-                                    HashMap<Object, String> CourseMap = new HashMap<>();
-
-                                    for (int k = 0; k < subname[no].length; k++) {
-                                        String course = subname[no][k].split("\\(")[0];
-                                        course = course.split("\\[")[0];
-                                        CourseMap.put(Integer.toString(k), course);
+                                for (int k = 0; k < subname[no].length; k++) {
+                                    String course = subname[no][k].split("\\(")[0];
+                                    course = course.split("\\[")[0];
+                                    if(k < subname[no].length - 1) {
+                                        entireCourse += course + " > ";
+                                    } else {
+                                        entireCourse += course;
                                     }
-
-                                    HashMap<Object, String> ImageMap = new HashMap<>();
-
-                                    for (int k = 0; k < subdetailimg[no].length; k++) {
-                                        ImageMap.put(Integer.toString(k), subdetailimg[no][k]);
-                                    }
-
-                                    firebaseDatabase = FirebaseDatabase.getInstance();
-                                    DatabaseReference reference = firebaseDatabase.getReference("users/" + uid + "/plan");
-                                    reference.child("city").setValue(city);
-                                    reference.child("course").setValue(CourseMap);
-                                    reference.child("courseImage").setValue(ImageMap);
-
-                                    Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    String popup_msg = "초기의 여행 계획과 다른 지역입니다.\n그래도 저장하시겠습니까?";
-                                    tv_popup_msg.setText(popup_msg);
-                                    rl_top.setVisibility(View.GONE);
-                                    btn_plus_myplan.setVisibility(View.GONE);
-                                    rl_info_popup.setVisibility(View.VISIBLE); // 팝업을 띄움
-                                    rl_popup_info_cancel.setVisibility(View.VISIBLE);
-
-                                    rl_popup_info_ok.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            rl_info_popup.setVisibility(View.GONE);
-                                            rl_top.setVisibility(View.VISIBLE);
-
-                                            FirebaseUser user = firebaseAuth.getCurrentUser();
-                                            String uid = user.getUid();
-
-                                            HashMap<Object, String> CourseMap = new HashMap<>();
-
-                                            for (int k = 0; k < subname[no].length; k++) {
-                                                String course = subname[no][k].split("\\(")[0];
-                                                course = course.split("\\[")[0];
-                                                CourseMap.put(Integer.toString(k), course);
-                                            }
-
-                                            HashMap<Object, String> ImageMap = new HashMap<>();
-
-                                            for (int k = 0; k < subdetailimg[no].length; k++) {
-                                                ImageMap.put(Integer.toString(k), subdetailimg[no][k]);
-                                            }
-
-                                            firebaseDatabase = FirebaseDatabase.getInstance();
-                                            DatabaseReference reference = firebaseDatabase.getReference("users/" + uid + "/plan");
-                                            reference.child("city").setValue(city);
-                                            reference.child("course").setValue(CourseMap);
-                                            reference.child("courseImage").setValue(ImageMap);
-
-                                            Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                    rl_popup_info_cancel.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            rl_info_popup.setVisibility(View.GONE);
-                                            rl_top.setVisibility(View.VISIBLE);
-                                        }
-                                    });
                                 }
+
+                                Log.d(TAG, "entire course : " + entireCourse);
+
+                                for (int k = 0; k < subdetailimg[no].length; k++) {
+                                    image = "&image=" + subdetailimg[no][k];
+                                }
+
+                                InsertData task = new InsertData();
+                                task.execute("http://" + IP_ADDRESS + "/insertPlanCourse.php", uid, city, stay, entireCourse, image);
+
                             } else {
                                 Toast.makeText(getApplicationContext(), "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
                             }
@@ -1149,6 +1101,118 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
         mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
     }
 
+    // 바이너리 바이트 배열을 스트링으로
+    public static String byteArrayToBinaryString(byte[] b) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < b.length; ++i) {
+            sb.append(byteToBinaryString(b[i]));
+        }
+        return sb.toString();
+    }
+
+    // 바이너리 바이트를 스트링으로
+    public static String byteToBinaryString(byte n) {
+        StringBuilder sb = new StringBuilder("00000000");
+        for (int bit = 0; bit < 8; bit++) {
+            if (((n >> bit) & 1) > 0) {
+                sb.setCharAt(7 - bit, '1');
+            }
+        }
+        return sb.toString();
+    }
+
+    class InsertData extends AsyncTask<String, Void, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(CourseRecoActivity.this,
+                    "계획 추가중입니다.", null, true, true);
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Toast.makeText(getApplicationContext(), "일정을 만들었습니다!", Toast.LENGTH_SHORT).show();
+
+            Log.d(TAG, "POST response  - " + result);
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String uid = (String) params[1];
+            String city = (String) params[2];
+            String stay = (String) params[3];
+            String course = (String) params[4];
+            String image = (String) params[5];
+
+            String serverURL = (String) params[0];
+            String postParameters = "uid=" + uid + "&city=" + city + "&stay=" + stay
+                    + "&course=" + course + image;
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "POST response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                } else {
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+
+                bufferedReader.close();
+
+
+                return sb.toString();
+
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+
+                return new String("Error: " + e.getMessage());
+            }
+
+        }
+    }
+
     public class Task extends AsyncTask<String, Void, String> {
 
         private String str, receiveMsg;
@@ -1244,12 +1308,14 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                 startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                 return true;
             case R.id.menu_logout:
-                FirebaseAuth.getInstance().signOut();
-
                 final ProgressDialog mDialog = new ProgressDialog(CourseRecoActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
 
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                dbOpenHelper.deleteColumn(uid);
+
+                FirebaseAuth.getInstance().signOut();
                 finish();
                 mDialog.dismiss();
 

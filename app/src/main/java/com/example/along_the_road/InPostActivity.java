@@ -42,7 +42,10 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
 
     private static final String TAG = "InPostActivity";
     private static final int REQUEST_CODE = 1001;
-    private static String IP_ADDRESS = "";
+
+    private static String IP_ADDRESS = "IP ADDRESS";
+
+    private DBOpenHelper dbOpenHelper;
 
     private RelativeLayout rl_image_container;
     private FirebaseAuth firebaseAuth;
@@ -162,20 +165,8 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
         btn_post_save = findViewById(R.id.btn_post_save);
         findViewById(R.id.btn_post_save).setOnClickListener(this);
 
-//        firebaseDatabase.getReference("reviews").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
-//                    reviewCount = Integer.parseInt(dataSnapshot.getKey());
-//                    Log.d(TAG, "reviewCount : " + reviewCount);
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+        dbOpenHelper = new DBOpenHelper(this);
+        dbOpenHelper.open();
 
     }
 
@@ -227,11 +218,9 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
 
             String title = mTitle.getText().toString();
             String content = mContents.getText().toString();
-            String name = username;
-            Log.d(TAG, "name : " + name);
 
             InsertData task = new InsertData();
-            task.execute("http://" + IP_ADDRESS + "/insertReviews.php", title, content, name, uid, image);
+            task.execute("http://" + IP_ADDRESS + "/insertReviews.php", title, content, uid, image);
 
 //        Intent create_to_detail = new Intent(getApplicationContext(), PostDetailActivity.class);
 //        create_to_detail.putExtra("PostId", postId);
@@ -334,11 +323,13 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
                 startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                 return true;
             case R.id.menu_logout:
-                FirebaseAuth.getInstance().signOut();
-
                 final ProgressDialog mDialog = new ProgressDialog(InPostActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
+
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                dbOpenHelper.deleteColumn(uid);
+                FirebaseAuth.getInstance().signOut();
 
                 finish();
                 mDialog.dismiss();
@@ -378,12 +369,11 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
 
             String title = (String)params[1];
             String content = (String)params[2];
-            String name = (String)params[3];
-            String uid = (String)params[4];
-            String image = (String)params[5];
+            String uid = (String)params[3];
+            String image = (String)params[4];
 
             String serverURL = (String)params[0];
-            String postParameters = "title=" + title + "&content=" + content + "&name=" + name + "&uid=" + uid + image;
+            String postParameters = "title=" + title + "&content=" + content + "&uid=" + uid + image;
 
             try {
 
@@ -391,8 +381,8 @@ public class InPostActivity extends AppCompatActivity implements View.OnClickLis
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
 
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setReadTimeout(10000);
+                httpURLConnection.setConnectTimeout(10000);
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.connect();
 

@@ -33,4 +33,11 @@
         <item name="android:textSize">18dp</item>
     </style>
 
+    <style name="EditTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorAccent">@color/basic_color_FFFFFF</item>
+        <item name="colorControlNormal">@color/basic_color_FFFFFF</item>
+        <item name="android:fontFamily">@font/nanumsquarebold</item>
+        <item name="android:textColor">@color/basic_color_FFFFFF</item>
+    </style>
+
 </resources>

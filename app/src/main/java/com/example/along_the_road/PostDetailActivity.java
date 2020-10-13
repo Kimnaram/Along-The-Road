@@ -51,7 +51,7 @@ public class PostDetailActivity extends AppCompatActivity {
     private static final String TAG_CONTNET = "content";
     private static final String TAG_LIKE = "count(*)";
     private static final String TAG_IMAGE = "image";
-    private static String IP_ADDRESS = "";
+    private static String IP_ADDRESS = "IP ADDRESS";
 
     // Other component
     private ImageView iv_review_image;
@@ -71,6 +71,8 @@ public class PostDetailActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
+
+    private DBOpenHelper dbOpenHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -286,6 +288,9 @@ public class PostDetailActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
 
+        dbOpenHelper = new DBOpenHelper(this);
+        dbOpenHelper.open();
+
     }
 
     @Override
@@ -423,12 +428,14 @@ public class PostDetailActivity extends AppCompatActivity {
                 startActivity(revdetail_to_signup);
                 return true;
             case R.id.menu_logout:
-
-                FirebaseAuth.getInstance().signOut();
-
                 final ProgressDialog mDialog = new ProgressDialog(PostDetailActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
+
+                String uid = firebaseAuth.getCurrentUser().getUid();
+                dbOpenHelper.deleteColumn(uid);
+
+                FirebaseAuth.getInstance().signOut();
 
                 Intent logout_to_revdetail = new Intent(getApplicationContext(), PostDetailActivity.class);
                 mDialog.dismiss();
@@ -765,7 +772,11 @@ public class PostDetailActivity extends AppCompatActivity {
                 String name = item.getString(TAG_NAME);
                 String title = item.getString(TAG_TITLE);
                 String content = item.getString(TAG_CONTNET);
-                String image = item.getString(TAG_IMAGE);
+                String image = "";
+                boolean imcheck = item.isNull(TAG_IMAGE);
+                if(imcheck == false) {
+                    image = item.getString(TAG_IMAGE);
+                }
 
                 if (firebaseAuth.getCurrentUser() != null) {
                     if (firebaseAuth.getCurrentUser().getUid().equals(uid)) {
@@ -783,11 +794,7 @@ public class PostDetailActivity extends AppCompatActivity {
                     btn_review_like.setVisibility(View.VISIBLE);
                 }
 
-                Log.d(TAG, "image : " + image);
-
-                if (image == null || image.isEmpty()) {
-                    Log.d(TAG, "Image is null");
-                } else {
+                if(imcheck == false) {
                     Bitmap bitmap = StringToBitmap(image);
                     iv_review_image.setImageBitmap(bitmap);
                     iv_review_image.setScaleType(ImageView.ScaleType.CENTER_CROP);
