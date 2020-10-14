@@ -30,7 +30,8 @@
         <RelativeLayout
             android:id="@+id/rl_plan_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_margin="20dp"
             android:visibility="gone">
 
@@ -38,7 +39,6 @@
                 android:id="@+id/rl_info_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/rl_info_detail_container"
                 android:layout_marginBottom="13dp"
                 android:gravity="center">
 
@@ -93,7 +93,7 @@
                 android:id="@+id/rl_info_detail_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true">
+                android:layout_below="@+id/rl_info_container">
 
                 <ImageView
                     android:id="@+id/iv_hotel_image"
@@ -154,7 +154,7 @@
                                 android:layout_marginLeft="10dp"
                                 android:layout_toRightOf="@+id/tv_date_info"
                                 android:fontFamily="@font/nanumsquarebold"
-                                android:text="xxxx-xx-xx"
+                                android:text=""
                                 android:textSize="21dp" />
 
                             <TextView
@@ -174,7 +174,7 @@
                                 android:layout_marginLeft="10dp"
                                 android:layout_toRightOf="@+id/tv_start_date"
                                 android:fontFamily="@font/nanumsquarebold"
-                                android:text="xxxx-xx-xx"
+                                android:text=""
                                 android:textSize="21dp" />
 
                         </org.apmem.tools.layouts.FlowLayout>

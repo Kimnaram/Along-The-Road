@@ -179,7 +179,6 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
         Intent intent = getIntent();
         if (intent != null) {
             sqliteArea = intent.getStringExtra("sqliteArea");
-            Log.d(TAG, "sqliteArea : " + sqliteArea);
         }
 
         initAllComponent();
@@ -511,7 +510,6 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                         try {
 
                             search_url = detail_Course;
-                            Log.d(TAG, "url : " + detail_Course);
                             resultText2 = new Task().execute().get(); // URL에 있는 내용을 받아옴
 
                             search_url = null;
@@ -594,7 +592,6 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                     }
 
                     selected_city_txt = city;
-                    Log.d(TAG, "area : " + areaCode);
                     selected_course_txt = "에서 " + course;
 
                     tv_selected_city.setText(selected_city_txt);
@@ -812,6 +809,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
         ith_course.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                entireCourse = "";
                 // 코스가 눌리면 상세 코스가 나오도록
                 if (state[no] == 0) {
                     mMap.clear();
@@ -865,8 +863,6 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
                                         entireCourse += course;
                                     }
                                 }
-
-                                Log.d(TAG, "entire course : " + entireCourse);
 
                                 for (int k = 0; k < subdetailimg[no].length; k++) {
                                     image = "&image=" + subdetailimg[no][k];
@@ -943,6 +939,7 @@ public class CourseRecoActivity extends AppCompatActivity implements OnMapReadyC
             try {
 
                 search_url = Directions_URL;
+                Log.d(TAG, search_url);
                 resultText3 = new Task().execute().get(); // URL에 있는 내용을 받아옴
 
                 JSONObject jsonObject = new JSONObject(resultText3);

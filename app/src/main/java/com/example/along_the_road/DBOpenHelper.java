@@ -111,8 +111,15 @@ public class DBOpenHelper {
     }
 
     public Cursor selectColumn(String uid) {
-        Cursor c = mDB.rawQuery("SELECT name, email, city FROM " + Databases.UserDB.TABLE_NAME + " WHERE uid='" + uid + "';", null);
+        Cursor c = mDB.rawQuery("SELECT name, email, IFNULL(city, '') AS city FROM " + Databases.UserDB.TABLE_NAME + " WHERE uid='" + uid + "';", null);
         return c;
     }
+
+    public boolean updateColumn(String uid, String city) {
+        ContentValues values = new ContentValues();
+        values.put(Databases.UserDB.CITY, city);
+        return mDB.update(Databases.UserDB.TABLE_NAME, values, "uid='" + uid + "'", null) > 0;
+    }
+
 
 }

@@ -135,9 +135,12 @@ public class MainActivity extends AppCompatActivity {
                 username = tempName;
                 String tempEmail = iCursor.getString(iCursor.getColumnIndex("email"));
                 String tempCity = iCursor.getString(iCursor.getColumnIndex("city"));
-                area = tempCity;
+                if(!iCursor.getString(iCursor.getColumnIndex("city")).equals("null")) {
+                    area = tempCity;
+                }
 
                 Log.d(TAG, "name : " + tempName);
+                Log.d(TAG, "city : " + area);
                 tv_username.setText(tempName + " 님");
                 tv_useremail.setText(tempEmail);
 

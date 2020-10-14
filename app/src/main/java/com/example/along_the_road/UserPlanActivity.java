@@ -70,6 +70,7 @@ public class UserPlanActivity extends AppCompatActivity {
     private TextView tv_area_name;
     private TextView tv_start_date;
     private TextView tv_end_date;
+    private TextView tv_symbol;
     private TextView tv_hotel_name;
     private TextView tv_course_name;
     private TextView tv_popup_msg;
@@ -246,6 +247,7 @@ public class UserPlanActivity extends AppCompatActivity {
         tv_area_name = findViewById(R.id.tv_area_name);
         tv_start_date = findViewById(R.id.tv_start_date);
         tv_end_date = findViewById(R.id.tv_end_date);
+        tv_symbol = findViewById(R.id.tv_symbol);
         tv_hotel_name = findViewById(R.id.tv_hotel_name);
         tv_course_name = findViewById(R.id.tv_course_name);
         tv_popup_msg = findViewById(R.id.tv_popup_msg);
@@ -611,6 +613,9 @@ public class UserPlanActivity extends AppCompatActivity {
                 if(edcheck == false) {
                     tv_end_date.setText(end_date);
                 }
+                if(sdcheck == true || edcheck == true) {
+                    tv_symbol.setVisibility(View.GONE);
+                }
                 if(cocheck == false) {
                     tv_course_name.setText(course);
                 }
@@ -643,6 +648,8 @@ public class UserPlanActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
+            String uid = firebaseAuth.getCurrentUser().getUid();
+            dbOpenHelper.updateColumn(uid, "null");
             progressDialog.dismiss();
             tv_popup_msg.setText("삭제되었습니다.\n새로운 일정을 만들 수 있습니다!");
             rl_info_popup.setVisibility(View.VISIBLE);
