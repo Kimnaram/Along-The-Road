@@ -1,31 +1,42 @@
 package com.example.along_the_road;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
@@ -39,6 +50,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import static com.example.along_the_road.R.drawable.main_menu_white;
 
 public class PostDetailActivity extends AppCompatActivity {
 
@@ -70,9 +83,13 @@ public class PostDetailActivity extends AppCompatActivity {
     private JSONArray reviews = null;
 
     private FirebaseAuth firebaseAuth;
-    private FirebaseDatabase firebaseDatabase;
-
     private DBOpenHelper dbOpenHelper;
+
+    private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
+
+    private String username = "";
+    private String area = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,9 +100,160 @@ public class PostDetailActivity extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayShowTitleEnabled(false); //xml에서 titleview 설정
         getSupportActionBar().setDisplayShowCustomEnabled(true); //커스터마이징 하기 위해 필요
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //툴바 뒤로가기 생성
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_icon); //뒤로가기 버튼 모양 설정
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //툴바 메뉴버튼 생성
+        getSupportActionBar().setHomeAsUpIndicator(main_menu_white); // 메뉴 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3A7AFF"))); //툴바 배경색
+
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        navigationView = findViewById(R.id.navigationView);
+        drawerLayout = findViewById(R.id.drawerLayout);
+
+        //네비게이션 드로어 헤더 설정
+        LinearLayout ll_navigation_container = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.navigation_item, null);
+        ll_navigation_container.setBackground(getResources().getDrawable(R.color.basic_color_3A7AFF));
+        ll_navigation_container.setPadding(20, 150, 40, 50);
+        ll_navigation_container.setOrientation(LinearLayout.VERTICAL);
+        ll_navigation_container.setGravity(Gravity.BOTTOM);
+        ll_navigation_container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+
+        LinearLayout.LayoutParams param1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        //Typeface typeface = Typeface.createFromAsset(getAssets(), "font/nanumsquarebold.ttf");
+        // 커스텀폰트 오류 발생, 시스템폰트 사용으로 변경
+        Typeface typeface = null;
+        try {
+            typeface = Typeface.createFromAsset(this.getAssets(), "nanumsquarebold.ttf");
+        } catch (Exception e) {
+            typeface = Typeface.defaultFromStyle(Typeface.NORMAL);
+        }
+
+        final TextView tv_username = new TextView(this);
+        tv_username.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+        tv_username.setTextSize(18);
+        tv_username.setTypeface(typeface);
+        tv_username.setPadding(0, 2, 0, 2);
+        param1.setMargins(20, 20, 20, 5);
+        tv_username.setLayoutParams(param1);
+
+        LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        final TextView tv_useremail = new TextView(this);
+        tv_useremail.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+        tv_useremail.setTextSize(15);
+        tv_useremail.setTypeface(typeface);
+        tv_useremail.setPadding(0, 2, 0, 2);
+        param2.setMargins(20, 0, 20, 10);
+        tv_useremail.setLayoutParams(param2);
+
+        LinearLayout.LayoutParams param3 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        final TextView tv_login_or_out = new TextView(this);
+        tv_login_or_out.setTextColor(getResources().getColor(R.color.basic_color_FFFFFF));
+        tv_login_or_out.setTextSize(14);
+        tv_login_or_out.setTypeface(typeface);
+        tv_login_or_out.setPadding(0, 2, 0, 2);
+        param3.setMargins(20, 30, 20, 20);
+        tv_login_or_out.setGravity(Gravity.RIGHT);
+
+        tv_login_or_out.setLayoutParams(param3);
+
+        final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser != null) {
+            String uid = firebaseUser.getUid();
+
+            dbOpenHelper = new DBOpenHelper(this);
+            dbOpenHelper.open();
+
+            Cursor iCursor = dbOpenHelper.selectColumn(uid);
+
+            while (iCursor.moveToNext()) {
+
+                String tempName = iCursor.getString(iCursor.getColumnIndex("name"));
+                username = tempName;
+                String tempEmail = iCursor.getString(iCursor.getColumnIndex("email"));
+                String tempCity = iCursor.getString(iCursor.getColumnIndex("city"));
+                if(!iCursor.getString(iCursor.getColumnIndex("city")).equals("null")) {
+                    area = tempCity;
+                }
+
+                tv_username.setText(tempName + " 님");
+                tv_useremail.setText(tempEmail);
+
+            }
+
+//            tv_useremail.setText(firebaseUser.getEmail());
+            tv_login_or_out.setText("로그아웃");
+
+            tv_login_or_out.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String uid = firebaseAuth.getCurrentUser().getUid();
+                    dbOpenHelper.deleteColumn(uid);
+
+                    firebaseAuth.signOut();
+
+                    Intent navi_to_logout = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(navi_to_logout);
+                }
+            });
+
+        } else if (firebaseUser == null) {
+
+            tv_username.setText("로그인이 필요합니다.");
+            tv_useremail.setVisibility(View.GONE);
+
+            tv_login_or_out.setText("로그인");
+
+            tv_login_or_out.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent navi_to_login = new Intent(getApplicationContext(), LoginActivity.class);
+
+                    startActivity(navi_to_login);
+                }
+            });
+
+        }
+
+        ll_navigation_container.addView(tv_username);
+        ll_navigation_container.addView(tv_useremail);
+
+        ll_navigation_container.addView(tv_login_or_out);
+
+        navigationView.addHeaderView(ll_navigation_container);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                menuItem.setChecked(true);
+                drawerLayout.closeDrawers();
+
+                int id = menuItem.getItemId();
+
+                //길 찾기
+                if (id == R.id.item_directions) {
+                    startActivity(new Intent(getApplicationContext(), TrafficSearchActivity.class));
+                }
+                //내 여행 계획 보기
+                if (id == R.id.item_checkplan) {
+                    startActivity(new Intent(getApplicationContext(), UserPlanActivity.class));
+                }
+                //후기 구경하기
+                if (id == R.id.item_review) {
+                    Intent intent = new Intent(getApplicationContext(), PostListActivity.class);
+                    intent.putExtra("name", username);
+
+                    startActivity(intent);
+                }
+
+                return true;
+            }
+        });
 
         initAllComponent();
 
@@ -202,48 +370,46 @@ public class PostDetailActivity extends AppCompatActivity {
             }
         });
 
-        if (firebaseAuth.getCurrentUser() != null) {
-            btn_review_like.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (firebaseAuth.getCurrentUser() != null) {
+        btn_review_like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (firebaseAuth.getCurrentUser() != null) {
 //                    PostLike += 1;
 //                    firebaseDatabase.getReference("reviews/" + PostId + "/like").setValue(PostLike);
 //                    // 좋아요 누르는거 어떻게 컨트롤할지가 필요!
 
-                        String postId = Integer.toString(PostId);
-                        String uid = firebaseAuth.getCurrentUser().getUid();
+                    String postId = Integer.toString(PostId);
+                    String uid = firebaseAuth.getCurrentUser().getUid();
 
-                        if (PostLike == 0) {
-                            // 아직 추천을 하지 않았다면
+                    if (PostLike == 0) {
+                        // 아직 추천을 하지 않았다면
 
-                            InsertData task = new InsertData();
-                            task.execute("http://" + IP_ADDRESS + "/insertRecommendPost.php", postId, uid);
-                            PostLike += 1;
+                        InsertData task = new InsertData();
+                        task.execute("http://" + IP_ADDRESS + "/insertRecommendPost.php", postId, uid);
+                        PostLike += 1;
 
-                            Toast.makeText(getApplicationContext(), "해당 글을 추천하셨습니다!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "해당 글을 추천하셨습니다!", Toast.LENGTH_SHORT).show();
 
-                            GetLikeData ltask = new GetLikeData();
-                            ltask.execute(Integer.toString(PostId));
+                        GetLikeData ltask = new GetLikeData();
+                        ltask.execute(Integer.toString(PostId));
 
-                        } else if (PostLike > 0) {
-                            // 추천을 했다면
+                    } else if (PostLike > 0) {
+                        // 추천을 했다면
 
-                            deleteLikeData task = new deleteLikeData();
-                            task.execute(postId, uid);
-                            PostLike = 0;
+                        deleteLikeData task = new deleteLikeData();
+                        task.execute(postId, uid);
+                        PostLike = 0;
 
-                            GetLikeData ltask = new GetLikeData();
-                            ltask.execute(Integer.toString(PostId));
+                        GetLikeData ltask = new GetLikeData();
+                        ltask.execute(Integer.toString(PostId));
 
-                        }
-
-                    } else {
-                        Toast.makeText(getApplicationContext(), "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
                     }
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
                 }
-            });
-        }
+            }
+        });
 
         btn_review_like.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -286,7 +452,6 @@ public class PostDetailActivity extends AppCompatActivity {
         btn_review_like = findViewById(R.id.btn_review_like);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        firebaseDatabase = FirebaseDatabase.getInstance();
 
         dbOpenHelper = new DBOpenHelper(this);
         dbOpenHelper.open();
@@ -306,64 +471,12 @@ public class PostDetailActivity extends AppCompatActivity {
                 GetLikeData ltask = new GetLikeData();
                 ltask.execute(Integer.toString(PostId));
             }
+        } else {
+            GetLikeData ltask = new GetLikeData();
+            ltask.execute(Integer.toString(PostId));
         }
 
     }
-
-//    public void selectFirebase(int index) {
-////
-////        final int id = index;
-////
-////        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-////        firebaseDatabase.getReference("reviews/" + index).addValueEventListener(new ValueEventListener() {
-////            @Override
-////            public void onDataChange(@NonNull DataSnapshot snapshot) {
-////                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
-////                    if(dataSnapshot.getKey().equals("title"))
-////                        tv_review_title.setText(dataSnapshot.getValue().toString());
-////                    else if(dataSnapshot.getKey().equals("name"))
-////                        tv_review_user.setText(dataSnapshot.getValue().toString());
-////                    else if(dataSnapshot.getKey().equals("content"))
-////                        tv_review_content.setText(dataSnapshot.getValue().toString());
-////                    else if(dataSnapshot.getKey().equals("image")) {
-////                        String image = dataSnapshot.getValue().toString();
-////                        byte[] b = binaryStringToByteArray(image);
-////                        Log.d(TAG, "b : " + b);
-////                        ByteArrayInputStream is = new ByteArrayInputStream(b);
-////                        Drawable reviewImage = Drawable.createFromStream(is, "reviewImage");
-////                        iv_review_image.setImageDrawable(reviewImage);
-////                        iv_review_image.setVisbtnility(View.VISIBLE);
-////                    } else if(dataSnapshot.getKey().equals("like")) {
-////                        String like = dataSnapshot.getValue().toString();
-////                        PostLike = Integer.parseInt(like);
-////                        btn_review_like.setText("추천 " + PostLike);
-////                    } else if(dataSnapshot.getKey().equals("uid")) {
-////                        if (firebaseAuth.getCurrentUser() != null) {
-////                            if (firebaseAuth.getCurrentUser().getUid().equals(dataSnapshot.getValue().toString())) {
-////                                btn_review_update.setVisbtnility(View.VISIBLE);
-////                                btn_review_delete.setVisbtnility(View.VISIBLE);
-////                                btn_review_like.setVisbtnility(View.GONE);
-////                            } else {
-////                                btn_review_update.setVisbtnility(View.GONE);
-////                                btn_review_delete.setVisbtnility(View.GONE);
-////                                btn_review_like.setVisbtnility(View.VISIBLE);
-////                            }
-////                        } else if (firebaseAuth.getCurrentUser() == null) {
-////                            btn_review_update.setVisbtnility(View.GONE);
-////                            btn_review_delete.setVisbtnility(View.GONE);
-////                            btn_review_like.setVisbtnility(View.VISIBLE);
-////                        }
-////                    }
-////                }
-////            }
-////
-////            @Override
-////            public void onCancelled(@NonNull DatabaseError error) {
-////
-////            }
-////        });
-////
-////    }
 
     public static byte[] binaryStringToByteArray(String s) {
         int count = s.length() / 8;
@@ -400,6 +513,19 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+
+        //뒤로가기 버튼으로 네비게이션 드로어 닫기
+        DrawerLayout drawer = findViewById(R.id.drawerLayout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            finish();
+        }
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (firebaseAuth.getCurrentUser() == null) {
             getMenuInflater().inflate(R.menu.toolbar_bl_menu, menu);
@@ -413,8 +539,8 @@ public class PostDetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home: { //툴바 뒤로가기 동작
-                finish();
+            case android.R.id.home: {
+                drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             }
             case R.id.menu_login:
@@ -774,7 +900,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 String content = item.getString(TAG_CONTNET);
                 String image = "";
                 boolean imcheck = item.isNull(TAG_IMAGE);
-                if(imcheck == false) {
+                if (imcheck == false) {
                     image = item.getString(TAG_IMAGE);
                 }
 
@@ -794,7 +920,7 @@ public class PostDetailActivity extends AppCompatActivity {
                     btn_review_like.setVisibility(View.VISIBLE);
                 }
 
-                if(imcheck == false) {
+                if (imcheck == false) {
                     Bitmap bitmap = StringToBitmap(image);
                     iv_review_image.setImageBitmap(bitmap);
                     iv_review_image.setScaleType(ImageView.ScaleType.CENTER_CROP);

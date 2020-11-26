@@ -1,170 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HotelDetailActivity">
 
-    <!--상단 툴바-->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/drawerLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/toolbar_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/handon600"
-            android:text="객실 리스트"
-            android:textColor="#ffffff"
-            android:textSize="25dp"></TextView>
-    </androidx.appcompat.widget.Toolbar>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar">
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/tv_hotel_name"
+            <!--상단 툴바-->
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/nanumsquare"
-                android:gravity="center"
-                android:textColor="@color/basic_color_3A7AFF"
-                android:textSize="25dp" />
+                android:minHeight="?attr/actionBarSize">
 
-            <View
+                <TextView
+                    android:id="@+id/toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/handon600"
+                    android:text="객실 리스트"
+                    android:textColor="#ffffff"
+                    android:textSize="25dp"></TextView>
+            </androidx.appcompat.widget.Toolbar>
+
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_hotel_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nanumsquare"
+                        android:gravity="center"
+                        android:textColor="@color/basic_color_3A7AFF"
+                        android:textSize="25dp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_marginBottom="30dp"
+                        android:background="@color/basic_color_3A7AFF" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:id="@+id/tv_checkin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:layout_toLeftOf="@+id/v_tv_division_line"
+                            android:background="@color/basic_color_FFCD49"
+                            android:fontFamily="@font/nanumsquare"
+                            android:gravity="center"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:text="체크인"
+                            android:textColor="@color/basic_color_FFFFFF"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/tv_checkin_time"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/tv_checkin"
+                            android:layout_toLeftOf="@+id/v_time_division_line"
+                            android:fontFamily="@font/robotolight"
+                            android:gravity="center"
+                            android:text="12 : 00"
+                            android:textSize="23sp" />
+
+                        <View
+                            android:id="@+id/v_time_division_line"
+                            android:layout_width="2dp"
+                            android:layout_height="24sp"
+                            android:layout_below="@+id/v_tv_division_line"
+                            android:layout_centerHorizontal="true"
+                            android:background="@color/basic_color_3A7AFF" />
+
+                        <View
+                            android:id="@+id/v_tv_division_line"
+                            android:layout_width="2dp"
+                            android:layout_height="28sp"
+                            android:layout_centerHorizontal="true" />
+
+                        <TextView
+                            android:id="@+id/tv_checkout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_above="@+id/tv_checkout_time"
+                            android:layout_marginLeft="10dp"
+                            android:layout_toRightOf="@+id/v_tv_division_line"
+                            android:background="@color/basic_color_FFCD49"
+                            android:fontFamily="@font/nanumsquare"
+                            android:gravity="center"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:text="체크아웃"
+                            android:textColor="@color/basic_color_FFFFFF"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/tv_checkout_time"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/tv_checkin"
+                            android:layout_toRightOf="@+id/v_time_division_line"
+                            android:fontFamily="@font/robotolight"
+                            android:gravity="center"
+                            android:textSize="23sp" />
+
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_room_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </ScrollView>
+
+            <Button
+                android:id="@+id/btn_plus_myplan"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/btn_style_common_reversal"
+                android:fontFamily="@font/nanumsquare"
+                android:text="+"
+                android:textColor="@color/basic_color_FFFFFF"
+                android:textSize="30dp" />
+
+            <Button
+                android:id="@+id/btn_reservation"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
                 android:layout_marginRight="20dp"
-                android:layout_marginBottom="30dp"
-                android:background="@color/basic_color_3A7AFF" />
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/btn_style_common"
+                android:fontFamily="@font/nanumsquare"
+                android:text="예약하기"
+                android:textColor="@color/basic_color_3A7AFF"
+                android:textSize="25sp" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp" >
+        </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/tv_checkin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nanumsquare"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="체크인"
-                    android:background="@color/basic_color_FFCD49"
-                    android:textColor="@color/basic_color_FFFFFF"
-                    android:layout_toLeftOf="@+id/v_tv_division_line"
-                    android:gravity="center"
-                    android:textSize="20sp"
-                    android:layout_marginRight="10dp"/>
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            app:headerLayout="@layout/navigation_item"
+            app:itemTextAppearance="@style/NavigationViewStyle"
+            app:menu="@menu/navigation_menu" />
 
-                <TextView
-                    android:id="@+id/tv_checkin_time"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/robotolight"
-                    android:text="12 : 00"
-                    android:layout_toLeftOf="@+id/v_time_division_line"
-                    android:layout_below="@+id/tv_checkin"
-                    android:gravity="center"
-                    android:textSize="23sp"/>
+    </androidx.drawerlayout.widget.DrawerLayout>
 
-                <View
-                    android:id="@+id/v_time_division_line"
-                    android:layout_width="2dp"
-                    android:layout_height="24sp"
-                    android:background="@color/basic_color_3A7AFF"
-                    android:layout_centerHorizontal="true"
-                    android:layout_below="@+id/v_tv_division_line"/>
-
-                <View
-                    android:id="@+id/v_tv_division_line"
-                    android:layout_width="2dp"
-                    android:layout_height="28sp"
-                    android:layout_centerHorizontal="true" />
-
-                <TextView
-                    android:id="@+id/tv_checkout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="체크아웃"
-                    android:fontFamily="@font/nanumsquare"
-                    android:textColor="@color/basic_color_FFFFFF"
-                    android:background="@color/basic_color_FFCD49"
-                    android:layout_above="@+id/tv_checkout_time"
-                    android:layout_toRightOf="@+id/v_tv_division_line"
-                    android:layout_marginLeft="10dp"
-                    android:gravity="center"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/tv_checkout_time"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/robotolight"
-                    android:layout_toRightOf="@+id/v_time_division_line"
-                    android:layout_below="@+id/tv_checkin"
-                    android:gravity="center"
-                    android:textSize="23sp" />
-
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_room_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:orientation="vertical"
-                android:layout_gravity="center">
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-    <Button
-        android:id="@+id/btn_plus_myplan"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:text="+"
-        android:fontFamily="@font/nanumsquare"
-        android:background="@drawable/btn_style_common_reversal"
-        android:textColor="@color/basic_color_FFFFFF"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:textSize="30dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginBottom="20dp" />
-
-    <Button
-        android:id="@+id/btn_reservation"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/btn_style_common"
-        android:fontFamily="@font/nanumsquare"
-        android:text="예약하기"
-        android:textColor="@color/basic_color_3A7AFF"
-        android:textSize="25sp" />
-
-</RelativeLayout>
+</LinearLayout>

@@ -28,7 +28,7 @@ import android.widget.TextView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import static com.example.along_the_road.R.drawable.main_menu;
+import static com.example.along_the_road.R.drawable.main_menu_white;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayShowCustomEnabled(true); //커스터마이징 하기 위해 필요
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //툴바 메뉴버튼 생성
-        getSupportActionBar().setHomeAsUpIndicator(main_menu); // 메뉴 버튼 모양 설정
+        getSupportActionBar().setHomeAsUpIndicator(main_menu_white); // 메뉴 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3A7AFF"))); //툴바 배경색
 
         firebaseAuth = FirebaseAuth.getInstance();

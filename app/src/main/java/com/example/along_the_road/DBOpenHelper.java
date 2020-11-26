@@ -7,11 +7,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.Nullable;
 
 public class DBOpenHelper {
-
-    private static final String TAG = "DBOpenHelper";
 
     private static final String DATABASE_NAME = "UserDB.db";
     private static final int DATABASE_VERSION = 1;

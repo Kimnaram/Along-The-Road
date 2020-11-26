@@ -64,7 +64,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ItemViewHolder
         listReviewArrayList.add(listReview);
         displayItemList.add(listReview);
         notifyDataSetChanged();
-        Log.d(TAG, "Whyrano... " + listReview.getTitle());
 
     }
 

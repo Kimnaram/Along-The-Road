@@ -88,7 +88,7 @@ public class ListViewAdapter extends BaseAdapter {
         listViewItemList.add(listHotel);
         displayItemList.add(listHotel);
 
-        notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
     public void clearAllItem() {

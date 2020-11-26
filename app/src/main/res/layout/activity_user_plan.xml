@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".UserPlanActivity">
+
+    <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/drawerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
     <!--상단 툴바-->
     <androidx.appcompat.widget.Toolbar
@@ -42,19 +52,24 @@
                 android:layout_marginBottom="13dp"
                 android:gravity="center">
 
-                <View
-                    android:layout_width="55dp"
-                    android:layout_height="30dp"
-                    android:background="@color/basic_color_FFE77C" />
+<!--                <View-->
+<!--                    android:layout_width="55dp"-->
+<!--                    android:layout_height="30dp"-->
+<!--                    android:background="@color/basic_color_FFE77C" />-->
 
                 <TextView
                     android:id="@+id/tv_info_my_plan_area"
-                    android:layout_width="55dp"
-                    android:layout_height="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="6dp"
                     android:fontFamily="@font/nanumsquare"
                     android:gravity="center_vertical"
                     android:textColor="@color/basic_color_73A9FF"
+                    android:background="@color/basic_color_FFE77C"
+                    android:paddingRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="1dp"
+                    android:paddingBottom="1dp"
                     android:textSize="23sp" />
 
                 <TextView
@@ -69,22 +84,27 @@
                     android:textColor="@color/basic_color_73A9FF"
                     android:textSize="23sp" />
 
-                <View
-                    android:layout_width="85dp"
-                    android:layout_height="30dp"
-                    android:layout_marginLeft="6dp"
-                    android:layout_toRightOf="@+id/tv_info_my_plan_area_de"
-                    android:background="@color/basic_color_FFE77C" />
+<!--                <View-->
+<!--                    android:layout_width="85dp"-->
+<!--                    android:layout_height="30dp"-->
+<!--                    android:layout_marginLeft="6dp"-->
+<!--                    android:layout_toRightOf="@+id/tv_info_my_plan_area_de"-->
+<!--                    android:background="@color/basic_color_FFE77C" />-->
 
                 <TextView
                     android:id="@+id/tv_info_my_plan_day"
-                    android:layout_width="85dp"
-                    android:layout_height="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="6dp"
                     android:layout_toRightOf="@+id/tv_info_my_plan_area_de"
                     android:fontFamily="@font/nanumsquare"
                     android:gravity="center"
                     android:textColor="@color/basic_color_73A9FF"
+                    android:background="@color/basic_color_FFE77C"
+                    android:paddingRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="1dp"
+                    android:paddingBottom="1dp"
                     android:textSize="23sp" />
 
             </RelativeLayout>
@@ -337,5 +357,19 @@
 
     </RelativeLayout>
 
+        </RelativeLayout>
 
-</RelativeLayout>
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            app:headerLayout="@layout/navigation_item"
+            app:itemTextAppearance="@style/NavigationViewStyle"
+            app:menu="@menu/navigation_menu" />
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+
+</LinearLayout>

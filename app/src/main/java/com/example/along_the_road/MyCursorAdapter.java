@@ -7,26 +7,20 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.Button;
 import android.widget.CursorAdapter;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import static com.example.along_the_road.managebudgetActivity.TABLE_NAME;
 
-
 public class MyCursorAdapter extends CursorAdapter {
-    String TAG = "MyCursorAdapter";
+
+    public final static String TAG = "MyCursorAdapter";
+    private int _id;
+
     public MyCursorAdapter(Context context, Cursor c) {
         super(context, c);
     }
@@ -42,7 +36,7 @@ public class MyCursorAdapter extends CursorAdapter {
 
     //뷰의 속성 지정
     @Override
-    public void bindView(final View view, final Context context, Cursor cursor) {
+    public void bindView(final View view, final Context context, final Cursor cursor) {
 
         TextView item_context = (TextView) view.findViewById( R.id.item_context );
         TextView item_price = (TextView) view.findViewById( R.id.item_price );
@@ -50,7 +44,7 @@ public class MyCursorAdapter extends CursorAdapter {
         final LinearLayout list_area = (LinearLayout)view.findViewById(R.id.list_area);
 
         //getColumnindex(name) : name에 해당하는 필드의 인덱스 번호를 반환한다.
-        //cursor.getString(index) : 해당 커서가 위치한 인덱스 위치의 값을 반환한다.
+//        _id = cursor.getInt(cursor.getColumnIndex(managebudgetActivity.KEY_ID)); // : 해당 커서가 위치한 인덱스 위치의 값을 반환한다.
         String contexts = cursor.getString( cursor.getColumnIndex( managebudgetActivity.KEY_CONTEXT ) );
         String price = cursor.getString( cursor.getColumnIndex( managebudgetActivity.KEY_PRICE ) );
 
@@ -59,45 +53,5 @@ public class MyCursorAdapter extends CursorAdapter {
         item_context.setText( contexts );
         item_price.setText( price );
 
-        //롱클릭 이벤트
-        list_area.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(final View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("삭제하시겠습니까?");
-
-                builder.setPositiveButton("예",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                                MyDBHelper dbHelper;
-                                SQLiteDatabase db = null;
-
-                                dbHelper = new MyDBHelper(context);
-                                db = dbHelper.getWritableDatabase();
-
-                                db.delete(TABLE_NAME, null, null);
-                                db.close();
-
-                                Toast.makeText(context,"삭제가 왜 안되지..",Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                //builder.setNegativeButton("아니오",null);
-
-                builder.setNeutralButton("취소",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        });
-                builder.create().show();
-
-                return false;
-                // true:다른 이벤트 실행 안함, false:다른 이벤트 실행
-            }
-        });
     }
 }
