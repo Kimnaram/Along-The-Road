@@ -16,9 +16,28 @@
             app:showAsAction="always" />
 
         <item
+            android:id="@+id/item_budget"
+            android:title="예산 관리하기"
+            android:icon="@drawable/budget"
+            app:showAsAction="always" />
+
+        <item
+            android:id="@+id/item_local"
+            android:title="지역 선택하기"
+            android:icon="@drawable/local"
+            app:showAsAction="always" />
+
+        <item
+            android:id="@+id/item_festival"
+            android:title="행사 안내받기"
+            android:icon="@drawable/festival"
+            app:showAsAction="always" />
+
+        <item
             android:id="@+id/item_review"
             android:title="후기 구경하기"
             android:icon="@drawable/review"
             app:showAsAction="always" />
+
     </group>
 </menu>

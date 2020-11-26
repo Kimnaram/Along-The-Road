@@ -1,13 +1,5 @@
 package com.example.along_the_road;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,28 +16,34 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static com.example.along_the_road.R.drawable.main_menu_white;
 
-public class FestivalActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-    private FestivalAdapter adapter;
-    private ArrayList<FestivalItem> festivalItems = new ArrayList<>();
-    private ProgressBar progressBar;
+    private TextView detailTextView;
+    private String detailString;
+    private String detailString2;
 
     private FirebaseAuth firebaseAuth;
     private DBOpenHelper dbOpenHelper;
@@ -58,9 +56,8 @@ public class FestivalActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_festival);
+        setContentView(R.layout.activity_detail);
 
         //상단 툴바 설정
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -69,7 +66,6 @@ public class FestivalActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //툴바 메뉴버튼 생성
         getSupportActionBar().setHomeAsUpIndicator(main_menu_white); // 메뉴 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3A7AFF"))); //툴바 배경색
-
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -234,14 +230,12 @@ public class FestivalActivity extends AppCompatActivity {
             }
         });
 
-        progressBar = findViewById(R.id.progressBar);
-        recyclerView = findViewById(R.id.recyclerView);
+        ImageView imageView = findViewById(R.id.imageView);
+        TextView titleTextView = findViewById(R.id.textView);
+        detailTextView = findViewById(R.id.detailTextView);
 
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new FestivalAdapter(festivalItems, this);
-        recyclerView.setAdapter(adapter);
-
+        titleTextView.setText(getIntent().getStringExtra("title"));
+        Picasso.get().load(getIntent().getStringExtra("image")).into(imageView);
         Content content = new Content();
         content.execute();
     }
@@ -271,7 +265,7 @@ public class FestivalActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                 return true;
             case R.id.menu_logout:
-                final ProgressDialog mDialog = new ProgressDialog(FestivalActivity.this);
+                final ProgressDialog mDialog = new ProgressDialog(DetailActivity.this);
                 mDialog.setMessage("로그아웃 중입니다.");
                 mDialog.show();
 
@@ -282,7 +276,7 @@ public class FestivalActivity extends AppCompatActivity {
                 finish();
                 mDialog.dismiss();
 
-                startActivity(new Intent(getApplicationContext(), FestivalActivity.class));
+                startActivity(new Intent(getApplicationContext(), DetailActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -302,21 +296,19 @@ public class FestivalActivity extends AppCompatActivity {
 
     }
 
-    private class Content extends AsyncTask<Void,Void,Void>{
+    private class Content extends AsyncTask<Void,Void,Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-            progressBar.startAnimation(AnimationUtils.loadAnimation(FestivalActivity.this,android.R.anim.fade_in));
 
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            progressBar.setVisibility(View.GONE);
-            progressBar.startAnimation(AnimationUtils.loadAnimation(FestivalActivity.this,android.R.anim.fade_out));
-            adapter.notifyDataSetChanged();
+            detailTextView.setText(detailString);
+            detailTextView.setText(detailString2);
+
         }
 
         @Override
@@ -327,28 +319,16 @@ public class FestivalActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                String url = "https://www.gov.kr/portal/vfnews";
+                String baseUrl ="https://www.gov.kr/portal/vfnews/1954219";
+                String detailUrl = getIntent().getStringExtra("detailUrl");
+                String url = baseUrl+detailUrl;
                 Document doc = Jsoup.connect(url).get();
-                Elements data = doc.select("dd.thumb");
+                Elements data = doc.select("dl.board-view-detail");
+                detailString = data.select("dt")
+                        .text();
+                detailString2= data.select("dd")
+                        .text();
 
-
-                int size = data.size();
-                for (int i =0; i < size; i++) {
-                    String imgUrl = data.select("dd.thumb")
-                            .select("img")
-                            .eq(i)
-                            .attr("src");
-                    String title = data.select("dl")
-                            .select("a")
-                            .eq(i)
-                            .text();
-                    String detailUrl = data.select("div.text")
-                            .select("p.title")
-                            .eq(i)
-                            .attr("href");
-                    festivalItems.add(new FestivalItem(imgUrl, title,detailUrl));
-                    Log.d("items", "img:" + imgUrl + " . title:" + title);
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

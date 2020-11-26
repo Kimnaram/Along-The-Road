@@ -27,6 +27,7 @@
         <activity android:name=".CourseRecoActivity" />
         <activity android:name=".FestivalActivity" />
         <activity android:name=".InPostActivity" />
+        <activity android:name=".DetailActivity" />
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -208,6 +208,18 @@ public class CalendarActivity extends AppCompatActivity {
 
                     startActivity(intent);
                 }
+                // 예산 관리하기
+                if (id == R.id.item_budget) {
+                    startActivity(new Intent(getApplicationContext(), managebudgetActivity.class));
+                }
+                // 행사 안내받기
+                if (id == R.id.item_festival) {
+                    startActivity(new Intent(getApplicationContext(), FestivalActivity.class));
+                }
+                // 지역 선택하기
+                if (id == R.id.item_local) {
+                    startActivity(new Intent(getApplicationContext(), LocalSelectActivity.class));
+                }
 
                 return true;
             }

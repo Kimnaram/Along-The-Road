@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -20,8 +20,8 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="#88888888"/>
-        <ImageView
 
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:src="@drawable/gradient"
@@ -35,16 +35,10 @@
             android:text="Title"
             style="@style/TextAppearance.AppCompat.Medium"
             android:textColor ="#fff"
-            android:layout_marginStart='12dp'
+            android:layout_marginStart="12dp"
             android:layout_marginEnd ="12dp"
             android:layout_marginBottom="12dp"
             />
     </androidx.cardview.widget.CardView>
-
-
-
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
