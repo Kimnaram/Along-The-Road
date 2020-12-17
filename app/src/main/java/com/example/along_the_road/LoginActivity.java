@@ -126,6 +126,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                         GetData gtask = new GetData();
                                         gtask.execute(muid);
+                                        // 새로운 계정으로 로그인 불가능 오류 有
 
                                     } else {
                                         mDialog.dismiss();

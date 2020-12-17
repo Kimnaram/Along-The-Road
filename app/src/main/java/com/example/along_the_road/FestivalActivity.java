@@ -35,6 +35,7 @@ import com.google.firebase.auth.FirebaseUser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -144,7 +145,7 @@ public class FestivalActivity extends AppCompatActivity {
                 username = tempName;
                 String tempEmail = iCursor.getString(iCursor.getColumnIndex("email"));
                 String tempCity = iCursor.getString(iCursor.getColumnIndex("city"));
-                if(!iCursor.getString(iCursor.getColumnIndex("city")).equals("null")) {
+                if (!iCursor.getString(iCursor.getColumnIndex("city")).equals("null")) {
                     area = tempCity;
                 }
 
@@ -302,12 +303,12 @@ public class FestivalActivity extends AppCompatActivity {
 
     }
 
-    private class Content extends AsyncTask<Void,Void,Void>{
+    private class Content extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             progressBar.setVisibility(View.VISIBLE);
-            progressBar.startAnimation(AnimationUtils.loadAnimation(FestivalActivity.this,android.R.anim.fade_in));
+            progressBar.startAnimation(AnimationUtils.loadAnimation(FestivalActivity.this, android.R.anim.fade_in));
 
         }
 
@@ -315,7 +316,7 @@ public class FestivalActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             progressBar.setVisibility(View.GONE);
-            progressBar.startAnimation(AnimationUtils.loadAnimation(FestivalActivity.this,android.R.anim.fade_out));
+            progressBar.startAnimation(AnimationUtils.loadAnimation(FestivalActivity.this, android.R.anim.fade_out));
             adapter.notifyDataSetChanged();
         }
 
@@ -327,27 +328,54 @@ public class FestivalActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             try {
+
+                int page = 1;
+
                 String url = "https://www.gov.kr/portal/vfnews";
-                Document doc = Jsoup.connect(url).get();
-                Elements data = doc.select("dd.thumb");
+                Document d = Jsoup.connect(url).get();
+                Elements e = d.select("div.pagination").select("ul").select("li");
 
+                int e_size = e.size();
+                for (int i = 0; i < e_size; i++) {
 
-                int size = data.size();
-                for (int i =0; i < size; i++) {
-                    String imgUrl = data.select("dd.thumb")
-                            .select("img")
-                            .eq(i)
-                            .attr("src");
-                    String title = data.select("dl")
+                    String pnumber = e.select("li")
                             .select("a")
                             .eq(i)
-                            .text();
-                    String detailUrl = data.select("div.text")
-                            .select("p.title")
-                            .eq(i)
-                            .attr("href");
-                    festivalItems.add(new FestivalItem(imgUrl, title,detailUrl));
-                    Log.d("items", "img:" + imgUrl + " . title:" + title);
+                            .attr("title");
+
+                    if (pnumber.contains("페이지")) {
+                        page += 1;
+
+                        String pageurl = "https://www.gov.kr/portal/vfnews?&pageIndex=" + Integer.toString(page);
+                        Log.d("FestivalAcitivity", "pageurl : " + pageurl);
+                        Document doc = Jsoup.connect(pageurl).get();
+                        Elements data = doc.select("dl");
+
+                        int size = data.size();
+                        for (int j = 0; j < size; j++) {
+                            String imgUrl = data.select("dd.thumb")
+                                    .select("img")
+                                    .eq(j)
+                                    .attr("src");
+                            String title = data.select("dl")
+                                    .select("dt a")
+                                    .eq(j)
+                                    .text();
+                            String detailUrl = data.select("dd.thumb")
+                                    .select("a")
+                                    .eq(j)
+                                    .attr("href");
+                            String local = data.select("dd").text();
+                            local = local.split("행사소개")[0];
+
+                            if (local.contains("서울") || local.contains("속초") || local.contains("강릉") || local.contains("전주")
+                                    || local.contains("대구") || local.contains("경주") || local.contains("부산") || local.contains("여수") || local.contains("제주")) {
+                                Log.d("FestivalActivity", "local : " + local);
+                                festivalItems.add(new FestivalItem(imgUrl, title, detailUrl));
+                            }
+                        }
+                    }
+
                 }
             } catch (IOException e) {
                 e.printStackTrace();

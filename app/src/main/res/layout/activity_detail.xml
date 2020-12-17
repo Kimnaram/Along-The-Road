@@ -3,18 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/basic_color_FFFFFF"
     android:orientation="vertical">
 
-    <androidx.drawerlayout.widget.DrawerLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/drawerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/lv_detailInfo_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -37,10 +39,7 @@
                 style="@style/CardView.Light"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
-                android:layout_below="@+id/toolbar"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_marginTop="5dp">
 
                 <ImageView
                     android:id="@+id/imageView"
@@ -68,21 +67,196 @@
 
             </androidx.cardview.widget.CardView>
 
-            <TextView
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_date_info"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginRight="12dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text="기간"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/tv_date_data"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="7dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text="2020.12.15 ~ 2020.12.20"
+                        android:textColor="@color/basic_color_73A9FF"
+                        android:textSize="19dp" />
+
+                    <TextView
+                        android:id="@+id/tv_location_info"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginRight="12dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text="위치"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/tv_location_data"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="7dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text=""
+                        android:textColor="@color/basic_color_73A9FF"
+                        android:textSize="19dp" />
+
+                    <TextView
+                        android:id="@+id/tv_phone_info"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginRight="12dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text="연락처"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/tv_phone_data"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="7dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text=""
+                        android:textColor="@color/basic_color_73A9FF"
+                        android:textSize="19dp" />
+
+                    <TextView
+                        android:id="@+id/tv_host_info"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginRight="12dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text="주최 / 주관"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/tv_host_data"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="7dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text=""
+                        android:textColor="@color/basic_color_73A9FF"
+                        android:textSize="19dp" />
+
+                    <TextView
+                        android:id="@+id/tv_addr_info"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginRight="12dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text="주소"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/tv_addr_data"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="7dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text=""
+                        android:textColor="@color/basic_color_73A9FF"
+                        android:textSize="19dp" />
+
+                    <TextView
+                        android:id="@+id/tv_more_info"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="12dp"
+                        android:fontFamily="@font/nanumsquare"
+                        android:text="세부사항"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/tv_more_data"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="7dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginBottom="20dp"
+                        android:fontFamily="@font/nanumsquarebold"
+                        android:text=""
+                        android:textSize="17dp" />
+
+                </LinearLayout>
+
+            </ScrollView>
+
+
+            <!-- <TextView
                 android:id="@+id/detailTextView"
                 style="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/cardView"
                 android:layout_margin="12dp"
                 android:fontFamily="@font/nanumsquarebold"
                 android:textSize="20dp"
-                android:text="Detail"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardView" />
+                android:text="Detail" />
 
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/detailTextView2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="12dp"
+                android:text="info"
+                android:fontFamily="@font/nanumsquarebold"
+                android:textSize="18dp"/> -->
+
+
+        </LinearLayout>
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/navigationView"

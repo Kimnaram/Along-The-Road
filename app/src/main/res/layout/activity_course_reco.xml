@@ -153,7 +153,7 @@
                     android:id="@+id/ib_map_remove"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:layout_above="@+id/fr_hotel_map"
+                    android:layout_above="@+id/fr_course_map"
                     android:layout_alignParentRight="true"
                     android:background="@null"
                     android:gravity="center"

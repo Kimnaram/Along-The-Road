@@ -325,6 +325,8 @@ public class managebudgetActivity extends AppCompatActivity {
                                 myAdapter.notifyDataSetChanged();
                                 cursor.requery();
 
+                                sumToday_price();
+
                                 Toast.makeText(managebudgetActivity.this, "삭제되었습니다.",Toast.LENGTH_LONG).show();
                             }
                         });
@@ -382,9 +384,19 @@ public class managebudgetActivity extends AppCompatActivity {
         imm.hideSoftInputFromWindow( ePrice.getWindowToken(), 0 );
     }
 
+    public void sumToday_price() {
+        // 총합 가격 표시
+        String queryPriceSum = String.format( " SELECT SUM(price) FROM %s WHERE date = '%s'", TABLE_NAME, View_DATE);
+        cursor = db.rawQuery( queryPriceSum, null );
+        cursor.moveToNext();
+        String sum = String.valueOf(cursor.getInt(0));
+        Log.d(TAG, "sum : " + sum);
+        sum_view.setText(sum);
+    }
+
     //날짜 불러오기
     static public String getToday_date(){
-        SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("yyyy/M/d", Locale.KOREA);
+        SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.KOREA);
         Date currentTime = new Date();
         String Today_day = mSimpleDateFormat.format(currentTime).toString();
         return Today_day;
@@ -392,7 +404,7 @@ public class managebudgetActivity extends AppCompatActivity {
 
     //시간 불러오기
     static public String getThis_time(){
-        SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("HHMMSS", Locale.KOREA);
+        SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
         Date currentTime = new Date();
         String This_time = mSimpleDateFormat.format(currentTime).toString();
         return This_time;

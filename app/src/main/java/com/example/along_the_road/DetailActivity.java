@@ -15,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -41,9 +40,12 @@ import static com.example.along_the_road.R.drawable.main_menu_white;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private TextView detailTextView;
-    private String detailString;
-    private String detailString2;
+    private TextView tv_date_data;
+    private TextView tv_location_data;
+    private TextView tv_phone_data;
+    private TextView tv_host_data;
+    private TextView tv_addr_data;
+    private TextView tv_more_data;
 
     private FirebaseAuth firebaseAuth;
     private DBOpenHelper dbOpenHelper;
@@ -51,6 +53,8 @@ public class DetailActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
+    private String[] infoArr;
+    private String detailStr = "";
     private String username = "";
     private String area = "";
 
@@ -67,7 +71,7 @@ public class DetailActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(main_menu_white); // 메뉴 버튼 모양 설정
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3A7AFF"))); //툴바 배경색
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        initAllComponent();
 
         navigationView = findViewById(R.id.navigationView);
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -232,12 +236,24 @@ public class DetailActivity extends AppCompatActivity {
 
         ImageView imageView = findViewById(R.id.imageView);
         TextView titleTextView = findViewById(R.id.textView);
-        detailTextView = findViewById(R.id.detailTextView);
 
         titleTextView.setText(getIntent().getStringExtra("title"));
         Picasso.get().load(getIntent().getStringExtra("image")).into(imageView);
         Content content = new Content();
         content.execute();
+    }
+
+    private void initAllComponent() {
+
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        tv_date_data = findViewById(R.id.tv_date_data);
+        tv_location_data = findViewById(R.id.tv_location_data);
+        tv_phone_data = findViewById(R.id.tv_phone_data);
+        tv_host_data = findViewById(R.id.tv_host_data);
+        tv_addr_data = findViewById(R.id.tv_addr_data);
+        tv_more_data = findViewById(R.id.tv_more_data);
+
     }
 
     @Override
@@ -306,8 +322,32 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            detailTextView.setText(detailString);
-            detailTextView.setText(detailString2);
+
+            for(int i = 0; i < infoArr.length; i++) {
+                switch (i) {
+                    case 0:
+                        tv_date_data.setText(infoArr[i]);
+                        break;
+                    case 1:
+                        tv_location_data.setText(infoArr[i]);
+                        break;
+                    case 2:
+                        tv_phone_data.setText(infoArr[i]);
+                        break;
+                    case 3:
+                        tv_host_data.setText(infoArr[i]);
+                        break;
+                    case 4:
+                        infoArr[i] = infoArr[i].split("찾아오시는 길")[0];
+                        tv_addr_data.setText(infoArr[i]);
+                        break;
+                    default:
+                        Log.d("DetailActivity", "info error");
+                }
+            }
+
+            detailStr = detailStr.split("행사소개 ")[1];
+            tv_more_data.setText(detailStr);
 
         }
 
@@ -319,15 +359,25 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                String baseUrl ="https://www.gov.kr/portal/vfnews/1954219";
+                String baseUrl ="https://www.gov.kr";
                 String detailUrl = getIntent().getStringExtra("detailUrl");
                 String url = baseUrl+detailUrl;
+                Log.d("DetailActivity", "url : " + url);
                 Document doc = Jsoup.connect(url).get();
-                Elements data = doc.select("dl.board-view-detail");
-                detailString = data.select("dt")
+                Elements data = doc.select("dl").select("dd");
+
+                int size = data.size();
+                infoArr = new String[size];
+                for(int i = 0; i < size; i++) {
+                    infoArr[i] = data.select("dd").eq(i).text();
+                    Log.d("DetailActivity", infoArr[i]);
+                }
+
+                Elements moreData = doc.select("div.box-cont");
+                detailStr = moreData.select("p")
                         .text();
-                detailString2= data.select("dd")
-                        .text();
+
+                Log.d("DetailActivity", "p : " + detailStr);
 
             } catch (IOException e) {
                 e.printStackTrace();
