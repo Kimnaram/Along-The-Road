@@ -43,6 +43,8 @@ import static com.example.along_the_road.R.drawable.main_menu_white;
 
 public class FestivalActivity extends AppCompatActivity {
 
+    private final static String TAG = "FestivalActivity";
+
     private RecyclerView recyclerView;
     private FestivalAdapter adapter;
     private ArrayList<FestivalItem> festivalItems = new ArrayList<>();
@@ -329,7 +331,7 @@ public class FestivalActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             try {
 
-                int page = 1;
+                int page = 0;
 
                 String url = "https://www.gov.kr/portal/vfnews";
                 Document d = Jsoup.connect(url).get();
@@ -365,18 +367,18 @@ public class FestivalActivity extends AppCompatActivity {
                                     .select("a")
                                     .eq(j)
                                     .attr("href");
-                            String local = data.select("dd").text();
-                            local = local.split("행사소개")[0];
+                            String local = data.eq(j).select("dd").eq(2).text();
 
                             if (local.contains("서울") || local.contains("속초") || local.contains("강릉") || local.contains("전주")
-                                    || local.contains("대구") || local.contains("경주") || local.contains("부산") || local.contains("여수") || local.contains("제주")) {
-                                Log.d("FestivalActivity", "local : " + local);
+                                    || local.contains("대구") || local.contains("경주") || local.contains("부산")
+                                    || local.contains("여수") || local.contains("제주") || local.contains("온라인개최")) {
                                 festivalItems.add(new FestivalItem(imgUrl, title, detailUrl));
                             }
                         }
                     }
 
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

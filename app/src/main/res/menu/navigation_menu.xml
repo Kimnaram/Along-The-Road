@@ -24,13 +24,13 @@
         <item
             android:id="@+id/item_local"
             android:title="지역 선택하기"
-            android:icon="@drawable/local"
+            android:icon="@drawable/local_ico"
             app:showAsAction="always" />
 
         <item
             android:id="@+id/item_festival"
             android:title="행사 안내받기"
-            android:icon="@drawable/festival"
+            android:icon="@drawable/festival_ico"
             app:showAsAction="always" />
 
         <item
